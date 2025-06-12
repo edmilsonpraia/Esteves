@@ -102,7 +102,7 @@ const LoginAfricasHands: React.FC = () => {
           {/* Logo */}
           <div className="mb-8">
             <h1 className="text-4xl lg:text-5xl font-bold mb-3">Africa's Hands</h1>
-            <p className="text-xl text-red-100">Conectando a África Austral</p>
+            <p className="text-xl text-red-100">A África num clic</p>
           </div>
 
           {/* Countries */}

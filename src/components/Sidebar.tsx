@@ -1,28 +1,4 @@
 import React, { useState } from 'react';
-import {
-  FiHome,
-  FiUsers,
-  FiSettings,
-  FiPhone,
-  FiPackage,
-  FiGrid,
-  FiX,
-  FiBarChart,
-  FiFolder,
-  FiCalendar,
-  FiFileText,
-  FiDollarSign,
-  FiTrendingUp,
-  FiUserCheck,
-  FiMail,
-  FiHelpCircle,
-  FiChevronDown,
-  FiChevronRight,
-  FiBriefcase,
-  FiTarget,
-  FiClock,
-  FiMapPin
-} from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 
 interface SidebarProps {
@@ -30,14 +6,9 @@ interface SidebarProps {
   onClose: () => void;
 }
 
-// Componente wrapper para ícones para resolver problemas de tipagem
-const Icon = ({ IconComponent, ...props }: { IconComponent: any; [key: string]: any }) => {
-  return <IconComponent {...props} />;
-};
-
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { userRole } = useAuth();
-  const [expandedMenus, setExpandedMenus] = useState<string[]>(['projetos']);
+  const [expandedMenus, setExpandedMenus] = useState<string[]>(['main']);
 
   const toggleSubmenu = (menuId: string) => {
     setExpandedMenus(prev => 
@@ -47,140 +18,126 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     );
   };
 
-  // Menu items para administrador
+  // Menu items para administrador - APENAS FUNCIONALIDADES EXISTENTES
   const adminMenuItems = [
     {
-      id: 'dashboard',
-      label: 'Dashboard',
-      icon: <Icon IconComponent={FiHome} size={20} />,
-      path: '/admin',
-      badge: null
-    },
-    {
-      id: 'projetos',
-      label: 'Projetos',
-      icon: <Icon IconComponent={FiBriefcase} size={20} />,
-      badge: '12',
-      submenu: [
-        { label: 'Todos os Projetos', path: '/admin/projects', icon: <Icon IconComponent={FiFolder} size={16} /> },
-        { label: 'Criar Projeto', path: '/admin/projects/create', icon: <Icon IconComponent={FiTarget} size={16} /> },
-        { label: 'Em Andamento', path: '/admin/projects/active', icon: <Icon IconComponent={FiClock} size={16} />, badge: '8' },
-        { label: 'Concluídos', path: '/admin/projects/completed', icon: <Icon IconComponent={FiUserCheck} size={16} /> },
-        { label: 'Relatórios', path: '/admin/projects/reports', icon: <Icon IconComponent={FiFileText} size={16} /> }
+      section: 'main',
+      title: 'Principal',
+      icon: '⚡',
+      items: [
+        {
+          id: 'dashboard',
+          label: 'Dashboard',
+          icon: '📊',
+          path: '/admin',
+          badge: null
+        },
+        {
+          id: 'projects',
+          label: 'Projetos',
+          icon: '🚀',
+          badge: '12',
+          submenu: [
+            { label: 'Gestão de Projetos', path: '/admin/projects', icon: '📋', badge: '12' },
+            { label: 'Criar Projeto', path: '/admin/projects/create', icon: '➕' }
+          ]
+        },
+        {
+          id: 'clients',
+          label: 'Clientes & Parceiros',
+          icon: '🤝',
+          badge: '45',
+          path: '/admin/clients'
+        },
+        {
+          id: 'team',
+          label: 'Equipe Regional',
+          icon: '👥',
+          badge: '28',
+          path: '/admin/team'
+        },
+        {
+          id: 'finance',
+          label: 'Financeiro',
+          icon: '💰',
+          badge: '8',
+          path: '/admin/finance'
+        }
       ]
     },
     {
-      id: 'clientes',
-      label: 'Clientes',
-      icon: <Icon IconComponent={FiUsers} size={20} />,
-      badge: '45',
-      submenu: [
-        { label: 'Lista de Clientes', path: '/admin/clients', icon: <Icon IconComponent={FiUsers} size={16} /> },
-        { label: 'Adicionar Cliente', path: '/admin/clients/create', icon: <Icon IconComponent={FiUserCheck} size={16} /> },
-        { label: 'Histórico', path: '/admin/clients/history', icon: <Icon IconComponent={FiFileText} size={16} /> }
+      section: 'analytics',
+      title: 'Analytics & Insights',
+      icon: '📊',
+      items: [
+        {
+          id: 'analytics',
+          label: 'Analytics & KPIs',
+          icon: '📊',
+          path: '/admin/analytics'
+        }
       ]
     },
     {
-      id: 'financeiro',
-      label: 'Financeiro',
-      icon: <Icon IconComponent={FiDollarSign} size={20} />,
-      submenu: [
-        { label: 'Orçamentos', path: '/admin/finance/budgets', icon: <Icon IconComponent={FiFileText} size={16} /> },
-        { label: 'Faturas', path: '/admin/finance/invoices', icon: <Icon IconComponent={FiDollarSign} size={16} /> },
-        { label: 'Pagamentos', path: '/admin/finance/payments', icon: <Icon IconComponent={FiTrendingUp} size={16} /> },
-        { label: 'Relatórios', path: '/admin/finance/reports', icon: <Icon IconComponent={FiBarChart} size={16} /> }
-      ]
-    },
-    {
-      id: 'equipe',
-      label: 'Gestão de Equipe',
-      icon: <Icon IconComponent={FiUserCheck} size={20} />,
-      submenu: [
-        { label: 'Membros da Equipe', path: '/admin/team', icon: <Icon IconComponent={FiUsers} size={16} /> },
-        { label: 'Atribuições', path: '/admin/team/assignments', icon: <Icon IconComponent={FiTarget} size={16} /> },
-        { label: 'Performance', path: '/admin/team/performance', icon: <Icon IconComponent={FiTrendingUp} size={16} /> }
-      ]
-    },
-    {
-      id: 'servicos',
-      label: 'Serviços',
-      icon: <Icon IconComponent={FiPackage} size={20} />,
-      path: '/services'
-    },
-    {
-      id: 'calendario',
-      label: 'Calendário',
-      icon: <Icon IconComponent={FiCalendar} size={20} />,
-      path: '/admin/calendar',
-      badge: '3'
-    },
-    {
-      id: 'relatorios',
-      label: 'Relatórios',
-      icon: <Icon IconComponent={FiBarChart} size={20} />,
-      submenu: [
-        { label: 'Dashboard Executivo', path: '/admin/reports/executive', icon: <Icon IconComponent={FiTrendingUp} size={16} /> },
-        { label: 'Projetos', path: '/admin/reports/projects', icon: <Icon IconComponent={FiBriefcase} size={16} /> },
-        { label: 'Financeiro', path: '/admin/reports/financial', icon: <Icon IconComponent={FiDollarSign} size={16} /> },
-        { label: 'Equipe', path: '/admin/reports/team', icon: <Icon IconComponent={FiUsers} size={16} /> }
-      ]
-    },
-    {
-      id: 'contato',
-      label: 'Contato',
-      icon: <Icon IconComponent={FiPhone} size={20} />,
-      path: '/contact'
-    },
-    {
-      id: 'configuracoes',
-      label: 'Configurações',
-      icon: <Icon IconComponent={FiSettings} size={20} />,
-      submenu: [
-        { label: 'Geral', path: '/admin/settings/general', icon: <Icon IconComponent={FiSettings} size={16} /> },
-        { label: 'Usuários', path: '/admin/settings/users', icon: <Icon IconComponent={FiUsers} size={16} /> },
-        { label: 'Sistema', path: '/admin/settings/system', icon: <Icon IconComponent={FiGrid} size={16} /> }
+      section: 'services',
+      title: 'Serviços & Contato',
+      icon: '🌍',
+      items: [
+        {
+          id: 'services',
+          label: 'Serviços Regionais',
+          icon: '🛒',
+          path: '/services'
+        },
+        {
+          id: 'contact',
+          label: 'Contato',
+          icon: '📞',
+          path: '/contact'
+        }
       ]
     }
   ];
 
-  // Menu items para usuário comum
+  // Menu items para usuário comum - APENAS FUNCIONALIDADES EXISTENTES
   const userMenuItems = [
     {
-      id: 'dashboard',
-      label: 'Meu Painel',
-      icon: <Icon IconComponent={FiGrid} size={20} />,
-      path: '/user'
+      section: 'main',
+      title: 'Principal',
+      icon: '⚡',
+      items: [
+        {
+          id: 'dashboard',
+          label: 'Meu Painel',
+          icon: '📊',
+          path: '/user'
+        }
+      ]
     },
     {
-      id: 'meus-projetos',
-      label: 'Meus Projetos',
-      icon: <Icon IconComponent={FiBriefcase} size={20} />,
-      path: '/user/projects',
-      badge: '3'
-    },
-    {
-      id: 'servicos',
-      label: 'Serviços',
-      icon: <Icon IconComponent={FiPackage} size={20} />,
-      path: '/services'
-    },
-    {
-      id: 'contato',
-      label: 'Contato',
-      icon: <Icon IconComponent={FiPhone} size={20} />,
-      path: '/contact'
-    },
-    {
-      id: 'suporte',
-      label: 'Suporte',
-      icon: <Icon IconComponent={FiHelpCircle} size={20} />,
-      path: '/user/support'
+      section: 'services',
+      title: 'Serviços & Contato',
+      icon: '🌍',
+      items: [
+        {
+          id: 'services',
+          label: 'Serviços Regionais',
+          icon: '🛒',
+          path: '/services'
+        },
+        {
+          id: 'contact',
+          label: 'Contato',
+          icon: '📞',
+          path: '/contact'
+        }
+      ]
     }
   ];
 
-  const menuItems = userRole === 'admin' ? adminMenuItems : userMenuItems;
+  const menuSections = userRole === 'admin' ? adminMenuItems : userMenuItems;
 
-  const NavLink = ({ item, isSubmenu = false }: { item: any, isSubmenu?: boolean }) => {
+  const NavItem = ({ item, isSubmenu = false }: { item: any, isSubmenu?: boolean }) => {
     const hasSubmenu = item.submenu && item.submenu.length > 0;
     const isExpanded = expandedMenus.includes(item.id);
 
@@ -196,29 +153,31 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             }
           }}
           className={`
-            w-full flex items-center justify-between px-4 py-3 text-left transition-all duration-200 rounded-lg mx-2 mb-1
+            w-full flex items-center justify-between px-3 py-2.5 text-left transition-all duration-200 rounded-lg mx-2 mb-1
             ${isSubmenu 
-              ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 text-sm pl-6' 
+              ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 text-sm pl-8' 
               : 'text-gray-700 hover:text-gray-900 hover:bg-red-50 hover:border-red-100'
             }
             group
           `}
         >
           <div className="flex items-center gap-3">
-            <span className={`transition-colors ${!isSubmenu ? 'group-hover:text-red-600' : ''}`}>
+            <span className={`text-lg transition-colors ${!isSubmenu ? 'group-hover:text-red-600' : ''}`}>
               {item.icon}
             </span>
             <span className="font-medium">{item.label}</span>
             {item.badge && (
-              <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[20px] text-center">
+              <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[18px] text-center">
                 {item.badge}
               </span>
             )}
           </div>
           
           {hasSubmenu && (
-            <span className="transition-transform duration-200">
-              {isExpanded ? <Icon IconComponent={FiChevronDown} size={16} /> : <Icon IconComponent={FiChevronRight} size={16} />}
+            <span className={`transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
             </span>
           )}
         </button>
@@ -226,11 +185,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         {/* Submenu */}
         {hasSubmenu && (
           <div className={`overflow-hidden transition-all duration-300 ${
-            isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+            isExpanded ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0'
           }`}>
             <div className="py-1">
               {item.submenu.map((subItem: any, index: number) => (
-                <NavLink key={index} item={subItem} isSubmenu={true} />
+                <NavItem key={index} item={subItem} isSubmenu={true} />
               ))}
             </div>
           </div>
@@ -261,95 +220,171 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <div className="h-full flex flex-col">
           
           {/* Header da sidebar */}
-          <div className="px-6 py-6 border-b border-gray-200">
+          <div className="px-6 py-6 border-b border-gray-200 bg-gradient-to-r from-red-600 to-red-700 text-white">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {/* Logo */}
-                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <span className="text-white font-bold text-lg">E</span>
+                <div className="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center shadow-lg">
+                  <span className="text-white font-bold text-lg">🌍</span>
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900">Escritório</h2>
-                  <p className="text-sm text-red-600 font-medium">Esteves</p>
+                  <h2 className="text-lg font-bold">Africa's Hands</h2>
+                  <p className="text-sm text-red-200">🇦🇴 🇳🇦 🇿🇦 Regional</p>
                 </div>
               </div>
               
               {/* Botão de fechar (apenas em mobile) */}
               <button
                 onClick={onClose}
-                className="lg:hidden p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                className="lg:hidden p-2 rounded-lg text-red-200 hover:text-white hover:bg-white hover:bg-opacity-10 transition-colors"
               >
-                <Icon IconComponent={FiX} size={20} />
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
+            </div>
+          </div>
+
+          {/* Badge do Papel do Usuário */}
+          <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">
+            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
+              userRole === 'admin' 
+                ? 'bg-red-100 text-red-700' 
+                : 'bg-blue-100 text-blue-700'
+            }`}>
+              <span>{userRole === 'admin' ? '👨‍💼' : '👤'}</span>
+              {userRole === 'admin' ? 'Administrador' : 'Usuário'}
+              {userRole === 'admin' && <span className="bg-red-500 text-white text-xs px-1 rounded">PRO</span>}
             </div>
           </div>
 
           {/* Navegação principal */}
           <nav className="flex-1 overflow-y-auto py-4">
-            <div className="space-y-1">
-              {menuItems.map((item) => (
-                <NavLink key={item.id} item={item} />
-              ))}
+            <div className="space-y-6">
+              {menuSections.map((section) => {
+                const isSectionExpanded = expandedMenus.includes(section.section);
+                
+                return (
+                  <div key={section.section}>
+                    {/* Section Header */}
+                    <button
+                      onClick={() => toggleSubmenu(section.section)}
+                      className="w-full flex items-center justify-between px-4 py-2 mx-2 text-left transition-all duration-200 rounded-lg hover:bg-gray-100 group"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">{section.icon}</span>
+                        <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                          {section.title}
+                        </span>
+                      </div>
+                      <span className={`transition-transform duration-200 ${isSectionExpanded ? 'rotate-90' : ''}`}>
+                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </span>
+                    </button>
+
+                    {/* Section Items */}
+                    <div className={`overflow-hidden transition-all duration-300 ${
+                      isSectionExpanded ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
+                    }`}>
+                      <div className="space-y-1 mt-2">
+                        {section.items.map((item) => (
+                          <NavItem key={item.id} item={item} />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Seção de informações da empresa */}
             <div className="mt-8 mx-4 p-4 bg-gradient-to-br from-red-50 to-red-100 rounded-lg border border-red-200">
               <div className="text-center">
                 <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
-                  <Icon IconComponent={FiMapPin} className="text-white" size={20} />
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
                 </div>
-                <h3 className="text-sm font-semibold text-gray-900 mb-2">Atendemos em:</h3>
+                <h3 className="text-sm font-semibold text-gray-900 mb-2">Presença Regional</h3>
                 <div className="space-y-1 text-xs text-gray-600">
-                  <p className="flex items-center justify-center gap-1">
-                    <span className="w-2 h-2 bg-red-500 rounded-full"></span>
-                    Angola: Cunene, Lubango
-                  </p>
-                  <p className="flex items-center justify-center gap-1">
-                    <span className="w-2 h-2 bg-red-500 rounded-full"></span>
-                    Namíbia: Oshakati
-                  </p>
+                  <p>🇦🇴 Angola: Cunene, Lubango</p>
+                  <p>🇳🇦 Namíbia: Oshakati, Windhoek</p>
+                  <p>🇿🇦 África do Sul: Cape Town, Joburg</p>
                 </div>
               </div>
             </div>
 
-            {/* Links de contato rápido */}
-            <div className="mt-4 mx-4 space-y-2">
-              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-2">
-                Contato Rápido
-              </h4>
-              <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                <Icon IconComponent={FiPhone} size={16} />
-                <span>+244 924 166 401</span>
-              </button>
-              <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                <Icon IconComponent={FiMail} size={16} />
-                <span>Enviar E-mail</span>
-              </button>
+            {/* Status do Sistema */}
+            <div className="mt-4 mx-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-xs font-medium text-green-700">Sistema Operacional</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="bg-white p-1 rounded text-xs">
+                  <div className="font-bold text-blue-600">12</div>
+                  <div className="text-gray-500">Projetos</div>
+                </div>
+                <div className="bg-white p-1 rounded text-xs">
+                  <div className="font-bold text-green-600">45</div>
+                  <div className="text-gray-500">Clientes</div>
+                </div>
+                <div className="bg-white p-1 rounded text-xs">
+                  <div className="font-bold text-purple-600">28</div>
+                  <div className="text-gray-500">Equipe</div>
+                </div>
+              </div>
             </div>
           </nav>
 
           {/* Footer da sidebar */}
           <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+            {/* Quick Actions para Admin */}
+            {userRole === 'admin' && (
+              <div className="mb-4">
+                <button 
+                  onClick={() => {
+                    window.location.href = '/admin/projects/create';
+                    onClose();
+                  }}
+                  className="w-full flex items-center justify-center gap-2 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Novo Projeto
+                </button>
+              </div>
+            )}
+
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center">
                   <span className="text-white font-semibold text-xs">
-                    {userRole === 'admin' ? 'AD' : 'US'}
+                    {userRole === 'admin' ? 'VE' : 'US'}
                   </span>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-900">
-                    {userRole === 'admin' ? 'Admin' : 'Usuário'}
+                    {userRole === 'admin' ? 'Valdimir Esteves' : 'Usuário'}
                   </p>
-                  <p className="text-xs text-gray-500">Online</p>
+                  <p className="text-xs text-gray-500">
+                    {userRole === 'admin' ? '🇦🇴 Cunene, Angola' : 'Online'}
+                  </p>
                 </div>
               </div>
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
             </div>
             
             <div className="mt-3 text-center">
               <p className="text-xs text-gray-500">
-                Versão 2.1.0 • © 2024 Escritório Esteves
+                v2.1.0 • © 2024 Africa's Hands
+              </p>
+              <p className="text-xs text-gray-400 mt-1">
+                Desenvolvido por Valdimir Esteves
               </p>
             </div>
           </div>
