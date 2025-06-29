@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { TranslationProvider, useTranslation } from './context/TranslationContext';
 
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
@@ -24,8 +25,10 @@ import FinanceManagement from './pages/FinanceManagement';
 
 import './styles/global.css';
 
-const App: React.FC = () => {
+// Componente interno que usa o contexto de tradução
+const AppContent: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { t } = useTranslation();
 
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
   const closeSidebar = () => setIsSidebarOpen(false);
@@ -82,23 +85,23 @@ const App: React.FC = () => {
                             <div className="text-center">
                               <div className="text-6xl mb-4">🌍</div>
                               <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                                Bem-vindo ao Africa's Hands
+                                {t('welcome.title')}
                               </h2>
                               <p className="text-lg text-gray-600 mb-6">
-                                Conectando Angola 🇦🇴 Namíbia 🇳🇦 África do Sul 🇿🇦
+                                {t('welcome.subtitle')}
                               </p>
                               <div className="flex gap-4 justify-center">
                                 <button 
                                   onClick={() => window.location.href = '/admin'}
                                   className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-medium"
                                 >
-                                  🚀 Acessar Dashboard
+                                  🚀 {t('welcome.accessDashboard')}
                                 </button>
                                 <button 
                                   onClick={() => window.location.href = '/services'}
                                   className="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium"
                                 >
-                                  📋 Ver Serviços
+                                  📋 {t('welcome.viewServices')}
                                 </button>
                               </div>
                             </div>
@@ -114,23 +117,23 @@ const App: React.FC = () => {
                             <div className="text-center">
                               <div className="text-6xl mb-4">🔍</div>
                               <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                                Página não encontrada
+                                {t('error.notFound.title')}
                               </h2>
                               <p className="text-gray-600 mb-6">
-                                A página que você está procurando não existe ou foi movida.
+                                {t('error.notFound.description')}
                               </p>
                               <div className="flex gap-4 justify-center">
                                 <button 
                                   onClick={() => window.location.href = '/'}
                                   className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-medium"
                                 >
-                                  🏠 Voltar ao Início
+                                  🏠 {t('error.notFound.backHome')}
                                 </button>
                                 <button 
                                   onClick={() => window.location.href = '/admin'}
                                   className="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium"
                                 >
-                                  📊 Dashboard
+                                  📊 {t('nav.dashboard')}
                                 </button>
                               </div>
                             </div>
@@ -146,6 +149,15 @@ const App: React.FC = () => {
         </div>
       </Router>
     </AuthProvider>
+  );
+};
+
+// Componente principal que fornece o contexto de tradução
+const App: React.FC = () => {
+  return (
+    <TranslationProvider>
+      <AppContent />
+    </TranslationProvider>
   );
 };
 
