@@ -30,6 +30,16 @@ const UserDashboardMobile: React.FC = () => {
   const [activeTab, setActiveTab] = useState('opportunities');
   const [selectedCountry, setSelectedCountry] = useState('all');
   const [selectedSector, setSelectedSector] = useState('all');
+  const [showServicesModal, setShowServicesModal] = useState(false);
+  const [selectedService, setSelectedService] = useState('');
+  const [showRequestForm, setShowRequestForm] = useState(false);
+  const [selectedServiceForRequest, setSelectedServiceForRequest] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    message: ''
+  });
   const { t } = useTranslation();
 
   // Perfil do usuário
@@ -197,15 +207,105 @@ const UserDashboardMobile: React.FC = () => {
     return labels[type as keyof typeof labels] || type;
   };
 
-  // Estatísticas do usuário
+  // Função para abrir modal de serviços
+  const openServicesModal = (service: string) => {
+    setSelectedService(service);
+    setShowServicesModal(true);
+  };
+
+  // Função para abrir formulário de solicitação
+  const openRequestForm = (serviceType: string) => {
+    setSelectedServiceForRequest(serviceType);
+    setShowRequestForm(true);
+    setShowServicesModal(false);
+  };
+
+  // Função para fechar formulário e resetar dados
+  const closeRequestForm = () => {
+    setShowRequestForm(false);
+    setSelectedServiceForRequest('');
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      message: ''
+    });
+  };
+
+  // Função para lidar com mudanças no formulário
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Função para enviar solicitação
+  const handleSubmitRequest = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Aqui você pode adicionar a lógica para enviar os dados
+    console.log('Solicitação enviada:', { 
+      service: selectedServiceForRequest, 
+      ...formData 
+    });
+    
+    // Mostrar mensagem de sucesso (você pode personalizar isso)
+    alert(t('form.requestSent') || 'Solicitação enviada com sucesso!');
+    closeRequestForm();
+  };
+
+  // Estatísticas do usuário - com clique
   const userStats = [
-    { icon: '🎓', count: 3, label: t('sector.education'), color: 'text-blue-600' },
-    { icon: '🏥', count: 8, label: t('sector.health'), color: 'text-green-600' },
-    { icon: '🛒', count: 8, label: t('sector.commerce'), color: 'text-purple-600' },
-    { icon: '🏨', count: 8, label: t('sector.hospitalityTourism'), color: 'text-orange-600' },
-    { icon: '📍', count: 8, label: t('sector.localGuides'), color: 'text-teal-600' },
-    { icon: '✈️', count: 2, label: t('sector.transport'), color: 'text-indigo-600' },
-    { icon: '🤝', count: 45, label: t('stats.connections'), color: 'text-red-600' }
+    { 
+      icon: '🎓', 
+      count: 3, 
+      label: t('sector.education'), 
+      color: 'text-blue-600',
+      onClick: () => openServicesModal('education')
+    },
+    { 
+      icon: '🏥', 
+      count: 8, 
+      label: t('sector.health'), 
+      color: 'text-green-600',
+      onClick: () => openServicesModal('health')
+    },
+    { 
+      icon: '🛒', 
+      count: 8, 
+      label: t('sector.commerce'), 
+      color: 'text-purple-600',
+      onClick: () => openServicesModal('commerce')
+    },
+    { 
+      icon: '🏨', 
+      count: 8, 
+      label: t('sector.hospitalityTourism'), 
+      color: 'text-orange-600',
+      onClick: () => openServicesModal('tourism')
+    },
+    { 
+      icon: '📍', 
+      count: 8, 
+      label: t('sector.localGuides'), 
+      color: 'text-teal-600',
+      onClick: () => openServicesModal('guides')
+    },
+    { 
+      icon: '✈️', 
+      count: 2, 
+      label: t('sector.transport'), 
+      color: 'text-indigo-600',
+      onClick: () => openServicesModal('transport')
+    },
+    { 
+      icon: '🤝', 
+      count: 45, 
+      label: t('stats.connections'), 
+      color: 'text-red-600',
+      onClick: () => {} // Sem modal para conexões
+    }
   ];
 
   return (
@@ -247,7 +347,11 @@ const UserDashboardMobile: React.FC = () => {
         <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
           <div className="grid grid-cols-2 gap-3">
             {userStats.map((stat, index) => (
-              <div key={index} className="bg-gray-50 rounded-lg p-3 text-center">
+              <div 
+                key={index} 
+                className="bg-gray-50 rounded-lg p-3 text-center cursor-pointer hover:bg-gray-100 transition-colors"
+                onClick={stat.onClick}
+              >
                 <div className="text-2xl mb-1">{stat.icon}</div>
                 <div className={`text-xl font-bold ${stat.color} mb-1`}>{stat.count}</div>
                 <div className="text-xs text-gray-600 leading-tight">{stat.label}</div>
@@ -256,6 +360,748 @@ const UserDashboardMobile: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de Serviços */}
+      {showServicesModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            {/* Header do Modal */}
+            <div className="bg-gradient-to-r from-red-600 to-red-700 text-white p-4 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">🌍</span>
+                  <h2 className="text-lg font-bold">AFRICA'S HANDS</h2>
+                </div>
+                <button
+                  onClick={() => setShowServicesModal(false)}
+                  className="text-white hover:text-red-200 p-1"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-red-100 text-sm mt-1">Tudo o que precisas num único clique!</p>
+            </div>
+
+            {/* Conteúdo do Modal */}
+            <div className="p-4">
+              <div className="text-center mb-4">
+                <p className="text-gray-700 font-medium">📱 Portal especializado para Angola, Namíbia e África do Sul</p>
+              </div>
+
+              {/* Conteúdo Específico por Setor */}
+              {selectedService === 'education' && (
+                <div className="space-y-4 mb-6">
+                  <div className="text-center mb-4">
+                    <h3 className="text-lg font-bold text-blue-900 flex items-center justify-center gap-2">
+                      <span className="text-2xl">🎓</span>
+                      Serviços de Educação
+                    </h3>
+                    <p className="text-gray-600 text-sm">Instituições, cursos e apoio académico regional</p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🏫</span>
+                          <div>
+                            <p className="font-medium text-blue-900">Universidades</p>
+                            <p className="text-xs text-blue-700">Inscrições e informações</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Universidades')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">📚</span>
+                          <div>
+                            <p className="font-medium text-blue-900">Cursos Técnicos</p>
+                            <p className="text-xs text-blue-700">Formação profissional</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Cursos Técnicos')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🔬</span>
+                          <div>
+                            <p className="font-medium text-blue-900">Bolsas de Estudo</p>
+                            <p className="text-xs text-blue-700">Oportunidades regionais</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Bolsas de Estudo')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🌐</span>
+                          <div>
+                            <p className="font-medium text-blue-900">Cursos Online</p>
+                            <p className="text-xs text-blue-700">Educação à distância</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Cursos Online')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {selectedService === 'health' && (
+                <div className="space-y-4 mb-6">
+                  <div className="text-center mb-4">
+                    <h3 className="text-lg font-bold text-green-900 flex items-center justify-center gap-2">
+                      <span className="text-2xl">🏥</span>
+                      Serviços de Saúde
+                    </h3>
+                    <p className="text-gray-600 text-sm">Hospitais, clínicas, farmácias e consultas</p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🏥</span>
+                          <div>
+                            <p className="font-medium text-green-900">Hospitais</p>
+                            <p className="text-xs text-green-700">Consultas e internamentos</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-green-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Hospitais')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">💊</span>
+                          <div>
+                            <p className="font-medium text-green-900">Farmácias</p>
+                            <p className="text-xs text-green-700">Medicamentos e produtos</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-green-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Farmácias')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🩺</span>
+                          <div>
+                            <p className="font-medium text-green-900">Clínicas</p>
+                            <p className="text-xs text-green-700">Especialidades médicas</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-green-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Clínicas')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🚑</span>
+                          <div>
+                            <p className="font-medium text-green-900">Emergências</p>
+                            <p className="text-xs text-green-700">Atendimento urgente</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-green-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Emergências')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {selectedService === 'commerce' && (
+                <div className="space-y-4 mb-6">
+                  <div className="text-center mb-4">
+                    <h3 className="text-lg font-bold text-purple-900 flex items-center justify-center gap-2">
+                      <span className="text-2xl">🛒</span>
+                      Serviços de Comércio
+                    </h3>
+                    <p className="text-gray-600 text-sm">Produtos, lojas e entregas regionais</p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🏪</span>
+                          <div>
+                            <p className="font-medium text-purple-900">Lojas Locais</p>
+                            <p className="text-xs text-purple-700">Produtos regionais</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Lojas Locais')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">📦</span>
+                          <div>
+                            <p className="font-medium text-purple-900">Entregas</p>
+                            <p className="text-xs text-purple-700">Logística regional</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Entregas')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🎨</span>
+                          <div>
+                            <p className="font-medium text-purple-900">Artesanato</p>
+                            <p className="text-xs text-purple-700">Produtos tradicionais</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Artesanato')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">💳</span>
+                          <div>
+                            <p className="font-medium text-purple-900">Pagamentos</p>
+                            <p className="text-xs text-purple-700">Soluções financeiras</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Pagamentos')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {selectedService === 'tourism' && (
+                <div className="space-y-4 mb-6">
+                  <div className="text-center mb-4">
+                    <h3 className="text-lg font-bold text-orange-900 flex items-center justify-center gap-2">
+                      <span className="text-2xl">🏨</span>
+                      Hotelaria e Turismo
+                    </h3>
+                    <p className="text-gray-600 text-sm">Hotéis, passeios e reservas rápidas</p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🏨</span>
+                          <div>
+                            <p className="font-medium text-orange-900">Hotéis</p>
+                            <p className="text-xs text-orange-700">Reservas em toda região</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-orange-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Hotéis')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🎒</span>
+                          <div>
+                            <p className="font-medium text-orange-900">Passeios</p>
+                            <p className="text-xs text-orange-700">Tours regionais</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-orange-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Passeios')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🍽️</span>
+                          <div>
+                            <p className="font-medium text-orange-900">Restaurantes</p>
+                            <p className="text-xs text-orange-700">Gastronomia local</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-orange-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Restaurantes')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🎭</span>
+                          <div>
+                            <p className="font-medium text-orange-900">Cultura</p>
+                            <p className="text-xs text-orange-700">Eventos e espetáculos</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-orange-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Cultura')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {selectedService === 'transport' && (
+                <div className="space-y-4 mb-6">
+                  <div className="text-center mb-4">
+                    <h3 className="text-lg font-bold text-indigo-900 flex items-center justify-center gap-2">
+                      <span className="text-2xl">✈️</span>
+                      Serviços de Transporte
+                    </h3>
+                    <p className="text-gray-600 text-sm">Táxis, aluguer de carros e voos</p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🚗</span>
+                          <div>
+                            <p className="font-medium text-indigo-900">Táxis</p>
+                            <p className="text-xs text-indigo-700">Transporte urbano</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Táxis')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🚙</span>
+                          <div>
+                            <p className="font-medium text-indigo-900">Aluguer de Carros</p>
+                            <p className="text-xs text-indigo-700">Veículos para rent</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Aluguer de Carros')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">✈️</span>
+                          <div>
+                            <p className="font-medium text-indigo-900">Voos</p>
+                            <p className="text-xs text-indigo-700">Viagens regionais</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Voos')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🚌</span>
+                          <div>
+                            <p className="font-medium text-indigo-900">Autocarros</p>
+                            <p className="text-xs text-indigo-700">Transporte público</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Autocarros')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {selectedService === 'guides' && (
+                <div className="space-y-4 mb-6">
+                  <div className="text-center mb-4">
+                    <h3 className="text-lg font-bold text-teal-900 flex items-center justify-center gap-2">
+                      <span className="text-2xl">📍</span>
+                      Guias e Informações Locais
+                    </h3>
+                    <p className="text-gray-600 text-sm">Potencialidade económica regional</p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="bg-teal-50 border border-teal-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🗺️</span>
+                          <div>
+                            <p className="font-medium text-teal-900">Guias Turísticos</p>
+                            <p className="text-xs text-teal-700">Acompanhamento local</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-teal-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Guias Turísticos')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-teal-50 border border-teal-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">💼</span>
+                          <div>
+                            <p className="font-medium text-teal-900">Negócios</p>
+                            <p className="text-xs text-teal-700">Oportunidades de investimento</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-teal-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Negócios')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-teal-50 border border-teal-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🏛️</span>
+                          <div>
+                            <p className="font-medium text-teal-900">Cultura Local</p>
+                            <p className="text-xs text-teal-700">Tradições e costumes</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-teal-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Cultura Local')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-teal-50 border border-teal-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">📊</span>
+                          <div>
+                            <p className="font-medium text-teal-900">Dados Económicos</p>
+                            <p className="text-xs text-teal-700">Estatísticas regionais</p>
+                          </div>
+                        </div>
+                        <button 
+                          className="bg-teal-600 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                          onClick={() => openRequestForm('Dados Económicos')}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Localizações */}
+              <div className="space-y-4">
+                <h3 className="font-bold text-gray-900 text-center mb-3">📍 Nossas Localizações</h3>
+                
+                {/* África do Sul */}
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-lg">🇿🇦</span>
+                    <h4 className="font-bold text-green-900">UNGOMBO LOGÍSTICA</h4>
+                  </div>
+                  <div className="text-xs text-green-800 space-y-1">
+                    <p><strong>P.O.BOX 107</strong></p>
+                    <p>Strathavon-Sandton</p>
+                    <p>Johannesburg-South Africa</p>
+                    <p>Address: 250 a Albertina Sisulu</p>
+                    <p>📞 +27 11 632 8888</p>
+                    <p>📱 +27 82 643 6476</p>
+                    <p>📧 info@ungombo.com</p>
+                  </div>
+                </div>
+
+                {/* Namíbia */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-lg">🇳🇦</span>
+                    <h4 className="font-bold text-blue-900">UNGOMBO LOGÍSTICA</h4>
+                  </div>
+                  <div className="text-xs text-blue-800 space-y-1">
+                    <p><strong>P.O.BOX 2070</strong></p>
+                    <p>Address: 0102 Main Road</p>
+                    <p>Opposite/Hotel Pisca</p>
+                    <p>Oshikango - Namibia</p>
+                    <p>📞 +264 65 26 5559</p>
+                    <p>📱 +264 81 770 2026</p>
+                    <p>📱 +244 928 770 090</p>
+                    <p>📧 Info@ungombo.com</p>
+                  </div>
+                </div>
+
+                {/* Angola */}
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-lg">🇦🇴</span>
+                    <h4 className="font-bold text-red-900">UNGOMBO LOGÍSTICA (SU),LDA</h4>
+                  </div>
+                  <div className="text-xs text-red-800 space-y-1">
+                    <p><strong>NIF: 500 18 55 280</strong></p>
+                    <p>Bairro: Hidipo, Estrada 105</p>
+                    <p>Santa Clara/Namacunde</p>
+                    <p>Cunene-Angola</p>
+                    <p>📞 +244 949 734 666</p>
+                    <p>📞 +244 928 77 00 90</p>
+                    <p>📧 info@ungombo.ao</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Botão Fechar */}
+              <button
+                onClick={() => setShowServicesModal(false)}
+                className="w-full mt-6 bg-red-600 text-white py-3 rounded-lg font-medium"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Formulário de Solicitação */}
+      {showRequestForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            {/* Header do Modal */}
+            <div className="bg-gradient-to-r from-red-600 to-red-700 text-white p-4 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">📝</span>
+                  <h2 className="text-lg font-bold">Solicitação de Serviço</h2>
+                </div>
+                <button
+                  onClick={closeRequestForm}
+                  className="text-white hover:text-red-200 p-1"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-red-100 text-sm mt-1">Serviço: {selectedServiceForRequest}</p>
+            </div>
+
+            {/* Formulário */}
+            <form onSubmit={handleSubmitRequest} className="p-4">
+              <div className="space-y-4">
+                {/* Campo Nome */}
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                    Nome Completo *
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    placeholder="Digite seu nome completo"
+                  />
+                </div>
+
+                {/* Campo Email */}
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                    Email *
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    placeholder="Digite seu email"
+                  />
+                </div>
+
+                {/* Campo Telefone */}
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                    Telefone *
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    placeholder="+244 ou +27 ou +264"
+                  />
+                </div>
+
+                {/* Campo Mensagem */}
+                <div>
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+                    Detalhes da Solicitação *
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleFormChange}
+                    required
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
+                    placeholder="Descreva sua necessidade, localização preferida, datas, etc..."
+                  />
+                </div>
+
+                {/* Informação do Serviço */}
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                  <div className="flex items-center gap-2 text-sm text-gray-700">
+                    <span className="text-lg">ℹ️</span>
+                    <div>
+                      <p className="font-medium">Serviço solicitado:</p>
+                      <p className="text-red-600 font-semibold">{selectedServiceForRequest}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Botões */}
+              <div className="flex gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={closeRequestForm}
+                  className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-medium text-sm"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 bg-red-600 text-white py-3 rounded-lg font-medium text-sm"
+                >
+                  📤 Enviar Solicitação
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Navegação por Abas Mobile */}
       <div className="bg-white border-t border-gray-200 sticky top-0 z-40">
@@ -289,44 +1135,6 @@ const UserDashboardMobile: React.FC = () => {
         {/* Aba de Oportunidades */}
         {activeTab === 'opportunities' && (
           <div className="space-y-4">
-            {/* Oportunidades em Destaque */}
-            <div className="bg-white rounded-xl p-4">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-xl">⭐</span>
-                <h2 className="text-lg font-bold text-gray-900">{t('userDash.featuredOpportunities')}</h2>
-              </div>
-              
-              <div className="space-y-4">
-                {featuredOpportunities.map((opportunity) => (
-                  <div key={opportunity.id} className="bg-gray-50 rounded-lg overflow-hidden">
-                    <img 
-                      src={opportunity.image}
-                      alt={opportunity.title}
-                      className="w-full h-32 object-cover"
-                    />
-                    <div className="p-3">
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 className="text-sm font-bold text-gray-900 line-clamp-2">{opportunity.title}</h3>
-                        <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(opportunity.type)}`}>
-                          {getTypeIcon(opportunity.type)}
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-600 mb-2 line-clamp-2">{opportunity.description}</p>
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs text-gray-500">{getCountryFlag(opportunity.country)} {opportunity.country}</span>
-                        {opportunity.budget && (
-                          <span className="text-xs font-semibold text-green-600">${(opportunity.budget/1000).toFixed(0)}K</span>
-                        )}
-                      </div>
-                      <button className="w-full bg-red-600 text-white py-2 rounded-lg text-sm font-medium">
-                        {t('userDash.viewDetails')}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {/* Filtros Mobile */}
             <div className="bg-white rounded-xl p-4">
               <h3 className="text-lg font-bold text-gray-900 mb-3">{t('userDash.allRegionalOpportunities')}</h3>

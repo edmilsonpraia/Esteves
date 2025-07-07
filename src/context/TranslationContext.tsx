@@ -753,6 +753,208 @@ const translations: Translations = {
     en: 'Local Guides and Information'
   },
 
+// Login - Geral
+'login.slogan': {
+  pt: 'África no clique',
+  en: 'Africa at a click'
+},
+'login.otherSadcCountry': {
+  pt: 'Outro país SADC',
+  en: 'Other SADC country'
+},
+'login.countriesDescription': {
+  pt: 'Angola • Namíbia • África do Sul',
+  en: 'Angola • Namibia • South Africa'
+},
+
+// Login - Títulos e navegação
+'login.welcomeBack': {
+  pt: 'Bem-vindo de volta!',
+  en: 'Welcome back!'
+},
+'login.createAccount': {
+  pt: 'Criar Conta',
+  en: 'Create Account'
+},
+'login.accessAccountDescription': {
+  pt: 'Acesse sua conta para explorar oportunidades regionais',
+  en: 'Access your account to explore regional opportunities'
+},
+'login.joinNetworkDescription': {
+  pt: 'Junte-se à rede de cooperação da África Austral',
+  en: 'Join the Southern Africa cooperation network'
+},
+'login.signIn': {
+  pt: 'Entrar',
+  en: 'Sign In'
+},
+'login.register': {
+  pt: 'Registrar',
+  en: 'Register'
+},
+
+// Login - Features
+'login.features.regionalHealth': {
+  pt: 'Rede de Saúde Regional',
+  en: 'Regional Health Network'
+},
+'login.features.universityExchange': {
+  pt: 'Intercâmbio Universitário',
+  en: 'University Exchange'
+},
+'login.features.regionalMarketplace': {
+  pt: 'Marketplace Regional',
+  en: 'Regional Marketplace'
+},
+'login.features.innovationHub': {
+  pt: 'Hub de Inovação',
+  en: 'Innovation Hub'
+},
+
+// Login - Estatísticas
+'login.stats.population': {
+  pt: 'População',
+  en: 'Population'
+},
+'login.stats.countries': {
+  pt: 'Países',
+  en: 'Countries'
+},
+'login.stats.sectors': {
+  pt: 'Setores',
+  en: 'Sectors'
+},
+
+// Login - Formulário
+'login.form.email': {
+  pt: 'E-mail',
+  en: 'Email'
+},
+'login.form.emailPlaceholder': {
+  pt: 'seu@email.com',
+  en: 'your@email.com'
+},
+'login.form.adminTip': {
+  pt: 'Use \'admin@exemplo.com\' para acesso de administrador',
+  en: 'Use \'admin@example.com\' for administrator access'
+},
+'login.form.password': {
+  pt: 'Senha',
+  en: 'Password'
+},
+'login.form.passwordPlaceholder': {
+  pt: 'Sua senha',
+  en: 'Your password'
+},
+'login.form.optional': {
+  pt: 'Opcional',
+  en: 'Optional'
+},
+'login.form.selectCountry': {
+  pt: 'Selecione seu país',
+  en: 'Select your country'
+},
+'login.form.rememberMe': {
+  pt: 'Lembrar-me',
+  en: 'Remember me'
+},
+
+// Login - Botões
+'login.buttons.signingIn': {
+  pt: 'Entrando...',
+  en: 'Signing in...'
+},
+'login.buttons.creatingAccount': {
+  pt: 'Criando conta...',
+  en: 'Creating account...'
+},
+'login.buttons.enterPlatform': {
+  pt: 'Entrar na Plataforma',
+  en: 'Enter Platform'
+},
+'login.buttons.createMyAccount': {
+  pt: 'Criar Minha Conta',
+  en: 'Create My Account'
+},
+
+// Login - Esqueceu senha
+'login.forgotPassword.link': {
+  pt: 'Esqueceu a senha?',
+  en: 'Forgot password?'
+},
+'login.forgotPassword.emailSent': {
+  pt: 'Link de recuperação será enviado para seu e-mail!',
+  en: 'Recovery link will be sent to your email!'
+},
+
+// Login - Login social
+'login.socialLogin.orContinueWith': {
+  pt: 'ou continue com',
+  en: 'or continue with'
+},
+'login.socialLogin.continueWithGoogle': {
+  pt: 'Continuar com Google',
+  en: 'Continue with Google'
+},
+'login.socialLogin.continueWithFacebook': {
+  pt: 'Continuar com Facebook',
+  en: 'Continue with Facebook'
+},
+'login.socialLogin.googleSoon': {
+  pt: 'Login com Google será implementado em breve!',
+  en: 'Google login will be implemented soon!'
+},
+
+// Login - Contas demo
+'login.demoAccounts.title': {
+  pt: 'Contas Demo',
+  en: 'Demo Accounts'
+},
+'login.demoAccounts.admin': {
+  pt: 'Admin',
+  en: 'Admin'
+},
+'login.demoAccounts.user': {
+  pt: 'Usuário',
+  en: 'User'
+},
+
+// Login - Footer
+'login.footer.agreement': {
+  pt: 'Ao continuar, você concorda com nossos',
+  en: 'By continuing, you agree to our'
+},
+'login.footer.termsOfUse': {
+  pt: 'Termos de Uso',
+  en: 'Terms of Use'
+},
+'login.footer.and': {
+  pt: 'e',
+  en: 'and'
+},
+'login.footer.privacyPolicy': {
+  pt: 'Política de Privacidade',
+  en: 'Privacy Policy'
+},
+'login.footer.developedBy': {
+  pt: 'Desenvolvido por',
+  en: 'Developed by'
+},
+
+// Login - Erros
+'login.errors.fillAllFields': {
+  pt: 'Por favor, preencha todos os campos obrigatórios.',
+  en: 'Please fill in all required fields.'
+},
+'login.errors.selectCountry': {
+  pt: 'Por favor, selecione seu país.',
+  en: 'Please select your country.'
+},
+'login.errors.loginFailed': {
+  pt: 'Erro ao fazer login. Tente novamente.',
+  en: 'Login failed. Please try again.'
+},
+
   // Tipos de Oportunidade
   'opportunityType.project': {
     pt: 'Projeto',
