@@ -907,59 +907,60 @@ const UserDashboardMobile: React.FC = () => {
                 </div>
               )}
 
-              {/* Localizações */}
+              {/* Localização */}
               <div className="space-y-4">
-                <h3 className="font-bold text-gray-900 text-center mb-3">📍 Nossas Localizações</h3>
+                <h3 className="font-bold text-gray-900 text-center mb-3">📍 Nossa Localização</h3>
                 
-                {/* África do Sul */}
-                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg">🇿🇦</span>
-                    <h4 className="font-bold text-green-900">UNGOMBO LOGÍSTICA</h4>
-                  </div>
-                  <div className="text-xs text-green-800 space-y-1">
-                    <p><strong>P.O.BOX 107</strong></p>
-                    <p>Strathavon-Sandton</p>
-                    <p>Johannesburg-South Africa</p>
-                    <p>Address: 250 a Albertina Sisulu</p>
-                    <p>📞 +27 11 632 8888</p>
-                    <p>📱 +27 82 643 6476</p>
-                    <p>📧 info@ungombo.com</p>
-                  </div>
-                </div>
-
-                {/* Namíbia */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg">🇳🇦</span>
-                    <h4 className="font-bold text-blue-900">UNGOMBO LOGÍSTICA</h4>
-                  </div>
-                  <div className="text-xs text-blue-800 space-y-1">
-                    <p><strong>P.O.BOX 2070</strong></p>
-                    <p>Address: 0102 Main Road</p>
-                    <p>Opposite/Hotel Pisca</p>
-                    <p>Oshikango - Namibia</p>
-                    <p>📞 +264 65 26 5559</p>
-                    <p>📱 +264 81 770 2026</p>
-                    <p>📱 +244 928 770 090</p>
-                    <p>📧 Info@ungombo.com</p>
-                  </div>
-                </div>
-
-                {/* Angola */}
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                  <div className="flex items-center gap-2 mb-2">
+                {/* Angola - Sede */}
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-3">
                     <span className="text-lg">🇦🇴</span>
-                    <h4 className="font-bold text-red-900">UNGOMBO LOGÍSTICA (SU),LDA</h4>
+                    <div>
+                      <h4 className="font-bold text-red-900">AFRICA'S HANDS</h4>
+                      <p className="text-xs text-red-700">ESCRITÓRIO V.J ESTEVES</p>
+                    </div>
                   </div>
-                  <div className="text-xs text-red-800 space-y-1">
-                    <p><strong>NIF: 500 18 55 280</strong></p>
-                    <p>Bairro: Hidipo, Estrada 105</p>
-                    <p>Santa Clara/Namacunde</p>
-                    <p>Cunene-Angola</p>
-                    <p>📞 +244 949 734 666</p>
-                    <p>📞 +244 928 77 00 90</p>
-                    <p>📧 info@ungombo.ao</p>
+                  <div className="text-xs text-red-800 space-y-1 mb-4">
+                    <p><strong>NIF: 5002564580</strong></p>
+                    <p>Bairro: Naipalala</p>
+                    <p>Cunene/Ondjiva - Angola</p>
+                    <p>📧 escritorioestevesemultisservic@gmail.com</p>
+                  </div>
+                  
+                  {/* Redes Sociais */}
+                  <div className="border-t border-red-200 pt-3">
+                    <p className="text-xs font-medium text-red-900 mb-2">Siga-nos:</p>
+                    <div className="flex gap-3">
+                      <a 
+                        href="https://wa.me/+244924166401"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 bg-green-500 text-white px-3 py-2 rounded-lg text-xs font-medium hover:bg-green-600 transition-colors"
+                      >
+                        <span>📱</span>
+                        WhatsApp
+                      </a>
+                      <button 
+                        onClick={() => {
+                          // Adicionar link do Facebook aqui
+                          console.log('Facebook - Link a ser adicionado');
+                        }}
+                        className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors"
+                      >
+                        <span>📘</span>
+                        Facebook
+                      </button>
+                      <button 
+                        onClick={() => {
+                          // Adicionar link do Instagram aqui
+                          console.log('Instagram - Link a ser adicionado');
+                        }}
+                        className="flex items-center gap-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-2 rounded-lg text-xs font-medium hover:from-purple-600 hover:to-pink-600 transition-colors"
+                      >
+                        <span>📷</span>
+                        Instagram
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
