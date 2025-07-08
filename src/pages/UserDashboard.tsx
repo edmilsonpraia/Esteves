@@ -930,35 +930,35 @@ const UserDashboardMobile: React.FC = () => {
                   {/* Redes Sociais */}
                   <div className="border-t border-red-200 pt-3">
                     <p className="text-xs font-medium text-red-900 mb-2">Siga-nos:</p>
-                    <div className="flex gap-3">
+                    <div className="flex gap-2 flex-wrap">
                       <a 
                         href="https://wa.me/+244924166401"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1 bg-green-500 text-white px-3 py-2 rounded-lg text-xs font-medium hover:bg-green-600 transition-colors"
+                        className="flex items-center gap-1 bg-green-500 text-white px-2 py-1.5 rounded-md text-xs font-medium hover:bg-green-600 transition-colors"
                       >
-                        <span>📱</span>
-                        WhatsApp
+                        <span className="text-sm">📱</span>
+                        <span className="text-xs">WhatsApp</span>
                       </a>
                       <button 
                         onClick={() => {
                           // Adicionar link do Facebook aqui
                           console.log('Facebook - Link a ser adicionado');
                         }}
-                        className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors"
+                        className="flex items-center gap-1 bg-blue-600 text-white px-2 py-1.5 rounded-md text-xs font-medium hover:bg-blue-700 transition-colors"
                       >
-                        <span>📘</span>
-                        Facebook
+                        <span className="text-sm">📘</span>
+                        <span className="text-xs">Facebook</span>
                       </button>
                       <button 
                         onClick={() => {
                           // Adicionar link do Instagram aqui
                           console.log('Instagram - Link a ser adicionado');
                         }}
-                        className="flex items-center gap-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-2 rounded-lg text-xs font-medium hover:from-purple-600 hover:to-pink-600 transition-colors"
+                        className="flex items-center gap-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1.5 rounded-md text-xs font-medium hover:from-purple-600 hover:to-pink-600 transition-colors"
                       >
-                        <span>📷</span>
-                        Instagram
+                        <span className="text-sm">📷</span>
+                        <span className="text-xs">Instagram</span>
                       </button>
                     </div>
                   </div>
