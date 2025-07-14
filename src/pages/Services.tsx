@@ -861,10 +861,10 @@ const ServicesAfricasHands: React.FC = () => {
                 🇦🇴 Angola: +244 924 166 401
               </span>
               <span className="flex items-center gap-2">
-                🇳🇦 Namíbia: +264 817 049 40
+                
               </span>
               <span className="flex items-center gap-2">
-                📧 contato@africashands.com
+                📧 escritorioestevesemultisservic@gmail.com
               </span>
             </div>
           </div>

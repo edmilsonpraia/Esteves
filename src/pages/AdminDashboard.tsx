@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../context/TranslationContext';
 
 interface Project {
@@ -16,6 +16,14 @@ interface Project {
   progress: number;
   team: string[];
   description: string;
+  client_organization_id?: number;
+  country_id?: number;
+  sector_id?: number;
+  start_date?: string;
+  end_date?: string;
+  created_by_user_id?: number;
+  location?: string;
+  image_url?: string;
 }
 
 interface QuickAction {
@@ -35,95 +43,309 @@ interface Activity {
   time: string;
   user: string;
   country: string;
+  user_name?: string;
+  created_at?: string;
+}
+
+interface Country {
+  id: number;
+  name: string;
+  code: string;
+  flag_emoji: string;
+  capital?: string;
+  currency?: string;
+  phone_prefix?: string;
+}
+
+interface Sector {
+  id: number;
+  name: string;
+  icon_emoji: string;
+  description?: string;
+  color?: string;
+}
+
+interface Organization {
+  id: number;
+  name: string;
+  type?: string;
+  country_id: number;
+  verified?: boolean;
+}
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  country_id?: number;
+  organization_id?: number;
+  verified?: boolean;
+  created_at?: string;
+}
+
+interface Stats {
+  totalProjects: number;
+  activeProjects: number;
+  completedProjects: number;
+  totalClients: number;
+  totalTeamMembers: number;
+  totalBudget: number;
+  totalSpent: number;
+  avgProgress: number;
 }
 
 const AdminDashboardAfricasHands: React.FC = () => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [sectors, setSectors] = useState<Sector[]>([]);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [stats, setStats] = useState<Stats>({
+    totalProjects: 0,
+    activeProjects: 0,
+    completedProjects: 0,
+    totalClients: 0,
+    totalTeamMembers: 0,
+    totalBudget: 0,
+    totalSpent: 0,
+    avgProgress: 0
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const { t } = useTranslation();
 
-  // Dados dos projetos regionais
-  const projects: Project[] = [
-    {
-      id: 1,
-      name: t('projects.regionalTelemedicine'),
-      client: t('projects.clients.sagradaEsperanca'),
-      country: t('country.angola'),
-      sector: t('sector.health'),
-      status: t('status.active'),
-      priority: t('priority.high'),
-      budget: 85000,
-      spent: 45000,
-      startDate: '2024-01-15',
-      endDate: '2024-08-15',
-      progress: 65,
-      team: ['Dr. António Silva', 'Eng. Maria Santos'],
-      description: t('projects.regionalTelemedicineDesc')
-    },
-    {
-      id: 2,
-      name: t('projects.africanCraftsMarketplace'),
-      client: t('projects.clients.himbaArtisans'),
-      country: t('country.namibia'),
-      sector: t('sector.commerce'),
-      status: t('status.active'),
-      priority: t('priority.medium'),
-      budget: 45000,
-      spent: 23000,
-      startDate: '2024-02-01',
-      endDate: '2024-09-01',
-      progress: 50,
-      team: ['João Kazembe', 'Sarah Nghikembua'],
-      description: t('projects.africanCraftsMarketplaceDesc')
-    },
-    {
-      id: 3,
-      name: t('projects.universityExchange'),
-      client: t('projects.clients.uct'),
-      country: t('country.southAfrica'),
-      sector: t('sector.education'),
-      status: t('status.completed'),
-      priority: t('priority.high'),
-      budget: 120000,
-      spent: 118000,
-      startDate: '2023-09-01',
-      endDate: '2024-03-01',
-      progress: 100,
-      team: ['Prof. David Williams', 'Dr. Fatima Moyo'],
-      description: t('projects.universityExchangeDesc')
-    },
-    {
-      id: 4,
-      name: t('projects.sustainableTourismApp'),
-      client: t('projects.clients.hiltonWindhoek'),
-      country: t('country.namibia'),
-      sector: t('sector.tourism'),
-      status: t('status.active'),
-      priority: t('priority.medium'),
-      budget: 65000,
-      spent: 30000,
-      startDate: '2024-03-15',
-      endDate: '2024-10-15',
-      progress: 40,
-      team: ['Ana Rodrigues', 'Tom Nghoshi'],
-      description: t('projects.sustainableTourismAppDesc')
-    },
-    {
-      id: 5,
-      name: t('projects.regionalTransportPlatform'),
-      client: t('projects.clients.taagAngola'),
-      country: t('country.angola'),
-      sector: t('sector.transport'),
-      status: t('status.planning'),
-      priority: t('priority.high'),
-      budget: 150000,
-      spent: 15000,
-      startDate: '2024-06-01',
-      endDate: '2025-02-01',
-      progress: 10,
-      team: ['Eng. Carlos Mbala', 'Piloto Maria Costa'],
-      description: t('projects.regionalTransportPlatformDesc')
+  // Carregar dados da API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Carregar dados básicos em paralelo
+        const [
+          countriesResponse,
+          sectorsResponse,
+          organizationsResponse,
+          usersResponse,
+          activitiesResponse
+        ] = await Promise.all([
+          fetch('/api/countries'),
+          fetch('/api/sectors'),
+          fetch('/api/organizations'),
+          fetch('/api/users'),
+          fetch('/api/activities/recent')
+        ]);
+
+        // Verificar se todas as respostas são OK
+        if (!countriesResponse.ok || !sectorsResponse.ok) {
+          throw new Error('Erro ao carregar dados básicos');
+        }
+
+        const countriesData = await countriesResponse.json();
+        const sectorsData = await sectorsResponse.json();
+        
+        setCountries(countriesData.data || countriesData);
+        setSectors(sectorsData.data || sectorsData);
+
+        // Carregar organizações se disponível
+        if (organizationsResponse.ok) {
+          const organizationsData = await organizationsResponse.json();
+          setOrganizations(organizationsData.data || organizationsData);
+        }
+
+        // Carregar utilizadores se disponível
+        if (usersResponse.ok) {
+          const usersData = await usersResponse.json();
+          setUsers(usersData.data || usersData);
+        }
+
+        // Carregar atividades se disponível
+        if (activitiesResponse.ok) {
+          const activitiesData = await activitiesResponse.json();
+          setActivities(activitiesData.data || activitiesData);
+        }
+
+        // Carregar projetos se disponível
+        try {
+          const projectsResponse = await fetch('/api/projects');
+          if (projectsResponse.ok) {
+            const projectsData = await projectsResponse.json();
+            const formattedProjects = (projectsData.data || projectsData).map((project: any) => ({
+              ...project,
+              client: project.client_organization || 'Cliente não definido',
+              startDate: project.start_date || project.startDate,
+              endDate: project.end_date || project.endDate,
+              team: project.team || []
+            }));
+            setProjects(formattedProjects);
+          }
+        } catch (projectError) {
+          console.log('Projetos não disponíveis ainda, usando dados de exemplo');
+          // Usar projetos de exemplo baseados nos dados reais
+          setProjects(createExampleProjects(countriesData.data || countriesData, sectorsData.data || sectorsData));
+        }
+
+        // Calcular estatísticas
+        calculateStats();
+
+      } catch (error) {
+        console.error('Erro ao carregar dados:', error);
+        setError('Erro ao carregar dados. Usando dados de exemplo.');
+        
+        // Fallback para dados de exemplo
+        loadFallbackData();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Função para criar projetos de exemplo baseados nos dados reais
+  const createExampleProjects = (countriesData: Country[], sectorsData: Sector[]): Project[] => {
+    const exampleProjects: Project[] = [
+      {
+        id: 1,
+        name: 'Programa de Intercâmbio Médico Luanda',
+        client: 'Hospital Geral de Luanda',
+        country: countriesData.find(c => c.code === 'AO')?.name || 'Angola',
+        sector: sectorsData.find(s => s.name === 'Saúde')?.name || 'Saúde',
+        status: 'active',
+        priority: 'high',
+        budget: 85000,
+        spent: 45000,
+        startDate: '2024-01-15',
+        endDate: '2024-08-15',
+        progress: 65,
+        team: ['Dr. António Silva', 'Eng. Maria Santos'],
+        description: 'Programa de intercâmbio para médicos especializarem-se em cardiologia e medicina interna em Luanda.'
+      },
+      {
+        id: 2,
+        name: 'Centro de Formação Técnica Benguela',
+        client: 'Instituto Técnico de Benguela',
+        country: countriesData.find(c => c.code === 'AO')?.name || 'Angola',
+        sector: sectorsData.find(s => s.name === 'Educação')?.name || 'Educação',
+        status: 'active',
+        priority: 'medium',
+        budget: 80000,
+        spent: 23000,
+        startDate: '2024-02-01',
+        endDate: '2024-09-01',
+        progress: 50,
+        team: ['João Kazembe', 'Sarah Nghikembua'],
+        description: 'Projeto para criar centro de formação técnica em mecânica e eletricidade para jovens.'
+      },
+      {
+        id: 3,
+        name: 'Intercâmbio Universitário SADC',
+        client: 'University of Cape Town',
+        country: countriesData.find(c => c.code === 'ZA')?.name || 'África do Sul',
+        sector: sectorsData.find(s => s.name === 'Educação')?.name || 'Educação',
+        status: 'completed',
+        priority: 'high',
+        budget: 120000,
+        spent: 118000,
+        startDate: '2023-09-01',
+        endDate: '2024-03-01',
+        progress: 100,
+        team: ['Prof. David Williams', 'Dr. Fatima Moyo'],
+        description: 'Programa de intercâmbio médico com foco em cirurgia cardíaca e medicina de emergência.'
+      },
+      {
+        id: 4,
+        name: 'Turismo Sustentável Namíbia',
+        client: 'Hilton Windhoek',
+        country: countriesData.find(c => c.code === 'NA')?.name || 'Namíbia',
+        sector: sectorsData.find(s => s.name === 'Turismo')?.name || 'Turismo',
+        status: 'active',
+        priority: 'medium',
+        budget: 65000,
+        spent: 30000,
+        startDate: '2024-03-15',
+        endDate: '2024-10-15',
+        progress: 40,
+        team: ['Ana Rodrigues', 'Tom Nghoshi'],
+        description: 'Sistema de turismo sustentável para a capital da Namíbia.'
+      },
+      {
+        id: 5,
+        name: 'Plataforma de Transporte Regional',
+        client: 'TAAG Angola Airlines',
+        country: countriesData.find(c => c.code === 'AO')?.name || 'Angola',
+        sector: sectorsData.find(s => s.name === 'Transporte')?.name || 'Transporte',
+        status: 'planning',
+        priority: 'high',
+        budget: 150000,
+        spent: 15000,
+        startDate: '2024-06-01',
+        endDate: '2025-02-01',
+        progress: 10,
+        team: ['Eng. Carlos Mbala', 'Piloto Maria Costa'],
+        description: 'Sistema de transporte público sustentável integrando os três países.'
+      }
+    ];
+
+    return exampleProjects;
+  };
+
+  // Função para carregar dados de fallback
+  const loadFallbackData = () => {
+    // Dados de fallback caso a API não esteja disponível
+    const fallbackCountries: Country[] = [
+      { id: 1, name: 'Angola', code: 'AO', flag_emoji: '🇦🇴', capital: 'Luanda' },
+      { id: 2, name: 'Namíbia', code: 'NA', flag_emoji: '🇳🇦', capital: 'Windhoek' },
+      { id: 3, name: 'África do Sul', code: 'ZA', flag_emoji: '🇿🇦', capital: 'Cidade do Cabo' }
+    ];
+
+    const fallbackSectors: Sector[] = [
+      { id: 1, name: 'Saúde', icon_emoji: '🏥', color: 'green' },
+      { id: 2, name: 'Educação', icon_emoji: '🎓', color: 'blue' },
+      { id: 3, name: 'Turismo', icon_emoji: '🏨', color: 'orange' },
+      { id: 4, name: 'Comércio', icon_emoji: '🛒', color: 'purple' },
+      { id: 5, name: 'Transporte', icon_emoji: '✈️', color: 'indigo' },
+      { id: 6, name: 'Tecnologia', icon_emoji: '💻', color: 'pink' }
+    ];
+
+    setCountries(fallbackCountries);
+    setSectors(fallbackSectors);
+    setProjects(createExampleProjects(fallbackCountries, fallbackSectors));
+  };
+
+  // Calcular estatísticas baseadas nos dados carregados
+  const calculateStats = () => {
+    const totalProjects = projects.length;
+    const activeProjects = projects.filter(p => p.status === 'active').length;
+    const completedProjects = projects.filter(p => p.status === 'completed').length;
+    const totalBudget = projects.reduce((sum, p) => sum + (p.budget || 0), 0);
+    const totalSpent = projects.reduce((sum, p) => sum + (p.spent || 0), 0);
+    const avgProgress = projects.length > 0 
+      ? Math.round(projects.reduce((sum, p) => sum + (p.progress || 0), 0) / projects.length)
+      : 0;
+
+    setStats({
+      totalProjects,
+      activeProjects,
+      completedProjects,
+      totalClients: organizations.length || 45,
+      totalTeamMembers: users.length || 28,
+      totalBudget,
+      totalSpent,
+      avgProgress
+    });
+  };
+
+  // Recalcular estatísticas quando projetos mudarem
+  useEffect(() => {
+    if (projects.length > 0) {
+      calculateStats();
     }
-  ];
+  }, [projects, organizations, users]);
 
   // Ações rápidas para navegação
   const quickActions: QuickAction[] = [
@@ -177,8 +399,8 @@ const AdminDashboardAfricasHands: React.FC = () => {
     }
   ];
 
-  // Atividades recentes
-  const recentActivities: Activity[] = [
+  // Atividades recentes - usar dados da API ou fallback
+  const recentActivities: Activity[] = activities.length > 0 ? activities : [
     {
       id: 1,
       type: 'project_completed',
@@ -226,32 +448,23 @@ const AdminDashboardAfricasHands: React.FC = () => {
     }
   ];
 
-  const countries = [t('country.angola'), t('country.namibia'), t('country.southAfrica')];
-  const sectors = [t('sector.health'), t('sector.education'), t('sector.tourism'), t('sector.commerce'), t('sector.transport'), t('sector.technology')];
-
-  // Estatísticas regionais
-  const stats = {
-    totalProjects: projects.length,
-    activeProjects: projects.filter(p => p.status === t('status.active')).length,
-    completedProjects: projects.filter(p => p.status === t('status.completed')).length,
-    totalClients: 45,
-    totalTeamMembers: 28,
-    totalBudget: projects.reduce((sum, p) => sum + p.budget, 0),
-    totalSpent: projects.reduce((sum, p) => sum + p.spent, 0),
-    avgProgress: Math.round(projects.reduce((sum, p) => sum + p.progress, 0) / projects.length)
-  };
-
   const getCountryFlag = (country: string) => {
+    const countryData = countries.find(c => c.name === country);
+    if (countryData) return countryData.flag_emoji;
+    
     const flags = {
       [t('country.angola')]: '🇦🇴',
       [t('country.namibia')]: '🇳🇦',
       [t('country.southAfrica')]: '🇿🇦',
       [t('activities.regional')]: '🌍'
     };
-    return flags[country] || '🌍';
+    return flags[country as keyof typeof flags] || '🌍';
   };
 
   const getSectorIcon = (sector: string) => {
+    const sectorData = sectors.find(s => s.name === sector);
+    if (sectorData) return sectorData.icon_emoji;
+    
     const icons = {
       [t('sector.health')]: '🏥',
       [t('sector.education')]: '🎓',
@@ -260,7 +473,7 @@ const AdminDashboardAfricasHands: React.FC = () => {
       [t('sector.transport')]: '✈️',
       [t('sector.technology')]: '💻'
     };
-    return icons[sector] || '💼';
+    return icons[sector as keyof typeof icons] || '💼';
   };
 
   const getActivityIcon = (type: string) => {
@@ -289,16 +502,69 @@ const AdminDashboardAfricasHands: React.FC = () => {
     console.log(`${t('navigation.navigatingTo')}: ${action.link}`);
   };
 
-  const handleCreateProject = () => {
+  const handleCreateProject = async () => {
     console.log(t('navigation.navigatingToCreateProject'));
+    // Implementar criação de projeto via API
+    try {
+      const response = await fetch('/api/projects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: 'Novo Projeto Regional',
+          description: 'Descrição do projeto...',
+          // outros campos necessários
+        })
+      });
+      
+      if (response.ok) {
+        // Recarregar projetos
+        const projectsResponse = await fetch('/api/projects');
+        if (projectsResponse.ok) {
+          const projectsData = await projectsResponse.json();
+          setProjects(projectsData.data || projectsData);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao criar projeto:', error);
+    }
   };
 
   const handleViewAllProjects = () => {
     console.log(t('navigation.navigatingToAllProjects'));
   };
 
+  // Mostrar loading
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-red-600 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Carregando Dashboard Admin</h2>
+          <p className="text-gray-600">Conectando à base de dados Elves...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
+      {/* Mostrar erro se houver */}
+      {error && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <span className="text-yellow-400">⚠️</span>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-yellow-800">Aviso</h3>
+              <p className="text-sm text-yellow-700 mt-1">{error}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header Principal */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
@@ -420,7 +686,7 @@ const AdminDashboardAfricasHands: React.FC = () => {
           </div>
           <div className="mt-4 flex items-center text-sm">
             <span className="text-gray-500">
-              {((stats.totalSpent / stats.totalBudget) * 100).toFixed(1)}{t('stats.executed')}
+              {stats.totalBudget > 0 ? ((stats.totalSpent / stats.totalBudget) * 100).toFixed(1) : 0}{t('stats.executed')}
             </span>
           </div>
         </div>
@@ -469,17 +735,17 @@ const AdminDashboardAfricasHands: React.FC = () => {
           
           <div className="grid grid-cols-3 gap-6 mb-6">
             {countries.map((country) => {
-              const countryProjects = projects.filter(p => p.country === country);
-              const countryBudget = countryProjects.reduce((sum, p) => sum + p.budget, 0);
+              const countryProjects = projects.filter(p => p.country === country.name);
+              const countryBudget = countryProjects.reduce((sum, p) => sum + (p.budget || 0), 0);
               const avgProgress = countryProjects.length > 0 
-                ? Math.round(countryProjects.reduce((sum, p) => sum + p.progress, 0) / countryProjects.length)
+                ? Math.round(countryProjects.reduce((sum, p) => sum + (p.progress || 0), 0) / countryProjects.length)
                 : 0;
               
               return (
-                <div key={country} className="text-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <div className="text-4xl mb-3">{getCountryFlag(country)}</div>
+                <div key={country.id} className="text-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <div className="text-4xl mb-3">{country.flag_emoji}</div>
                   <div className="text-2xl font-bold text-gray-900 mb-1">{countryProjects.length}</div>
-                  <div className="text-sm text-gray-600 mb-2">{country}</div>
+                  <div className="text-sm text-gray-600 mb-2">{country.name}</div>
                   <div className="text-xs text-gray-500 mb-2">
                     ${(countryBudget / 1000).toFixed(0)}K {t('stats.invested')}
                   </div>
@@ -500,7 +766,8 @@ const AdminDashboardAfricasHands: React.FC = () => {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('dashboard.recentProjects')}</h3>
             <div className="space-y-3">
               {projects.slice(0, 3).map((project) => (
-                <div key={project.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div key={project.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                     onClick={() => setSelectedProject(project)}>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
                       <span>{getCountryFlag(project.country)}</span>
@@ -522,11 +789,13 @@ const AdminDashboardAfricasHands: React.FC = () => {
                       <span className="text-sm font-medium">{project.progress}%</span>
                     </div>
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      project.status === t('status.active') ? 'bg-yellow-100 text-yellow-800' :
-                      project.status === t('status.completed') ? 'bg-green-100 text-green-800' :
+                      project.status === 'active' ? 'bg-yellow-100 text-yellow-800' :
+                      project.status === 'completed' ? 'bg-green-100 text-green-800' :
                       'bg-gray-100 text-gray-800'
                     }`}>
-                      {project.status}
+                      {project.status === 'active' ? 'Ativo' :
+                       project.status === 'completed' ? 'Completo' :
+                       project.status === 'planning' ? 'Planeamento' : project.status}
                     </span>
                   </div>
                 </div>
@@ -557,9 +826,9 @@ const AdminDashboardAfricasHands: React.FC = () => {
                   </div>
                   <p className="text-xs text-gray-600 mb-1">{activity.description}</p>
                   <div className="flex items-center gap-2">
-                    <p className="text-xs text-gray-400">{activity.time}</p>
+                    <p className="text-xs text-gray-400">{activity.time || 'Recente'}</p>
                     <span className="text-xs text-gray-400">•</span>
-                    <p className="text-xs text-gray-400">{activity.user}</p>
+                    <p className="text-xs text-gray-400">{activity.user || activity.user_name}</p>
                   </div>
                 </div>
               </div>
@@ -628,21 +897,24 @@ const AdminDashboardAfricasHands: React.FC = () => {
                     <div className="flex justify-between">
                       <span className="text-gray-500">{t('form.status')}:</span> 
                       <span className={`font-medium ${
-                        selectedProject.status === t('status.active') ? 'text-yellow-600' :
-                        selectedProject.status === t('status.completed') ? 'text-green-600' :
+                        selectedProject.status === 'active' ? 'text-yellow-600' :
+                        selectedProject.status === 'completed' ? 'text-green-600' :
                         'text-gray-600'
                       }`}>
-                        {selectedProject.status}
+                        {selectedProject.status === 'active' ? 'Ativo' :
+                         selectedProject.status === 'completed' ? 'Completo' :
+                         selectedProject.status === 'planning' ? 'Planeamento' : selectedProject.status}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-500">{t('form.priority')}:</span> 
                       <span className={`font-medium ${
-                        selectedProject.priority === t('priority.high') ? 'text-red-600' :
-                        selectedProject.priority === t('priority.medium') ? 'text-yellow-600' :
+                        selectedProject.priority === 'high' ? 'text-red-600' :
+                        selectedProject.priority === 'medium' ? 'text-yellow-600' :
                         'text-green-600'
                       }`}>
-                        {selectedProject.priority}
+                        {selectedProject.priority === 'high' ? 'Alta' :
+                         selectedProject.priority === 'medium' ? 'Média' : 'Baixa'}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -738,7 +1010,7 @@ const AdminDashboardAfricasHands: React.FC = () => {
                       <span className="text-gray-600">{t('modal.end')}</span>
                       <span className="font-medium">{new Date(selectedProject.endDate).toLocaleDateString('pt-BR')}</span>
                       <div className={`w-3 h-3 rounded-full ${
-                        selectedProject.status === t('status.completed') ? 'bg-green-500' : 'bg-gray-300'
+                        selectedProject.status === 'completed' ? 'bg-green-500' : 'bg-gray-300'
                       }`}></div>
                     </div>
                   </div>
@@ -785,18 +1057,18 @@ const AdminDashboardAfricasHands: React.FC = () => {
           
           <div className="space-y-4">
             {sectors.map((sector) => {
-              const sectorProjects = projects.filter(p => p.sector === sector);
-              const sectorBudget = sectorProjects.reduce((sum, p) => sum + p.budget, 0);
+              const sectorProjects = projects.filter(p => p.sector === sector.name);
+              const sectorBudget = sectorProjects.reduce((sum, p) => sum + (p.budget || 0), 0);
               const avgProgress = sectorProjects.length > 0 
-                ? Math.round(sectorProjects.reduce((sum, p) => sum + p.progress, 0) / sectorProjects.length)
+                ? Math.round(sectorProjects.reduce((sum, p) => sum + (p.progress || 0), 0) / sectorProjects.length)
                 : 0;
               
               return (
-                <div key={sector} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div key={sector.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                   <div className="flex items-center gap-4">
-                    <div className="text-2xl">{getSectorIcon(sector)}</div>
+                    <div className="text-2xl">{sector.icon_emoji}</div>
                     <div>
-                      <h3 className="font-medium text-gray-900">{sector}</h3>
+                      <h3 className="font-medium text-gray-900">{sector.name}</h3>
                       <p className="text-sm text-gray-600">
                         {sectorProjects.length} projeto{sectorProjects.length !== 1 ? 's' : ''} • 
                         ${(sectorBudget / 1000).toFixed(0)}K
@@ -864,7 +1136,7 @@ const AdminDashboardAfricasHands: React.FC = () => {
                 <div>
                   <p className="text-sm font-medium text-purple-600">{t('stats.profitMargin')}</p>
                   <p className="text-2xl font-bold text-purple-700">
-                    {((stats.totalBudget - stats.totalSpent) / stats.totalBudget * 100).toFixed(1)}%
+                    {stats.totalBudget > 0 ? ((stats.totalBudget - stats.totalSpent) / stats.totalBudget * 100).toFixed(1) : 0}%
                   </p>
                 </div>
                 <div className="text-3xl">📊</div>

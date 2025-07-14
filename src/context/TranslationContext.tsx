@@ -148,10 +148,7 @@ const translations: Translations = {
     pt: 'AO: +244 924 166 401',
     en: 'AO: +244 924 166 401'
   },
-  'user.phoneNamibia': {
-    pt: 'NB: +264 817 049 40',
-    en: 'NB: +264 817 049 40'
-  },
+  
   'user.logout': {
     pt: 'Sair',
     en: 'Logout'

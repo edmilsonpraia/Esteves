@@ -80,15 +80,7 @@ const ContactAfricasHands: React.FC = () => {
       image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=200&fit=crop',
       icon: '📞'
     },
-    {
-      type: 'phone',
-      label: 'Namíbia',
-      value: '+264 817 049 40',
-      country: 'Namíbia',
-      city: 'Oshakati',
-      image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400&h=200&fit=crop',
-      icon: '📞'
-    },
+    
     {
       type: 'email',
       label: 'E-mail Regional',
@@ -133,8 +125,8 @@ const ContactAfricasHands: React.FC = () => {
           city: 'Oshakati',
           type: 'Escritório Regional',
           address: 'Main Street, CBD',
-          phone: '+264 817 049 40',
-          email: 'oshakati@africashands.com',
+          phone: '',
+          email: '',
           image: 'https://images.unsplash.com/photo-1554469384-e58fac16e23a?w=300&h=200&fit=crop',
           specialties: ['Mineração', 'Turismo', 'Sustentabilidade']
         },
@@ -142,8 +134,8 @@ const ContactAfricasHands: React.FC = () => {
           city: 'Windhoek',
           type: 'Centro de Parcerias',
           address: 'Independence Avenue',
-          phone: '+264 817 049 40',
-          email: 'windhoek@africashands.com',
+          phone: '',
+          email: '',
           image: 'https://images.unsplash.com/photo-1590736969955-71cc94901144?w=300&h=200&fit=crop',
           specialties: ['Governo', 'Educação', 'Inovação']
         }
@@ -157,8 +149,8 @@ const ContactAfricasHands: React.FC = () => {
           city: 'Cidade do Cabo',
           type: 'Hub de Inovação',
           address: 'V&A Waterfront',
-          phone: '+27 21 XXX XXXX',
-          email: 'capetown@africashands.com',
+          phone: '',
+          email: '',
           image: 'https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=300&h=200&fit=crop',
           specialties: ['Tecnologia', 'Startups', 'Financeiro']
         },
@@ -166,8 +158,8 @@ const ContactAfricasHands: React.FC = () => {
           city: 'Joanesburgo',
           type: 'Centro de Negócios',
           address: 'Sandton City',
-          phone: '+27 11 XXX XXXX',
-          email: 'johannesburg@africashands.com',
+          phone: '',
+          email: '',
           image: 'https://images.unsplash.com/photo-1577948000111-9c970dfe3743?w=300&h=200&fit=crop',
           specialties: ['Corporativo', 'Mineração', 'Logística']
         }
