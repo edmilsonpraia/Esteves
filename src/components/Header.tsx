@@ -12,12 +12,29 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, isSidebarOpen }) => {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
   
-  const { userRole, logout } = useAuth();
+  const { userRole, logout, user } = useAuth(); // ✅ Adicionado 'user'
   const { t } = useTranslation();
 
-  const handleLogout = () => {
-    logout();
-    window.location.href = '/login';
+  // 🔧 FUNÇÃO DE LOGOUT CORRIGIDA
+  const handleLogout = async () => {
+    try {
+      console.log('👋 Header: Iniciando logout...');
+      
+      // Fechar dropdowns
+      setUserDropdownOpen(false);
+      setNotificationsOpen(false);
+      
+      // Chamar logout do AuthContext
+      await logout();
+      
+      console.log('✅ Header: Logout realizado com sucesso');
+      
+      // NÃO fazer redirecionamento manual - deixar o App.tsx gerenciar
+      // window.location.href = '/login'; // ❌ REMOVIDO
+      
+    } catch (error) {
+      console.error('❌ Header: Erro no logout:', error);
+    }
   };
 
   // Notificações simuladas - agora traduzidas
@@ -198,9 +215,9 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, isSidebarOpen }) => {
               {/* User Info - Hidden on small screens */}
               <div className="hidden sm:block text-left">
                 <p className="text-sm font-medium text-gray-900">
-                  {userRole === 'admin' ? t('user.administrator') : t('user.user')}
+                  {user?.name || (userRole === 'admin' ? t('user.administrator') : t('user.user'))}
                 </p>
-                <p className="text-xs text-gray-500">{t('header.companyName')}</p>
+                <p className="text-xs text-gray-500">{user?.email || t('header.companyName')}</p>
               </div>
 
               <svg 
@@ -223,9 +240,9 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, isSidebarOpen }) => {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-900">
-                        {userRole === 'admin' ? t('user.administrator') : t('user.user')}
+                        {user?.name || (userRole === 'admin' ? t('user.administrator') : t('user.user'))}
                       </p>
-                      <p className="text-xs text-gray-500">{t('user.email')}</p>
+                      <p className="text-xs text-gray-500">{user?.email || t('user.email')}</p>
                     </div>
                   </div>
                 </div>
@@ -233,8 +250,9 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, isSidebarOpen }) => {
                 <div className="py-2">
                   <button
                     onClick={() => {
-                      window.location.href = '/profile';
+                      console.log('📄 Navegando para perfil...');
                       setUserDropdownOpen(false);
+                      // Implementar navegação interna aqui se necessário
                     }}
                     className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                   >
@@ -246,8 +264,9 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, isSidebarOpen }) => {
 
                   <button
                     onClick={() => {
-                      window.location.href = '/settings';
+                      console.log('⚙️ Navegando para configurações...');
                       setUserDropdownOpen(false);
+                      // Implementar navegação interna aqui se necessário
                     }}
                     className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                   >
@@ -280,6 +299,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, isSidebarOpen }) => {
 
                   <div className="border-t border-gray-200 my-2"></div>
 
+                  {/* 🔧 BOTÃO DE LOGOUT CORRIGIDO */}
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"

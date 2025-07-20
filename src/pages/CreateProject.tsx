@@ -1,1193 +1,1004 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabase';
 
-interface ProjectFormData {
-  name: string;
-  client: string;
-  country: string;
-  sector: string;
-  description: string;
-  budget: number;
-  startDate: string;
-  endDate: string;
-  priority: 'low' | 'medium' | 'high' | 'critical';
-  deliverables: string[];
-  objectives: string[];
-  teamMembers: TeamMemberForm[];
-  risks: RiskForm[];
-  milestones: MilestoneForm[];
-  requirements: string;
-  expectedOutcomes: string;
-  stakeholders: string[];
-  communicationPlan: string;
-}
-
-interface TeamMemberForm {
-  name: string;
-  role: string;
-  email: string;
-  country: string;
-  expertise: string;
-}
-
-interface RiskForm {
-  description: string;
-  level: 'low' | 'medium' | 'high';
-  mitigation: string;
-  probability: number;
-  impact: number;
-}
-
-interface MilestoneForm {
+interface OpportunityForm {
   title: string;
   description: string;
-  dueDate: string;
-  priority: 'low' | 'medium' | 'high';
+  country: string;
+  sector: string;
+  type: 'project' | 'partnership' | 'funding' | 'education';
+  organization: string;
+  location: string;
+  budget: string;
+  deadline: string;
+  requirements: string[];
+  featured: boolean;
+  image: File | null;
+  imageUrl: string;
 }
 
 const CreateProject: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-
-  const [formData, setFormData] = useState<ProjectFormData>({
-    name: '',
-    client: '',
+  const [formData, setFormData] = useState<OpportunityForm>({
+    title: '',
+    description: '',
     country: '',
     sector: '',
-    description: '',
-    budget: 0,
-    startDate: '',
-    endDate: '',
-    priority: 'medium',
-    deliverables: [''],
-    objectives: [''],
-    teamMembers: [{
-      name: '',
-      role: '',
-      email: '',
-      country: '',
-      expertise: ''
-    }],
-    risks: [{
-      description: '',
-      level: 'medium',
-      mitigation: '',
-      probability: 50,
-      impact: 50
-    }],
-    milestones: [{
-      title: '',
-      description: '',
-      dueDate: '',
-      priority: 'medium'
-    }],
-    requirements: '',
-    expectedOutcomes: '',
-    stakeholders: [''],
-    communicationPlan: ''
+    type: 'project',
+    organization: '',
+    location: '',
+    budget: '',
+    deadline: '',
+    requirements: [''],
+    featured: false,
+    image: null,
+    imageUrl: ''
   });
+  
+  const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState(1);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const { user } = useAuth();
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  // ✅ VERIFICAÇÃO ROBUSTA DE ADMIN
+  useEffect(() => {
+    const checkUserRole = async () => {
+      if (!user) {
+        setCheckingAuth(false);
+        return;
+      }
 
-  const countries = ['Angola', 'Namíbia', 'África do Sul'];
-  const sectors = ['Saúde', 'Educação', 'Turismo', 'Comércio', 'Transporte', 'Tecnologia'];
-  const priorities = [
-    { value: 'low', label: 'Baixa', color: 'bg-green-100 text-green-800' },
-    { value: 'medium', label: 'Média', color: 'bg-yellow-100 text-yellow-800' },
-    { value: 'high', label: 'Alta', color: 'bg-orange-100 text-orange-800' },
-    { value: 'critical', label: 'Crítica', color: 'bg-red-100 text-red-800' }
-  ];
+      console.log('🔍 Verificando permissões para:', user.email);
 
-  const steps = [
-    { id: 1, title: 'Informações Básicas', icon: '📋', description: 'Dados principais do projeto' },
-    { id: 2, title: 'Planejamento', icon: '📅', description: 'Cronograma e objetivos' },
-    { id: 3, title: 'Equipe & Recursos', icon: '👥', description: 'Membros e orçamento' },
-    { id: 4, title: 'Riscos & Marcos', icon: '⚠️', description: 'Gestão de riscos e milestones' },
-    { id: 5, title: 'Revisão & Envio', icon: '✅', description: 'Confirmar e criar projeto' }
-  ];
-
-  // Helper functions
-  const getCountryFlag = (country: string) => {
-    const flags = {
-      'Angola': '🇦🇴',
-      'Namíbia': '🇳🇦',
-      'África do Sul': '🇿🇦'
-    };
-    return flags[country as keyof typeof flags] || '🌍';
-  };
-
-  const getSectorIcon = (sector: string) => {
-    const icons = {
-      'Saúde': '🏥',
-      'Educação': '🎓',
-      'Turismo': '🏨',
-      'Comércio': '🛒',
-      'Transporte': '✈️',
-      'Tecnologia': '💻'
-    };
-    return icons[sector as keyof typeof icons] || '💼';
-  };
-
-  // Form validation
-  const validateStep = (step: number): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    switch (step) {
-      case 1:
-        if (!formData.name.trim()) newErrors.name = 'Nome do projeto é obrigatório';
-        if (!formData.client.trim()) newErrors.client = 'Cliente é obrigatório';
-        if (!formData.country) newErrors.country = 'País é obrigatório';
-        if (!formData.sector) newErrors.sector = 'Setor é obrigatório';
-        if (!formData.description.trim()) newErrors.description = 'Descrição é obrigatória';
-        break;
-      case 2:
-        if (!formData.startDate) newErrors.startDate = 'Data de início é obrigatória';
-        if (!formData.endDate) newErrors.endDate = 'Data de término é obrigatória';
-        if (formData.startDate && formData.endDate && new Date(formData.startDate) >= new Date(formData.endDate)) {
-          newErrors.endDate = 'Data de término deve ser posterior à data de início';
+      try {
+        // ✅ PRIMEIRO: Verificar por email (mais confiável)
+        const roleFromEmail = determineRoleFromEmail(user.email);
+        
+        if (roleFromEmail === 'admin') {
+          setIsAuthorized(true);
+          setUserProfile({
+            full_name: user.name || user.email?.split('@')[0] || 'Admin',
+            organization: 'Africa\'s Hands',
+            role: 'admin'
+          });
+          console.log('✅ Admin autorizado por email:', user.email);
+          setCheckingAuth(false);
+          return;
         }
-        if (formData.budget <= 0) newErrors.budget = 'Orçamento deve ser maior que zero';
-        break;
-      case 3:
-        if (formData.teamMembers.some(member => !member.name.trim() || !member.role.trim() || !member.email.trim())) {
-          newErrors.teamMembers = 'Todos os campos dos membros da equipe são obrigatórios';
+
+        // ✅ SEGUNDO: Tentar verificar no banco (com timeout)
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Timeout')), 2000);
+        });
+
+        const dbPromise = supabase
+          .from('profiles')
+          .select('role, full_name, name, organization')
+          .eq('id', user.id)
+          .single();
+
+        const { data, error } = await Promise.race([dbPromise, timeoutPromise]) as any;
+
+        if (!error && data?.role === 'admin') {
+          setIsAuthorized(true);
+          setUserProfile(data);
+          console.log('✅ Admin autorizado por banco:', data);
+        } else {
+          setIsAuthorized(false);
+          console.log('❌ Não é admin ou erro no banco:', error?.message);
         }
-        break;
-    }
+      } catch (err) {
+        console.warn('⚠️ Erro ao verificar permissões (usando verificação por email):', err);
+        
+        // ✅ FALLBACK: Verificar por email mesmo com erro no banco
+        const roleFromEmail = determineRoleFromEmail(user.email);
+        if (roleFromEmail === 'admin') {
+          setIsAuthorized(true);
+          setUserProfile({
+            full_name: user.name || user.email?.split('@')[0] || 'Admin',
+            organization: 'Africa\'s Hands',
+            role: 'admin'
+          });
+          console.log('✅ Admin autorizado por email (fallback):', user.email);
+        } else {
+          setIsAuthorized(false);
+        }
+      } finally {
+        setCheckingAuth(false);
+      }
+    };
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    checkUserRole();
+  }, [user]);
 
-  // Array manipulation functions
-  const addArrayItem = (field: keyof ProjectFormData, defaultValue: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: [...(prev[field] as any[]), defaultValue]
-    }));
-  };
-
-  const removeArrayItem = (field: keyof ProjectFormData, index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: (prev[field] as any[]).filter((_, i) => i !== index)
-    }));
-  };
-
-  const updateArrayItem = (field: keyof ProjectFormData, index: number, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: (prev[field] as any[]).map((item, i) => i === index ? value : item)
-    }));
-  };
-
-  // Navigation
-  const nextStep = () => {
-    if (validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(prev + 1, 5));
-    }
-  };
-
-  const prevStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
-  };
-
-  // Form submission
-  const handleSubmit = async () => {
-    if (!validateStep(currentStep)) return;
-
-    setIsSubmitting(true);
+  // ✅ FUNÇÃO PARA DETERMINAR ROLE POR EMAIL
+  const determineRoleFromEmail = (email: string): 'admin' | 'user' => {
+    if (!email) return 'user';
     
-    try {
-      // Simular criação do projeto
-      await new Promise(resolve => setTimeout(resolve, 2000));
+    const cleanEmail = email.toLowerCase().trim();
+    
+    const adminEmails = [
+      'admin@gmail.com',
+      'admin@africashands.com',
+      'edmilsondelfilme45@gmail.com'
+    ];
+    
+    const adminDomains = ['@africashands.com'];
+    const adminPatterns = ['admin', 'administrator'];
+    
+    if (adminEmails.includes(cleanEmail)) return 'admin';
+    if (adminDomains.some(domain => cleanEmail.includes(domain))) return 'admin';
+    if (adminPatterns.some(pattern => cleanEmail.includes(pattern))) return 'admin';
+    
+    return 'user';
+  };
+
+  // Se ainda está verificando autenticação
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-red-600 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Verificando permissões...</h2>
+          <p className="text-gray-600">Aguarde um momento</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Se não está autorizado (não é admin)
+  if (!isAuthorized) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-8">
+          <div className="text-6xl mb-6">🚫</div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Acesso Negado</h2>
+          <p className="text-gray-600 mb-6">
+            Apenas administradores podem criar oportunidades. Você não tem permissão para acessar esta página.
+          </p>
+          <div className="space-y-3">
+            <button
+              onClick={() => window.history.back()}
+              className="w-full bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors"
+            >
+              ← Voltar ao Dashboard
+            </button>
+            <p className="text-sm text-gray-500">
+              Se você acredita que isso é um erro, entre em contato com o administrador do sistema.
+            </p>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+              <h4 className="font-semibold text-blue-800 mb-2">🔍 Informações de Debug:</h4>
+              <div className="text-xs text-blue-700 space-y-1">
+                <p><strong>Email:</strong> {user?.email}</p>
+                <p><strong>Role detectado por email:</strong> {determineRoleFromEmail(user?.email || '')}</p>
+                <p><strong>ID do usuário:</strong> {user?.id}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const countries = [
+    { code: 'AO', name: 'Angola', flag: '🇦🇴', cities: ['Luanda', 'Benguela', 'Huíla', 'Cunene'] },
+    { code: 'NA', name: 'Namíbia', flag: '🇳🇦', cities: ['Windhoek', 'Swakopmund', 'Oshakati', 'Rundu'] },
+    { code: 'ZA', name: 'África do Sul', flag: '🇿🇦', cities: ['Cape Town', 'Johannesburg', 'Durban', 'Pretória'] }
+  ];
+
+  const sectors = [
+    { name: 'Saúde', icon: '🏥', color: 'green' },
+    { name: 'Educação', icon: '🎓', color: 'blue' },
+    { name: 'Turismo', icon: '🏨', color: 'orange' },
+    { name: 'Comércio', icon: '🛒', color: 'purple' },
+    { name: 'Transporte', icon: '✈️', color: 'indigo' },
+    { name: 'Tecnologia', icon: '💻', color: 'pink' }
+  ];
+
+  const opportunityTypes = [
+    { value: 'project', label: 'Projeto', icon: '🚀', desc: 'Projeto específico com metas definidas' },
+    { value: 'partnership', label: 'Parceria', icon: '🤝', desc: 'Oportunidade de parceria empresarial' },
+    { value: 'funding', label: 'Financiamento', icon: '💰', desc: 'Oportunidade de financiamento ou investimento' },
+    { value: 'education', label: 'Educação', icon: '📚', desc: 'Programa educacional ou formação' }
+  ];
+
+  const defaultImages = {
+    'Saúde': 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=200&fit=crop&crop=center',
+    'Educação': 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400&h=200&fit=crop&crop=center',
+    'Turismo': 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=400&h=200&fit=crop&crop=center',
+    'Comércio': 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400&h=200&fit=crop&crop=center',
+    'Transporte': 'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=400&h=200&fit=crop&crop=center',
+    'Tecnologia': 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=200&fit=crop&crop=center'
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    
+    if (type === 'checkbox') {
+      const checkbox = e.target as HTMLInputElement;
+      setFormData(prev => ({
+        ...prev,
+        [name]: checkbox.checked
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+
+      // Auto-definir imagem baseada no setor
+      if (name === 'sector' && value && !formData.image && !formData.imageUrl) {
+        setFormData(prev => ({
+          ...prev,
+          imageUrl: defaultImages[value as keyof typeof defaultImages] || ''
+        }));
+        setPreviewImage(defaultImages[value as keyof typeof defaultImages] || null);
+      }
+    }
+  };
+
+  const handleRequirementChange = (index: number, value: string) => {
+    const newRequirements = [...formData.requirements];
+    newRequirements[index] = value;
+    setFormData(prev => ({
+      ...prev,
+      requirements: newRequirements
+    }));
+  };
+
+  const addRequirement = () => {
+    setFormData(prev => ({
+      ...prev,
+      requirements: [...prev.requirements, '']
+    }));
+  };
+
+  const removeRequirement = (index: number) => {
+    if (formData.requirements.length > 1) {
+      const newRequirements = formData.requirements.filter((_, i) => i !== index);
+      setFormData(prev => ({
+        ...prev,
+        requirements: newRequirements
+      }));
+    }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validar tipo de arquivo
+      if (!file.type.startsWith('image/')) {
+        alert('Por favor, selecione apenas arquivos de imagem.');
+        return;
+      }
       
-      setShowSuccess(true);
-      setTimeout(() => {
-        // Redirecionar para a lista de projetos
-        window.location.href = '/admin/projects';
-      }, 3000);
+      // Validar tamanho (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('A imagem deve ter no máximo 5MB.');
+        return;
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        image: file,
+        imageUrl: ''
+      }));
+
+      // Criar preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreviewImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // ✅ FUNÇÃO DE UPLOAD CORRIGIDA (SEM STORAGEUTILS)
+  const uploadImage = async (file: File): Promise<string> => {
+    try {
+      console.log('📤 Iniciando upload da imagem...');
+      
+      const fileExt = file.name.split('.').pop();
+      const fileName = `opportunity-${Date.now()}.${fileExt}`;
+      const filePath = `opportunities/${fileName}`;
+
+      console.log('📁 Upload para:', filePath);
+
+      // ✅ UPLOAD DIRETO PARA O BUCKET
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        console.error('❌ Erro no upload:', uploadError);
+        throw uploadError;
+      }
+
+      console.log('✅ Upload realizado com sucesso');
+
+      // ✅ OBTER URL PÚBLICA
+      const { data } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      console.log('🔗 URL pública gerada:', data.publicUrl);
+      return data.publicUrl;
       
     } catch (error) {
-      console.error('Erro ao criar projeto:', error);
-    } finally {
-      setIsSubmitting(false);
+      console.error('❌ Erro completo no upload:', error);
+      throw error;
     }
   };
 
-  const calculateProjectScore = () => {
-    let score = 0;
-    let maxScore = 0;
+  // ✅ FUNÇÃO PARA CRIAR OPORTUNIDADE
+  const handleSubmit = async () => {
+    if (!user) {
+      alert('Você precisa estar logado para criar oportunidades.');
+      return;
+    }
 
-    // Informações básicas (30 pontos)
-    maxScore += 30;
-    if (formData.name.trim()) score += 5;
-    if (formData.client.trim()) score += 5;
-    if (formData.country) score += 5;
-    if (formData.sector) score += 5;
-    if (formData.description.trim()) score += 10;
+    setLoading(true);
+    
+    try {
+      let imageUrl = formData.imageUrl;
+      
+      // ✅ UPLOAD DA IMAGEM SE NECESSÁRIO
+      if (formData.image) {
+        console.log('📤 Fazendo upload da imagem...');
+        imageUrl = await uploadImage(formData.image);
+      }
 
-    // Planejamento (25 pontos)
-    maxScore += 25;
-    if (formData.startDate) score += 5;
-    if (formData.endDate) score += 5;
-    if (formData.budget > 0) score += 5;
-    if (formData.objectives.some(obj => obj.trim())) score += 10;
+      // Filtrar requisitos vazios
+      const validRequirements = formData.requirements.filter(req => req.trim() !== '');
 
-    // Equipe (20 pontos)
-    maxScore += 20;
-    if (formData.teamMembers.some(member => member.name.trim())) score += 20;
+      const opportunityData = {
+        title: formData.title,
+        description: formData.description,
+        country: formData.country,
+        sector: formData.sector,
+        type: formData.type,
+        organization: formData.organization,
+        location: formData.location,
+        budget: formData.budget ? parseFloat(formData.budget) : null,
+        deadline: formData.deadline,
+        requirements: validRequirements,
+        status: 'active',
+        featured: formData.featured,
+        image: imageUrl,
+        created_by: user.id
+      };
 
-    // Riscos e marcos (15 pontos)
-    maxScore += 15;
-    if (formData.risks.some(risk => risk.description.trim())) score += 7;
-    if (formData.milestones.some(milestone => milestone.title.trim())) score += 8;
+      console.log('🚀 Criando oportunidade no Supabase...', opportunityData);
+      
+      // ✅ INSERIR NO BANCO DE DADOS
+      const { data, error } = await supabase
+        .from('opportunities')
+        .insert([opportunityData])
+        .select()
+        .single();
 
-    // Extras (10 pontos)
-    maxScore += 10;
-    if (formData.requirements.trim()) score += 3;
-    if (formData.expectedOutcomes.trim()) score += 3;
-    if (formData.communicationPlan.trim()) score += 4;
+      if (error) {
+        console.error('❌ Erro do Supabase:', error);
+        throw error;
+      }
 
-    return Math.round((score / maxScore) * 100);
+      console.log('✅ Oportunidade criada com sucesso:', data.id);
+      
+      // ✅ MOSTRAR MENSAGEM DE SUCESSO
+      setSuccessMessage(`Oportunidade "${data.title}" criada com sucesso! 🎉`);
+      
+      // Reset form após 4 segundos
+      setTimeout(() => {
+        setFormData({
+          title: '',
+          description: '',
+          country: '',
+          sector: '',
+          type: 'project',
+          organization: '',
+          location: '',
+          budget: '',
+          deadline: '',
+          requirements: [''],
+          featured: false,
+          image: null,
+          imageUrl: ''
+        });
+        setPreviewImage(null);
+        setStep(1);
+        setSuccessMessage(null);
+      }, 4000);
+
+    } catch (error: any) {
+      console.error('❌ Erro ao criar oportunidade:', error);
+      
+      // ✅ MENSAGENS DE ERRO MAIS ESPECÍFICAS
+      let errorMessage = 'Erro ao criar oportunidade. Tente novamente.';
+      
+      if (error.message?.includes('Bucket not found')) {
+        errorMessage = 'Erro no upload da imagem. Tente usar uma imagem padrão do setor.';
+      } else if (error.message?.includes('policies')) {
+        errorMessage = 'Erro de permissão. Verifique se você tem acesso de administrador.';
+      } else if (error.message) {
+        errorMessage = `Erro: ${error.message}`;
+      }
+      
+      alert(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Criar Novo Projeto Regional</h1>
-          <p className="text-lg text-gray-600">Desenvolva soluções inovadoras para Angola 🇦🇴 Namíbia 🇳🇦 África do Sul 🇿🇦</p>
-        </div>
+  const getSelectedCountry = () => {
+    return countries.find(c => c.name === formData.country);
+  };
 
-        {/* Progress Indicator */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            {steps.map((step, index) => (
-              <div key={step.id} className="flex items-center">
-                <div className={`flex items-center justify-center w-12 h-12 rounded-full border-2 ${
-                  currentStep >= step.id 
-                    ? 'bg-red-600 border-red-600 text-white' 
-                    : 'bg-white border-gray-300 text-gray-500'
-                }`}>
-                  <span className="text-xl">{step.icon}</span>
-                </div>
-                {index < steps.length - 1 && (
-                  <div className={`w-full h-1 mx-4 ${
-                    currentStep > step.id ? 'bg-red-600' : 'bg-gray-200'
-                  }`}></div>
-                )}
-              </div>
-            ))}
+  const getSelectedSector = () => {
+    return sectors.find(s => s.name === formData.sector);
+  };
+
+  const isStepValid = () => {
+    switch (step) {
+      case 1:
+        return formData.title && formData.description && formData.country && formData.sector;
+      case 2:
+        return formData.type && formData.organization && formData.location;
+      case 3:
+        return formData.deadline && formData.requirements.some(req => req.trim() !== '');
+      default:
+        return true;
+    }
+  };
+
+  // ✅ MODAL DE SUCESSO
+  if (successMessage) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-8 text-center">
+          <div className="text-6xl mb-4">🎉</div>
+          <h2 className="text-2xl font-bold text-green-600 mb-4">Sucesso!</h2>
+          <p className="text-gray-700 mb-6">{successMessage}</p>
+          
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <h3 className="font-semibold text-green-800 mb-2">📊 Oportunidade Publicada</h3>
+            <div className="text-sm text-green-700 space-y-1">
+              <p>✅ Salva no banco de dados</p>
+              <p>✅ Visível para todos os usuários</p>
+              <p>✅ Filtros funcionando automaticamente</p>
+              <p>✅ Pronta para receber candidaturas</p>
+            </div>
           </div>
           
-          <div className="text-center">
-            <h2 className="text-xl font-semibold text-gray-900">{steps[currentStep - 1].title}</h2>
-            <p className="text-gray-600">{steps[currentStep - 1].description}</p>
+          <div className="space-y-3">
+            <button
+              onClick={() => setSuccessMessage(null)}
+              className="w-full bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
+            >
+              ✨ Criar Nova Oportunidade
+            </button>
+            <button
+              onClick={() => window.history.back()}
+              className="w-full bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors"
+            >
+              ← Voltar ao Dashboard
+            </button>
+          </div>
+          
+          <p className="text-xs text-gray-500 mt-4">
+            🌍 A oportunidade está agora disponível para usuários de Angola, Namíbia e África do Sul!
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-red-600 to-red-700 px-8 py-6 text-white">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-2xl font-bold">🚀 Criar Nova Oportunidade SADC</h1>
+            <p className="text-red-100 mt-1">
+              Crie oportunidades regionais para Angola, Namíbia e África do Sul
+            </p>
+          </div>
+          
+          {/* Admin Info */}
+          <div className="text-right">
+            <p className="text-sm text-red-100">Admin:</p>
+            <p className="font-semibold">{userProfile?.full_name || user?.name || 'Administrador'}</p>
+            <p className="text-xs text-red-200">{userProfile?.organization || 'Africa\'s Hands'}</p>
+            <div className="flex items-center gap-1 mt-1 justify-end">
+              <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-xs text-green-200">Sistema Ativo</span>
+            </div>
           </div>
         </div>
+        
+        {/* Progress Bar */}
+        <div className="flex items-center">
+          {[1, 2, 3, 4].map((stepNumber) => (
+            <div key={stepNumber} className="flex items-center">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                step >= stepNumber 
+                  ? 'bg-white text-red-600' 
+                  : 'bg-red-500 text-white border-2 border-red-300'
+              }`}>
+                {stepNumber}
+              </div>
+              {stepNumber < 4 && (
+                <div className={`w-12 h-1 mx-2 ${
+                  step > stepNumber ? 'bg-white' : 'bg-red-500'
+                }`}></div>
+              )}
+            </div>
+          ))}
+        </div>
+        
+        <div className="mt-2 text-sm text-red-100">
+          Passo {step} de 4: {
+            step === 1 ? 'Informações Básicas' :
+            step === 2 ? 'Detalhes da Organização' :
+            step === 3 ? 'Requisitos e Cronograma' :
+            'Revisão e Publicação'
+          }
+        </div>
+      </div>
 
-        {/* Success Message */}
-        {showSuccess && (
-          <div className="mb-8 p-6 bg-green-50 border border-green-200 rounded-xl">
-            <div className="flex items-center gap-3">
-              <div className="text-3xl">🎉</div>
-              <div>
-                <h3 className="text-lg font-semibold text-green-800">Projeto Criado com Sucesso!</h3>
-                <p className="text-green-700">Seu projeto "{formData.name}" foi criado e está sendo processado.</p>
-                <p className="text-sm text-green-600 mt-1">Redirecionando para a lista de projetos...</p>
+      <div className="p-8">
+        {/* Passo 1: Informações Básicas */}
+        {step === 1 && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">📋 Informações Básicas</h2>
+            </div>
+
+            {/* Título */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Título da Oportunidade *
+              </label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                placeholder="Ex: Programa de Intercâmbio Médico Luanda"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                required
+              />
+            </div>
+
+            {/* Descrição */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Descrição Completa *
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                rows={4}
+                placeholder="Descreva detalhadamente a oportunidade, objetivos, benefícios..."
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
+                required
+              />
+              <div className="text-sm text-gray-500 mt-1">
+                {formData.description.length}/500 caracteres
+              </div>
+            </div>
+
+            {/* País */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                País da Oportunidade *
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {countries.map((country) => (
+                  <div
+                    key={country.code}
+                    onClick={() => setFormData(prev => ({ ...prev, country: country.name }))}
+                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                      formData.country === country.name
+                        ? 'border-red-500 bg-red-50'
+                        : 'border-gray-200 hover:border-red-300'
+                    }`}
+                  >
+                    <div className="text-center">
+                      <div className="text-3xl mb-2">{country.flag}</div>
+                      <div className="font-semibold text-gray-900">{country.name}</div>
+                      <div className="text-sm text-gray-600 mt-1">
+                        {country.cities.slice(0, 2).join(', ')}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Setor */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Setor da Oportunidade *
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {sectors.map((sector) => (
+                  <div
+                    key={sector.name}
+                    onClick={() => setFormData(prev => ({ ...prev, sector: sector.name }))}
+                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                      formData.sector === sector.name
+                        ? 'border-red-500 bg-red-50'
+                        : 'border-gray-200 hover:border-red-300'
+                    }`}
+                  >
+                    <div className="text-center">
+                      <div className="text-2xl mb-2">{sector.icon}</div>
+                      <div className="font-medium text-gray-900">{sector.name}</div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         )}
 
-        {/* Form Container */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-          
-          {/* Step 1: Informações Básicas */}
-          {currentStep === 1 && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Nome do Projeto *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                      errors.name ? 'border-red-300' : 'border-gray-300'
-                    }`}
-                    placeholder="Ex: Sistema de Telemedicina Regional"
-                  />
-                  {errors.name && <p className="text-red-600 text-sm mt-1">{errors.name}</p>}
-                </div>
+        {/* Passo 2: Detalhes da Organização */}
+        {step === 2 && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">🏢 Detalhes da Organização</h2>
+            </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Cliente/Organização *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.client}
-                    onChange={(e) => setFormData({ ...formData, client: e.target.value })}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                      errors.client ? 'border-red-300' : 'border-gray-300'
-                    }`}
-                    placeholder="Ex: Hospital Central de Luanda"
-                  />
-                  {errors.client && <p className="text-red-600 text-sm mt-1">{errors.client}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    País Principal *
-                  </label>
-                  <select
-                    value={formData.country}
-                    onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                      errors.country ? 'border-red-300' : 'border-gray-300'
+            {/* Tipo de Oportunidade */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Tipo de Oportunidade *
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {opportunityTypes.map((type) => (
+                  <div
+                    key={type.value}
+                    onClick={() => setFormData(prev => ({ ...prev, type: type.value as any }))}
+                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                      formData.type === type.value
+                        ? 'border-red-500 bg-red-50'
+                        : 'border-gray-200 hover:border-red-300'
                     }`}
                   >
-                    <option value="">Selecione o país</option>
-                    {countries.map(country => (
-                      <option key={country} value={country}>
-                        {getCountryFlag(country)} {country}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.country && <p className="text-red-600 text-sm mt-1">{errors.country}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Setor *
-                  </label>
-                  <select
-                    value={formData.sector}
-                    onChange={(e) => setFormData({ ...formData, sector: e.target.value })}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                      errors.sector ? 'border-red-300' : 'border-gray-300'
-                    }`}
-                  >
-                    <option value="">Selecione o setor</option>
-                    {sectors.map(sector => (
-                      <option key={sector} value={sector}>
-                        {getSectorIcon(sector)} {sector}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.sector && <p className="text-red-600 text-sm mt-1">{errors.sector}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Prioridade do Projeto
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {priorities.map(priority => (
-                      <button
-                        key={priority.value}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, priority: priority.value as any })}
-                        className={`p-3 rounded-lg border-2 transition-all ${
-                          formData.priority === priority.value
-                            ? `${priority.color} border-current`
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                      >
-                        <span className="font-medium">{priority.label}</span>
-                      </button>
-                    ))}
+                    <div className="flex items-center gap-3">
+                      <div className="text-2xl">{type.icon}</div>
+                      <div>
+                        <div className="font-semibold text-gray-900">{type.label}</div>
+                        <div className="text-sm text-gray-600">{type.desc}</div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Descrição do Projeto *
-                  </label>
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    rows={4}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                      errors.description ? 'border-red-300' : 'border-gray-300'
-                    }`}
-                    placeholder="Descreva os objetivos, escopo e benefícios esperados do projeto..."
-                  />
-                  {errors.description && <p className="text-red-600 text-sm mt-1">{errors.description}</p>}
-                  <p className="text-sm text-gray-500 mt-1">
-                    {formData.description.length}/500 caracteres
-                  </p>
-                </div>
+                ))}
               </div>
             </div>
-          )}
 
-          {/* Step 2: Planejamento */}
-          {currentStep === 2 && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Data de Início *
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.startDate}
-                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                      errors.startDate ? 'border-red-300' : 'border-gray-300'
-                    }`}
-                  />
-                  {errors.startDate && <p className="text-red-600 text-sm mt-1">{errors.startDate}</p>}
-                </div>
+            {/* Organização */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Organização/Empresa *
+              </label>
+              <input
+                type="text"
+                name="organization"
+                value={formData.organization}
+                onChange={handleInputChange}
+                placeholder="Ex: Hospital Geral de Luanda, University of Cape Town"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                required
+              />
+            </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Data de Término *
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.endDate}
-                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                      errors.endDate ? 'border-red-300' : 'border-gray-300'
-                    }`}
-                  />
-                  {errors.endDate && <p className="text-red-600 text-sm mt-1">{errors.endDate}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Orçamento (USD) *
-                  </label>
-                  <input
-                    type="number"
-                    value={formData.budget}
-                    onChange={(e) => setFormData({ ...formData, budget: Number(e.target.value) })}
-                    min="0"
-                    step="1000"
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                      errors.budget ? 'border-red-300' : 'border-gray-300'
-                    }`}
-                    placeholder="50000"
-                  />
-                  {errors.budget && <p className="text-red-600 text-sm mt-1">{errors.budget}</p>}
-                </div>
+            {/* Localização */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Localização Específica *
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleInputChange}
+                  placeholder="Ex: Luanda, Maianga"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  required
+                />
+                {getSelectedCountry() && (
+                  <select 
+                    onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  >
+                    <option value="">Selecionar cidade</option>
+                    {getSelectedCountry()?.cities.map(city => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
+                )}
               </div>
+            </div>
 
-              {/* Duration calculation */}
-              {formData.startDate && formData.endDate && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-blue-600">📅</span>
-                    <span className="text-blue-800 font-medium">
-                      Duração: {Math.ceil((new Date(formData.endDate).getTime() - new Date(formData.startDate).getTime()) / (1000 * 60 * 60 * 24))} dias
-                    </span>
+            {/* Orçamento */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Orçamento (USD) - Opcional
+              </label>
+              <input
+                type="number"
+                name="budget"
+                value={formData.budget}
+                onChange={handleInputChange}
+                placeholder="Ex: 50000"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                min="0"
+                step="1000"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Passo 3: Requisitos e Cronograma */}
+        {step === 3 && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">📅 Requisitos e Cronograma</h2>
+            </div>
+
+            {/* Prazo */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Prazo para Candidaturas *
+              </label>
+              <input
+                type="date"
+                name="deadline"
+                value={formData.deadline}
+                onChange={handleInputChange}
+                min={new Date().toISOString().split('T')[0]}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                required
+              />
+            </div>
+
+            {/* Requisitos */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Requisitos para Candidatos *
+              </label>
+              <div className="space-y-3">
+                {formData.requirements.map((requirement, index) => (
+                  <div key={index} className="flex gap-3">
+                    <input
+                      type="text"
+                      value={requirement}
+                      onChange={(e) => handleRequirementChange(index, e.target.value)}
+                      placeholder={`Requisito ${index + 1}: Ex: Diploma em Medicina`}
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    />
+                    {formData.requirements.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeRequirement(index)}
+                        className="px-3 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      >
+                        🗑️
+                      </button>
+                    )}
                   </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addRequirement}
+                  className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-red-300 hover:text-red-600 transition-colors"
+                >
+                  + Adicionar Requisito
+                </button>
+              </div>
+            </div>
+
+            {/* Upload de Imagem */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Imagem da Oportunidade
+              </label>
+              
+              {previewImage && (
+                <div className="mb-4">
+                  <img 
+                    src={previewImage} 
+                    alt="Preview" 
+                    className="w-full h-48 object-cover rounded-lg border border-gray-300"
+                  />
                 </div>
               )}
 
-              {/* Objectives */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Objetivos do Projeto
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => addArrayItem('objectives', '')}
-                    className="text-red-600 hover:text-red-700 text-sm font-medium"
-                  >
-                    + Adicionar Objetivo
-                  </button>
-                </div>
-                
-                <div className="space-y-2">
-                  {formData.objectives.map((objective, index) => (
-                    <div key={index} className="flex gap-2">
-                      <input
-                        type="text"
-                        value={objective}
-                        onChange={(e) => updateArrayItem('objectives', index, e.target.value)}
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        placeholder="Ex: Melhorar o acesso à saúde em áreas rurais"
-                      />
-                      {formData.objectives.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeArrayItem('objectives', index)}
-                          className="p-2 text-red-600 hover:text-red-700"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Deliverables */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Principais Entregas
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => addArrayItem('deliverables', '')}
-                    className="text-red-600 hover:text-red-700 text-sm font-medium"
-                  >
-                    + Adicionar Entrega
-                  </button>
-                </div>
-                
-                <div className="space-y-2">
-                  {formData.deliverables.map((deliverable, index) => (
-                    <div key={index} className="flex gap-2">
-                      <input
-                        type="text"
-                        value={deliverable}
-                        onChange={(e) => updateArrayItem('deliverables', index, e.target.value)}
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        placeholder="Ex: Aplicativo móvel para consultas"
-                      />
-                      {formData.deliverables.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeArrayItem('deliverables', index)}
-                          className="p-2 text-red-600 hover:text-red-700"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Step 3: Equipe & Recursos */}
-          {currentStep === 3 && (
-            <div className="space-y-6">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Equipe do Projeto</h3>
-                  <button
-                    type="button"
-                    onClick={() => addArrayItem('teamMembers', {
-                      name: '', role: '', email: '', country: '', expertise: ''
-                    })}
-                    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm"
-                  >
-                    + Adicionar Membro
-                  </button>
-                </div>
-
-                <div className="space-y-4">
-                  {formData.teamMembers.map((member, index) => (
-                    <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="font-medium text-gray-900">Membro {index + 1}</h4>
-                        {formData.teamMembers.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => removeArrayItem('teamMembers', index)}
-                            className="text-red-600 hover:text-red-700 p-1"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        )}
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <input
-                          type="text"
-                          value={member.name}
-                          onChange={(e) => updateArrayItem('teamMembers', index, { ...member, name: e.target.value })}
-                          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                          placeholder="Nome completo"
-                        />
-                        <input
-                          type="text"
-                          value={member.role}
-                          onChange={(e) => updateArrayItem('teamMembers', index, { ...member, role: e.target.value })}
-                          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                          placeholder="Cargo/Função"
-                        />
-                        <input
-                          type="email"
-                          value={member.email}
-                          onChange={(e) => updateArrayItem('teamMembers', index, { ...member, email: e.target.value })}
-                          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                          placeholder="E-mail"
-                        />
-                        <select
-                          value={member.country}
-                          onChange={(e) => updateArrayItem('teamMembers', index, { ...member, country: e.target.value })}
-                          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        >
-                          <option value="">Selecione o país</option>
-                          {countries.map(country => (
-                            <option key={country} value={country}>
-                              {getCountryFlag(country)} {country}
-                            </option>
-                          ))}
-                        </select>
-                        <input
-                          type="text"
-                          value={member.expertise}
-                          onChange={(e) => updateArrayItem('teamMembers', index, { ...member, expertise: e.target.value })}
-                          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent md:col-span-2"
-                          placeholder="Área de especialidade"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {errors.teamMembers && <p className="text-red-600 text-sm mt-1">{errors.teamMembers}</p>}
-              </div>
-
-              {/* Stakeholders */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Stakeholders Principais
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => addArrayItem('stakeholders', '')}
-                    className="text-red-600 hover:text-red-700 text-sm font-medium"
-                  >
-                    + Adicionar Stakeholder
-                  </button>
-                </div>
-                
-                <div className="space-y-2">
-                  {formData.stakeholders.map((stakeholder, index) => (
-                    <div key={index} className="flex gap-2">
-                      <input
-                        type="text"
-                        value={stakeholder}
-                        onChange={(e) => updateArrayItem('stakeholders', index, e.target.value)}
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        placeholder="Ex: Ministério da Saúde de Angola"
-                      />
-                      {formData.stakeholders.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeArrayItem('stakeholders', index)}
-                          className="p-2 text-red-600 hover:text-red-700"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Budget Breakdown */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                <h4 className="font-semibold text-gray-900 mb-4">Resumo Orçamentário</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center">
-                    <p className="text-sm text-gray-600">Orçamento Total</p>
-                    <p className="text-2xl font-bold text-blue-600">
-                      ${formData.budget.toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm text-gray-600">Por Membro da Equipe</p>
-                    <p className="text-xl font-bold text-gray-700">
-                      ${formData.budget > 0 && formData.teamMembers.length > 0 
-                        ? (formData.budget / formData.teamMembers.length).toLocaleString()
-                        : '0'
-                      }
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm text-gray-600">Duração (meses)</p>
-                    <p className="text-xl font-bold text-gray-700">
-                      {formData.startDate && formData.endDate
-                        ? Math.ceil((new Date(formData.endDate).getTime() - new Date(formData.startDate).getTime()) / (1000 * 60 * 60 * 24 * 30))
-                        : '0'
-                      }
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Step 4: Riscos & Marcos */}
-          {currentStep === 4 && (
-            <div className="space-y-8">
-              {/* Risks Section */}
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Gestão de Riscos</h3>
-                  <button
-                    type="button"
-                    onClick={() => addArrayItem('risks', {
-                      description: '', level: 'medium', mitigation: '', probability: 50, impact: 50
-                    })}
-                    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm"
-                  >
-                    + Adicionar Risco
-                  </button>
-                </div>
-
-                <div className="space-y-4">
-                  {formData.risks.map((risk, index) => (
-                    <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="font-medium text-gray-900">Risco {index + 1}</h4>
-                        {formData.risks.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => removeArrayItem('risks', index)}
-                            className="text-red-600 hover:text-red-700 p-1"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        )}
-                      </div>
-                      
-                      <div className="space-y-3">
-                        <input
-                          type="text"
-                          value={risk.description}
-                          onChange={(e) => updateArrayItem('risks', index, { ...risk, description: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                          placeholder="Descrição do risco"
-                        />
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                          <select
-                            value={risk.level}
-                            onChange={(e) => updateArrayItem('risks', index, { ...risk, level: e.target.value as any })}
-                            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                          >
-                            <option value="low">🟢 Baixo</option>
-                            <option value="medium">🟡 Médio</option>
-                            <option value="high">🔴 Alto</option>
-                          </select>
-                          
-                          <div>
-                            <label className="block text-xs text-gray-600 mb-1">Probabilidade (%)</label>
-                            <input
-                              type="range"
-                              min="0"
-                              max="100"
-                              value={risk.probability}
-                              onChange={(e) => updateArrayItem('risks', index, { ...risk, probability: Number(e.target.value) })}
-                              className="w-full"
-                            />
-                            <span className="text-xs text-gray-500">{risk.probability}%</span>
-                          </div>
-                          
-                          <div>
-                            <label className="block text-xs text-gray-600 mb-1">Impacto (%)</label>
-                            <input
-                              type="range"
-                              min="0"
-                              max="100"
-                              value={risk.impact}
-                              onChange={(e) => updateArrayItem('risks', index, { ...risk, impact: Number(e.target.value) })}
-                              className="w-full"
-                            />
-                            <span className="text-xs text-gray-500">{risk.impact}%</span>
-                          </div>
-                        </div>
-                        
-                        <textarea
-                          value={risk.mitigation}
-                          onChange={(e) => updateArrayItem('risks', index, { ...risk, mitigation: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                          rows={2}
-                          placeholder="Plano de mitigação"
-                        />
-                        
-                        <div className="bg-white p-2 rounded border">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Score de Risco:</span>
-                            <span className={`font-bold ${
-                              (risk.probability * risk.impact / 100) > 70 ? 'text-red-600' :
-                              (risk.probability * risk.impact / 100) > 40 ? 'text-yellow-600' :
-                              'text-green-600'
-                            }`}>
-                              {(risk.probability * risk.impact / 100).toFixed(0)}%
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Milestones Section */}
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Marcos do Projeto</h3>
-                  <button
-                    type="button"
-                    onClick={() => addArrayItem('milestones', {
-                      title: '', description: '', dueDate: '', priority: 'medium'
-                    })}
-                    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm"
-                  >
-                    + Adicionar Marco
-                  </button>
-                </div>
-
-                <div className="space-y-4">
-                  {formData.milestones.map((milestone, index) => (
-                    <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="font-medium text-gray-900">Marco {index + 1}</h4>
-                        {formData.milestones.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => removeArrayItem('milestones', index)}
-                            className="text-red-600 hover:text-red-700 p-1"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        )}
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                        <input
-                          type="text"
-                          value={milestone.title}
-                          onChange={(e) => updateArrayItem('milestones', index, { ...milestone, title: e.target.value })}
-                          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                          placeholder="Título do marco"
-                        />
-                        <input
-                          type="date"
-                          value={milestone.dueDate}
-                          onChange={(e) => updateArrayItem('milestones', index, { ...milestone, dueDate: e.target.value })}
-                          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        />
-                      </div>
-                      
-                      <textarea
-                        value={milestone.description}
-                        onChange={(e) => updateArrayItem('milestones', index, { ...milestone, description: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent mb-3"
-                        rows={2}
-                        placeholder="Descrição do marco"
-                      />
-                      
-                      <select
-                        value={milestone.priority}
-                        onChange={(e) => updateArrayItem('milestones', index, { ...milestone, priority: e.target.value as any })}
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                      >
-                        <option value="low">Baixa Prioridade</option>
-                        <option value="medium">Média Prioridade</option>
-                        <option value="high">Alta Prioridade</option>
-                      </select>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Step 5: Revisão & Envio */}
-          {currentStep === 5 && (
-            <div className="space-y-8">
-              {/* Project Score */}
-              <div className="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-xl p-6">
-                <div className="text-center">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Score de Completude do Projeto</h3>
-                  <div className="text-4xl font-bold text-red-600 mb-2">{calculateProjectScore()}%</div>
-                  <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
-                    <div
-                      className="bg-gradient-to-r from-red-500 to-red-600 h-3 rounded-full transition-all duration-500"
-                      style={{ width: `${calculateProjectScore()}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-gray-600">
-                    {calculateProjectScore() >= 80 ? '🎉 Excelente! Projeto bem estruturado.' :
-                     calculateProjectScore() >= 60 ? '✅ Bom! Algumas informações podem ser melhoradas.' :
-                     '⚠️ Projeto precisa de mais detalhes para melhor avaliação.'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Project Summary */}
-              <div className="bg-white border border-gray-200 rounded-xl p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-6">Resumo do Projeto</h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="font-semibold text-gray-700 mb-3">Informações Básicas</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Nome:</span>
-                        <span className="font-medium">{formData.name || 'Não informado'}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Cliente:</span>
-                        <span className="font-medium">{formData.client || 'Não informado'}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">País:</span>
-                        <span className="font-medium">
-                          {formData.country ? `${getCountryFlag(formData.country)} ${formData.country}` : 'Não informado'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Setor:</span>
-                        <span className="font-medium">
-                          {formData.sector ? `${getSectorIcon(formData.sector)} ${formData.sector}` : 'Não informado'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Prioridade:</span>
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          priorities.find(p => p.value === formData.priority)?.color || 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {priorities.find(p => p.value === formData.priority)?.label || 'Não informado'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold text-gray-700 mb-3">Cronograma & Orçamento</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Início:</span>
-                        <span className="font-medium">
-                          {formData.startDate ? new Date(formData.startDate).toLocaleDateString('pt-BR') : 'Não informado'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Término:</span>
-                        <span className="font-medium">
-                          {formData.endDate ? new Date(formData.endDate).toLocaleDateString('pt-BR') : 'Não informado'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Duração:</span>
-                        <span className="font-medium">
-                          {formData.startDate && formData.endDate
-                            ? `${Math.ceil((new Date(formData.endDate).getTime() - new Date(formData.startDate).getTime()) / (1000 * 60 * 60 * 24))} dias`
-                            : 'Não calculado'
-                          }
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Orçamento:</span>
-                        <span className="font-medium text-green-600">
-                          ${formData.budget.toLocaleString()}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Team Summary */}
-                <div className="mt-6">
-                  <h4 className="font-semibold text-gray-700 mb-3">Equipe ({formData.teamMembers.filter(m => m.name.trim()).length} membros)</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {formData.teamMembers.filter(member => member.name.trim()).map((member, index) => (
-                      <div key={index} className="bg-gray-50 p-3 rounded-lg">
-                        <div className="font-medium text-gray-900">{member.name}</div>
-                        <div className="text-sm text-gray-600">{member.role}</div>
-                        <div className="text-xs text-gray-500">
-                          {member.country && `${getCountryFlag(member.country)} ${member.country}`}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Risks Summary */}
-                {formData.risks.some(risk => risk.description.trim()) && (
-                  <div className="mt-6">
-                    <h4 className="font-semibold text-gray-700 mb-3">Principais Riscos</h4>
-                    <div className="space-y-2">
-                      {formData.risks.filter(risk => risk.description.trim()).map((risk, index) => (
-                        <div key={index} className="flex items-center gap-3 p-2 bg-gray-50 rounded">
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            risk.level === 'high' ? 'bg-red-100 text-red-800' :
-                            risk.level === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-green-100 text-green-800'
-                          }`}>
-                            {risk.level === 'high' ? 'Alto' : risk.level === 'medium' ? 'Médio' : 'Baixo'}
-                          </span>
-                          <span className="text-sm text-gray-700">{risk.description}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Milestones Summary */}
-                {formData.milestones.some(milestone => milestone.title.trim()) && (
-                  <div className="mt-6">
-                    <h4 className="font-semibold text-gray-700 mb-3">Marcos Principais</h4>
-                    <div className="space-y-2">
-                      {formData.milestones.filter(milestone => milestone.title.trim()).map((milestone, index) => (
-                        <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                          <span className="text-sm font-medium text-gray-900">{milestone.title}</span>
-                          <span className="text-xs text-gray-500">
-                            {milestone.dueDate && new Date(milestone.dueDate).toLocaleDateString('pt-BR')}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Additional Information */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Requisitos Técnicos
-                  </label>
-                  <textarea
-                    value={formData.requirements}
-                    onChange={(e) => setFormData({ ...formData, requirements: e.target.value })}
-                    rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    placeholder="Descreva os requisitos técnicos, infraestrutura necessária, tecnologias..."
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageUpload}
+                    accept="image/*"
+                    className="hidden"
                   />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-red-300 hover:text-red-600 transition-colors"
+                  >
+                    📤 Upload Imagem Personalizada
+                  </button>
                 </div>
+                
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (formData.sector) {
+                      const defaultUrl = defaultImages[formData.sector as keyof typeof defaultImages];
+                      setFormData(prev => ({ ...prev, imageUrl: defaultUrl, image: null }));
+                      setPreviewImage(defaultUrl);
+                    }
+                  }}
+                  disabled={!formData.sector}
+                  className="w-full py-3 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors disabled:opacity-50"
+                >
+                  🎨 Usar Imagem Padrão do Setor
+                </button>
+              </div>
+              
+              <p className="text-sm text-gray-500 mt-2">
+                Formatos aceites: JPG, PNG, GIF. Tamanho máximo: 5MB
+              </p>
+            </div>
+          </div>
+        )}
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Resultados Esperados
-                  </label>
-                  <textarea
-                    value={formData.expectedOutcomes}
-                    onChange={(e) => setFormData({ ...formData, expectedOutcomes: e.target.value })}
-                    rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    placeholder="Quais os resultados e impactos esperados com este projeto..."
-                  />
-                </div>
+        {/* Passo 4: Revisão */}
+        {step === 4 && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">✅ Revisão e Publicação</h2>
+            </div>
 
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Plano de Comunicação
-                  </label>
-                  <textarea
-                    value={formData.communicationPlan}
-                    onChange={(e) => setFormData({ ...formData, communicationPlan: e.target.value })}
-                    rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    placeholder="Como será a comunicação entre equipe, stakeholders e clientes..."
-                  />
+            {/* Preview da Oportunidade */}
+            <div className="border border-gray-200 rounded-lg p-6 bg-gray-50">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Preview da Oportunidade:</h3>
+              
+              <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <div className="flex gap-4">
+                  {previewImage && (
+                    <img 
+                      src={previewImage} 
+                      alt="Preview" 
+                      className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
+                    />
+                  )}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span>{getSelectedCountry()?.flag}</span>
+                      <span>{getSelectedSector()?.icon}</span>
+                      <h4 className="font-semibold text-gray-900">{formData.title}</h4>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">{formData.organization}</p>
+                    <p className="text-sm text-gray-600 mb-3">{formData.location}</p>
+                    <div className="flex items-center gap-2">
+                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                        Ativa
+                      </span>
+                      {formData.featured && (
+                        <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                          ⭐ Destaque
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          )}
 
-          {/* Navigation Buttons */}
-          <div className="flex justify-between pt-8 border-t border-gray-200">
-            <button
-              type="button"
-              onClick={prevStep}
-              disabled={currentStep === 1}
-              className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-                currentStep === 1
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              ← Anterior
-            </button>
-
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-500">
-                Passo {currentStep} de {steps.length}
-              </span>
+            {/* Resumo dos Dados */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-3">Informações Gerais</h4>
+                <div className="space-y-2 text-sm">
+                  <div><strong>País:</strong> {getSelectedCountry()?.flag} {formData.country}</div>
+                  <div><strong>Setor:</strong> {getSelectedSector()?.icon} {formData.sector}</div>
+                  <div><strong>Tipo:</strong> {opportunityTypes.find(t => t.value === formData.type)?.label}</div>
+                  <div><strong>Organização:</strong> {formData.organization}</div>
+                  <div><strong>Localização:</strong> {formData.location}</div>
+                  {formData.budget && <div><strong>Orçamento:</strong> ${Number(formData.budget).toLocaleString()} USD</div>}
+                  <div><strong>Prazo:</strong> {new Date(formData.deadline).toLocaleDateString('pt-BR')}</div>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-3">Requisitos</h4>
+                <ul className="text-sm space-y-1">
+                  {formData.requirements.filter(req => req.trim() !== '').map((req, index) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <span className="text-red-600">•</span>
+                      <span>{req}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
-            {currentStep < 5 ? (
+            {/* Opções de Publicação */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="font-semibold text-gray-900 mb-3">Opções de Publicação</h4>
+              <div className="flex items-center gap-3">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="featured"
+                    checked={formData.featured}
+                    onChange={handleInputChange}
+                    className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                  />
+                  <span className="text-sm font-medium">⭐ Marcar como Destaque</span>
+                </label>
+                <span className="text-xs text-gray-600">(Aparecerá em primeiro lugar no dashboard dos usuários)</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Botões de Navegação */}
+        <div className="flex justify-between items-center pt-8 border-t border-gray-200">
+          <div>
+            {step > 1 && (
               <button
                 type="button"
-                onClick={nextStep}
-                className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-medium"
+                onClick={() => setStep(step - 1)}
+                className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
               >
-                Próximo →
+                ← Voltar
+              </button>
+            )}
+          </div>
+
+          <div className="flex gap-3">
+            {step < 4 ? (
+              <button
+                type="button"
+                onClick={() => setStep(step + 1)}
+                disabled={!isStepValid()}
+                className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Continuar →
               </button>
             ) : (
               <button
-                type="button"
                 onClick={handleSubmit}
-                disabled={isSubmitting}
-                className="bg-red-600 text-white px-8 py-3 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={loading || !isStepValid()}
+                className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                {isSubmitting ? (
+                {loading ? (
                   <>
-                    <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Criando Projeto...
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Publicando...
                   </>
                 ) : (
                   <>
-                    🚀 Criar Projeto
+                    🚀 Publicar Oportunidade
                   </>
                 )}
               </button>
             )}
           </div>
-        </div>
-
-        {/* Progress Indicators */}
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500 mb-4">
-            Salvamento automático ativo • Dados protegidos por criptografia
-          </p>
-          <div className="flex justify-center gap-2">
-            {steps.map((step) => (
-              <div
-                key={step.id}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  currentStep >= step.id ? 'bg-red-600' : 'bg-gray-300'
-                }`}
-              ></div>
-            ))}
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-12 text-center bg-gray-100 rounded-xl p-6">
-          <p className="text-gray-600 mb-2">
-            <strong>Desenvolvido por:</strong> Valdimir Jacinto Esteves
-          </p>
-          <p className="text-sm text-gray-500">
-            © 2024 Africa's Hands • Conectando Angola, Namíbia e África do Sul
-          </p>
         </div>
       </div>
     </div>

@@ -4,9 +4,17 @@ import { useAuth } from '../context/AuthContext';
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  // ✅ PROPRIEDADES ADICIONADAS PARA NAVEGAÇÃO
+  onNavigate?: (page: string) => void;
+  currentPage?: string;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ 
+  isOpen, 
+  onClose, 
+  onNavigate,
+  currentPage = 'dashboard'
+}) => {
   const { userRole } = useAuth();
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['main']);
 
@@ -18,7 +26,20 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     );
   };
 
-  // Menu items para administrador - APENAS FUNCIONALIDADES EXISTENTES
+  // 🔧 FUNÇÃO DE NAVEGAÇÃO CORRIGIDA
+  const handleNavigation = (pageId: string) => {
+    console.log('🧭 Navegando para:', pageId);
+    
+    if (onNavigate) {
+      onNavigate(pageId);
+    } else {
+      console.warn('⚠️ onNavigate não foi fornecido ao Sidebar');
+    }
+    
+    onClose(); // Fechar sidebar após navegação
+  };
+
+  // Menu items para administrador - ATUALIZADO COM IDs CORRETOS
   const adminMenuItems = [
     {
       section: 'main',
@@ -29,7 +50,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           id: 'dashboard',
           label: 'Dashboard',
           icon: '📊',
-          path: '/admin',
+          pageId: 'dashboard', // ✅ ID para navegação interna
           badge: null
         },
         {
@@ -38,8 +59,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           icon: '🚀',
           badge: '12',
           submenu: [
-            { label: 'Gestão de Projetos', path: '/admin/projects', icon: '📋', badge: '12' },
-            { label: 'Criar Projeto', path: '/admin/projects/create', icon: '➕' }
+            { 
+              label: 'Gestão de Projetos', 
+              pageId: 'projects', // ✅ ID para navegação interna
+              icon: '📋', 
+              badge: '12' 
+            },
+            { 
+              label: 'Criar Projeto', 
+              pageId: 'create-project', // ✅ ID para navegação interna
+              icon: '➕' 
+            }
           ]
         },
         {
@@ -47,21 +77,21 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           label: 'Clientes & Parceiros',
           icon: '🤝',
           badge: '45',
-          path: '/admin/clients'
+          pageId: 'clients' // ✅ ID para navegação interna
         },
         {
           id: 'team',
           label: 'Equipe Regional',
           icon: '👥',
           badge: '28',
-          path: '/admin/team'
+          pageId: 'team' // ✅ ID para navegação interna
         },
         {
           id: 'finance',
           label: 'Financeiro',
           icon: '💰',
           badge: '8',
-          path: '/admin/finance'
+          pageId: 'finance' // ✅ ID para navegação interna
         }
       ]
     },
@@ -74,7 +104,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           id: 'analytics',
           label: 'Analytics & KPIs',
           icon: '📊',
-          path: '/admin/analytics'
+          pageId: 'analytics' // ✅ ID para navegação interna
         }
       ]
     },
@@ -87,19 +117,19 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           id: 'services',
           label: 'Serviços Regionais',
           icon: '🛒',
-          path: '/services'
+          pageId: 'services' // ✅ ID para navegação interna
         },
         {
           id: 'contact',
           label: 'Contato',
           icon: '📞',
-          path: '/contact'
+          pageId: 'contact' // ✅ ID para navegação interna
         }
       ]
     }
   ];
 
-  // Menu items para usuário comum - APENAS FUNCIONALIDADES EXISTENTES
+  // Menu items para usuário comum - ATUALIZADO COM IDs CORRETOS
   const userMenuItems = [
     {
       section: 'main',
@@ -110,7 +140,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           id: 'dashboard',
           label: 'Meu Painel',
           icon: '📊',
-          path: '/user'
+          pageId: 'dashboard' // ✅ ID para navegação interna
         }
       ]
     },
@@ -123,13 +153,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           id: 'services',
           label: 'Serviços Regionais',
           icon: '🛒',
-          path: '/services'
+          pageId: 'services' // ✅ ID para navegação interna
         },
         {
           id: 'contact',
           label: 'Contato',
           icon: '📞',
-          path: '/contact'
+          pageId: 'contact' // ✅ ID para navegação interna
         }
       ]
     }
@@ -140,6 +170,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const NavItem = ({ item, isSubmenu = false }: { item: any, isSubmenu?: boolean }) => {
     const hasSubmenu = item.submenu && item.submenu.length > 0;
     const isExpanded = expandedMenus.includes(item.id);
+    const isActive = currentPage === item.pageId; // ✅ Verificar se é a página ativa
 
     return (
       <div>
@@ -147,27 +178,34 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           onClick={() => {
             if (hasSubmenu) {
               toggleSubmenu(item.id);
-            } else if (item.path) {
-              window.location.href = item.path;
-              onClose();
+            } else if (item.pageId) {
+              handleNavigation(item.pageId); // ✅ Usar navegação interna
             }
           }}
           className={`
             w-full flex items-center justify-between px-3 py-2.5 text-left transition-all duration-200 rounded-lg mx-2 mb-1
             ${isSubmenu 
-              ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 text-sm pl-8' 
-              : 'text-gray-700 hover:text-gray-900 hover:bg-red-50 hover:border-red-100'
+              ? `text-gray-600 hover:text-gray-900 hover:bg-gray-100 text-sm pl-8 ${isActive ? 'bg-red-100 text-red-700' : ''}` 
+              : `text-gray-700 hover:text-gray-900 hover:bg-red-50 hover:border-red-100 ${isActive ? 'bg-red-100 text-red-700 border border-red-200' : ''}`
             }
             group
           `}
         >
           <div className="flex items-center gap-3">
-            <span className={`text-lg transition-colors ${!isSubmenu ? 'group-hover:text-red-600' : ''}`}>
+            <span className={`text-lg transition-colors ${
+              !isSubmenu 
+                ? (isActive ? 'text-red-600' : 'group-hover:text-red-600') 
+                : (isActive ? 'text-red-600' : '')
+            }`}>
               {item.icon}
             </span>
-            <span className="font-medium">{item.label}</span>
+            <span className={`font-medium ${isActive ? 'text-red-700' : ''}`}>
+              {item.label}
+            </span>
             {item.badge && (
-              <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[18px] text-center">
+              <span className={`text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[18px] text-center ${
+                isActive ? 'bg-red-600' : 'bg-red-500'
+              }`}>
                 {item.badge}
               </span>
             )}
@@ -346,10 +384,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             {userRole === 'admin' && (
               <div className="mb-4">
                 <button 
-                  onClick={() => {
-                    window.location.href = '/admin/projects/create';
-                    onClose();
-                  }}
+                  onClick={() => handleNavigation('create-project')} // ✅ Usar navegação interna
                   className="w-full flex items-center justify-center gap-2 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

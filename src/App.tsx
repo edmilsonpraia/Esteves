@@ -1,163 +1,511 @@
-// src/App.tsx
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import { TranslationProvider, useTranslation } from './context/TranslationContext';
+import React, { useEffect, useState } from 'react';
 
+// 🔧 CONTEXTOS E PROVIDERS
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { TranslationProvider } from './context/TranslationContext';
+import { OpportunitiesProvider } from './context/OpportunitiesContext'; // ✅ NOVA IMPORTAÇÃO
+
+// 🔧 BIBLIOTECA SUPABASE
+import { supabase } from './lib/supabase';
+
+// 📄 PÁGINAS - Baseadas na sua estrutura real
+import AdminDashboardAfricasHands from './pages/AdminDashboardAfricasHands';
+import Analytics from './pages/Analytics';
+import ClientsManagement from './pages/ClientsManagement';
+import Contact from './pages/Contact';
+import CreateProject from './pages/CreateProject';
+import FinanceManagement from './pages/FinanceManagement';
+import LoginAfricasHands from './pages/LoginAfricasHands';
+import ProjectsManagement from './pages/ProjectsManagement';
+import Services from './pages/Services';
+import TeamManagement from './pages/TeamManagement';
+import UserDashboard from './pages/UserDashboard';
+
+// 🧩 COMPONENTES - Baseados na sua estrutura real
 import Header from './components/Header';
+import IconWrapper from './components/IconWrapper';
 import Sidebar from './components/Sidebar';
 
-import AdminDashboard from './pages/AdminDashboard';
-import UserDashboard from './pages/UserDashboard';
-import Login from './pages/Login';
-import Services from './pages/Services';
-import Contact from './pages/Contact';
-import Analytics from './pages/Analytics';
-
-// Novas páginas criadas
-import ProjectsManagement from './pages/ProjectsManagement';
-import CreateProject from './pages/CreateProject';
-
-// Páginas ainda a serem criadas (placeholder)
-import ClientsManagement from './pages/ClientsManagement';
-import TeamManagement from './pages/TeamManagement';
-import FinanceManagement from './pages/FinanceManagement';
-
-import './styles/global.css';
-
-// Componente interno que usa o contexto de tradução
-const AppContent: React.FC = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { t } = useTranslation();
-
-  const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
-  const closeSidebar = () => setIsSidebarOpen(false);
-
+// 🔍 COMPONENTE DE DEBUG - Remover em produção
+const DebugAuthInfo: React.FC = () => {
+  const { user, userRole, isAuthenticated, isLoading } = useAuth();
+  
   return (
-    <AuthProvider>
-      <Router>
-        <div className="flex h-screen overflow-hidden">
-          {/* Sidebar: apenas visível para rotas distintas de /login */}
-          <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
-
-          <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Header: também é exibido somente para rotas distintas de /login */}
-            <Header onToggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
-
-            {/* Conteúdo principal */}
-            <main className="flex-1 overflow-auto bg-gray-50 p-4">
-              <Routes>
-                {/* Rota de Login - sem Header/Sidebar */}
-                <Route path="/login" element={<Login />} />
-
-                {/* Todas as outras rotas - com Header + Sidebar */}
-                <Route
-                  path="*"
-                  element={
-                    <Routes>
-                      {/* Dashboard Principal */}
-                      <Route path="/admin" element={<AdminDashboard />} />
-                      <Route path="/user" element={<UserDashboard />} />
-
-                      {/* Páginas de Gestão - Admin */}
-                      <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                      <Route path="/admin/projects" element={<ProjectsManagement />} />
-                      <Route path="/admin/create-project" element={<CreateProject />} />
-                      <Route path="/admin/clients" element={<ClientsManagement />} />
-                      <Route path="/admin/team" element={<TeamManagement />} />
-                      <Route path="/admin/finance" element={<FinanceManagement />} />
-                      <Route path="/admin/analytics" element={<Analytics />} />
-
-                      {/* Páginas Públicas */}
-                      <Route path="/services" element={<Services />} />
-                      <Route path="/contact" element={<Contact />} />
-
-                      {/* Páginas de Usuário */}
-                      <Route path="/user/dashboard" element={<UserDashboard />} />
-                      <Route path="/user/projects" element={<ProjectsManagement />} />
-                      <Route path="/user/analytics" element={<Analytics />} />
-
-                      {/* Página Inicial */}
-                      <Route
-                        path="/"
-                        element={
-                          <div className="flex items-center justify-center h-full">
-                            <div className="text-center">
-                              <div className="text-6xl mb-4">🌍</div>
-                              <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                                {t('welcome.title')}
-                              </h2>
-                              <p className="text-lg text-gray-600 mb-6">
-                                {t('welcome.subtitle')}
-                              </p>
-                              <div className="flex gap-4 justify-center">
-                                <button 
-                                  onClick={() => window.location.href = '/admin'}
-                                  className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-medium"
-                                >
-                                  🚀 {t('welcome.accessDashboard')}
-                                </button>
-                                <button 
-                                  onClick={() => window.location.href = '/services'}
-                                  className="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-                                >
-                                  📋 {t('welcome.viewServices')}
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        }
-                      />
-
-                      {/* Rota 404 - Página não encontrada */}
-                      <Route
-                        path="*"
-                        element={
-                          <div className="flex items-center justify-center h-full">
-                            <div className="text-center">
-                              <div className="text-6xl mb-4">🔍</div>
-                              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                                {t('error.notFound.title')}
-                              </h2>
-                              <p className="text-gray-600 mb-6">
-                                {t('error.notFound.description')}
-                              </p>
-                              <div className="flex gap-4 justify-center">
-                                <button 
-                                  onClick={() => window.location.href = '/'}
-                                  className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-medium"
-                                >
-                                  🏠 {t('error.notFound.backHome')}
-                                </button>
-                                <button 
-                                  onClick={() => window.location.href = '/admin'}
-                                  className="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-                                >
-                                  📊 {t('nav.dashboard')}
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        }
-                      />
-                    </Routes>
-                  }
-                />
-              </Routes>
-            </main>
-          </div>
-        </div>
-      </Router>
-    </AuthProvider>
+    <div className="fixed bottom-4 right-4 bg-black bg-opacity-90 text-white p-4 rounded-lg text-xs max-w-sm z-50">
+      <h4 className="font-bold mb-2 text-yellow-400">🔍 DEBUG AUTH INFO:</h4>
+      <div className="space-y-1">
+        <p><strong>isAuthenticated:</strong> {isAuthenticated ? '✅ true' : '❌ false'}</p>
+        <p><strong>isLoading:</strong> {isLoading ? '⏳ true' : '✅ false'}</p>
+        <p><strong>userRole:</strong> <span className="text-yellow-300">{userRole || '❌ null/undefined'}</span></p>
+        <p><strong>user.id:</strong> {user?.id || '❌ null'}</p>
+        <p><strong>user.email:</strong> {user?.email || '❌ null'}</p>
+        <p><strong>user.name:</strong> {user?.name || '❌ null'}</p>
+      </div>
+      
+      <button 
+        onClick={async () => {
+          if (user?.email) {
+            console.log('🔍 Verificando dados no Supabase...');
+            try {
+              const { data: profiles, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('email', user.email);
+              
+              if (error) {
+                console.error('❌ Erro ao buscar perfil:', error);
+              } else {
+                console.log('👤 Perfil encontrado:', profiles);
+                
+                if (profiles && profiles.length > 0) {
+                  console.log('✅ Role no banco:', profiles[0].role);
+                  console.log('📋 Dados completos:', profiles[0]);
+                } else {
+                  console.log('❌ Nenhum perfil encontrado no banco!');
+                }
+              }
+            } catch (error) {
+              console.error('❌ Erro na consulta:', error);
+            }
+          }
+        }}
+        className="mt-2 bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded text-xs"
+      >
+        Verificar Banco
+      </button>
+    </div>
   );
 };
 
-// Componente principal que fornece o contexto de tradução
+// ✅ NOVO COMPONENTE: Real-Time Status Indicator
+const RealTimeStatus: React.FC = () => {
+  const [isConnected, setIsConnected] = useState(true);
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  useEffect(() => {
+    // Simular status de conexão real-time
+    const checkConnection = () => {
+      setIsConnected(navigator.onLine);
+    };
+
+    window.addEventListener('online', checkConnection);
+    window.addEventListener('offline', checkConnection);
+
+    return () => {
+      window.removeEventListener('online', checkConnection);
+      window.removeEventListener('offline', checkConnection);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Subscription para notificações real-time
+    const subscription = supabase
+      .channel('real-time-notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'opportunities'
+        },
+        (payload) => {
+          console.log('🔔 Nova oportunidade detectada!', payload.new);
+          setNotificationCount(prev => prev + 1);
+          
+          // Auto-reset após 5 segundos
+          setTimeout(() => {
+            setNotificationCount(0);
+          }, 5000);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, []);
+
+  return (
+    <div className="fixed top-4 left-4 z-50">
+      <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${
+        isConnected 
+          ? 'bg-green-100 text-green-800' 
+          : 'bg-red-100 text-red-800'
+      }`}>
+        <div className={`w-2 h-2 rounded-full ${
+          isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'
+        }`}></div>
+        <span>{isConnected ? 'Real-Time Ativo' : 'Desconectado'}</span>
+        {notificationCount > 0 && (
+          <span className="bg-red-500 text-white px-1.5 py-0.5 rounded-full text-xs">
+            {notificationCount}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// 🔧 COMPONENTE DE LAYOUT PRINCIPAL
+const MainLayout: React.FC<{ 
+  children: React.ReactNode; 
+  userRole: string;
+  currentPage: string;
+  onPageChange: (page: string) => void;
+}> = ({ children, userRole, currentPage, onPageChange }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* ✅ INDICADOR REAL-TIME */}
+      <RealTimeStatus />
+      
+      {/* 🔧 SIDEBAR - Propriedades de navegação adicionadas */}
+      <Sidebar 
+        isOpen={sidebarOpen} 
+        onClose={() => setSidebarOpen(false)}
+        onNavigate={onPageChange}
+        currentPage={currentPage}
+      />
+      
+      <div className="flex-1 flex flex-col">
+        {/* 🔧 HEADER - Propriedades obrigatórias adicionadas */}
+        <Header 
+          onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+          isSidebarOpen={sidebarOpen}
+        />
+        
+        {/* 🔧 BOTÃO MENU MOBILE - Separado do Header */}
+        <div className="md:hidden bg-white border-b border-gray-200 p-4">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <IconWrapper name="FiMenu">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </IconWrapper>
+          </button>
+        </div>
+        
+        {/* Main Content */}
+        <main className="flex-1 overflow-auto">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+};
+
+// 🔧 COMPONENTE PRINCIPAL DA APLICAÇÃO
+const AppContent: React.FC = () => {
+  const { isAuthenticated, userRole, isLoading, user, logout } = useAuth();
+  const [currentMode, setCurrentMode] = useState<'login' | 'admin' | 'user'>('login');
+  const [currentPage, setCurrentPage] = useState<string>('dashboard');
+
+  // 🔧 LÓGICA DE REDIRECIONAMENTO
+  useEffect(() => {
+    console.log('🔄 Verificando modo atual:', {
+      isAuthenticated,
+      userRole,
+      isLoading
+    });
+
+    if (isAuthenticated && userRole && !isLoading) {
+      if (userRole === 'admin') {
+        console.log('🎯 Redirecionando para dashboard admin');
+        setCurrentMode('admin');
+      } else if (userRole === 'user') {
+        console.log('🎯 Redirecionando para dashboard user');
+        setCurrentMode('user');
+      }
+    } else if (!isAuthenticated && !isLoading) {
+      console.log('🎯 Redirecionando para login');
+      setCurrentMode('login');
+    }
+  }, [isAuthenticated, userRole, isLoading]);
+
+  // 🔧 FUNÇÃO DE LOGOUT
+  const handleLogout = async () => {
+    try {
+      console.log('👋 Iniciando logout...');
+      await logout();
+      setCurrentMode('login');
+      setCurrentPage('dashboard');
+    } catch (error) {
+      console.error('❌ Erro ao fazer logout:', error);
+    }
+  };
+
+  // 🔧 FUNÇÃO PARA MUDAR PÁGINA
+  const handlePageChange = (page: string) => {
+    console.log('📄 Mudando para página:', page);
+    setCurrentPage(page);
+  };
+
+  // 🔧 LOADING STATE
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-red-600 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Carregando Africa's Hands</h2>
+          <p className="text-gray-600">Verificando autenticação...</p>
+          <div className="mt-4 text-sm text-green-600">🔔 Iniciando sistema real-time...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // 🔧 RENDERIZAR PÁGINA BASEADA NO CURRENTPAGE
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'dashboard':
+        return userRole === 'admin' ? <AdminDashboardAfricasHands /> : <UserDashboard />;
+      case 'analytics':
+        return <Analytics />;
+      case 'clients':
+        return <ClientsManagement />;
+      case 'projects':
+        return <ProjectsManagement />;
+      case 'create-project':
+        return <CreateProject />;
+      case 'team':
+        return <TeamManagement />;
+      case 'finance':
+        return <FinanceManagement />;
+      case 'services':
+        return <Services />;
+      case 'contact':
+        return <Contact />;
+      default:
+        return userRole === 'admin' ? <AdminDashboardAfricasHands /> : <UserDashboard />;
+    }
+  };
+
+  // 🔧 RENDERIZAÇÃO POR MODO
+  const renderCurrentMode = () => {
+    switch (currentMode) {
+      case 'admin':
+        return (
+          <MainLayout 
+            userRole="admin" 
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+          >
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              {renderPage()}
+            </div>
+          </MainLayout>
+        );
+      
+      case 'user':
+        return (
+          <MainLayout 
+            userRole="user" 
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+          >
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              {renderPage()}
+            </div>
+          </MainLayout>
+        );
+      
+      default:
+        return <LoginAfricasHands />;
+    }
+  };
+
+  return (
+    <div className="App">
+      {/* 🔍 COMPONENTE DE DEBUG - Apenas em desenvolvimento */}
+      {process.env.NODE_ENV === 'development' && <DebugAuthInfo />}
+      
+      {/* 📱 CONTEÚDO PRINCIPAL */}
+      {renderCurrentMode()}
+      
+      {/* 🔧 LOGOUT BUTTON PARA MOBILE - Apenas quando autenticado */}
+      {isAuthenticated && (
+        <div className="fixed top-4 right-4 z-50 md:hidden">
+          <button
+            onClick={handleLogout}
+            className="bg-red-600 text-white p-3 rounded-full shadow-lg hover:bg-red-700 transition-colors"
+            title="Sair"
+          >
+            <IconWrapper name="FiLogOut">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </IconWrapper>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ✅ NOVO COMPONENTE: Notifications Container
+const NotificationsContainer: React.FC = () => {
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user) return;
+
+    // Subscription para notificações em tempo real
+    const subscription = supabase
+      .channel('user-notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'opportunities'
+        },
+        (payload) => {
+          const notification = {
+            id: Date.now(),
+            type: 'opportunity',
+            title: 'Nova Oportunidade Disponível!',
+            message: `${payload.new.title} em ${payload.new.country}`,
+            timestamp: new Date(),
+            opportunity: payload.new
+          };
+
+          setNotifications(prev => [notification, ...prev.slice(0, 4)]); // Máximo 5 notificações
+
+          // Auto-remover após 8 segundos
+          setTimeout(() => {
+            setNotifications(prev => prev.filter(n => n.id !== notification.id));
+          }, 8000);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'applications',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload) => {
+          if (payload.new.status !== payload.old.status) {
+            const notification = {
+              id: Date.now(),
+              type: 'application',
+              title: 'Status da Candidatura Atualizado!',
+              message: `Sua candidatura foi ${
+                payload.new.status === 'approved' ? 'aprovada' :
+                payload.new.status === 'rejected' ? 'rejeitada' : 'analisada'
+              }`,
+              timestamp: new Date(),
+              status: payload.new.status
+            };
+
+            setNotifications(prev => [notification, ...prev.slice(0, 4)]);
+
+            setTimeout(() => {
+              setNotifications(prev => prev.filter(n => n.id !== notification.id));
+            }, 10000);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, [user]);
+
+  if (notifications.length === 0) return null;
+
+  return (
+    <div className="fixed top-20 right-4 z-50 space-y-2 max-w-sm">
+      {notifications.map((notification) => (
+        <div
+          key={notification.id}
+          className={`p-4 rounded-lg shadow-lg border-l-4 transform transition-all duration-300 animate-slide-in-right ${
+            notification.type === 'opportunity' 
+              ? 'bg-blue-50 border-blue-500' 
+              : notification.status === 'approved'
+              ? 'bg-green-50 border-green-500'
+              : notification.status === 'rejected'
+              ? 'bg-red-50 border-red-500'
+              : 'bg-yellow-50 border-yellow-500'
+          }`}
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <h4 className={`font-semibold text-sm ${
+                notification.type === 'opportunity' 
+                  ? 'text-blue-900' 
+                  : notification.status === 'approved'
+                  ? 'text-green-900'
+                  : notification.status === 'rejected'
+                  ? 'text-red-900'
+                  : 'text-yellow-900'
+              }`}>
+                {notification.title}
+              </h4>
+              <p className={`text-xs mt-1 ${
+                notification.type === 'opportunity' 
+                  ? 'text-blue-700' 
+                  : notification.status === 'approved'
+                  ? 'text-green-700'
+                  : notification.status === 'rejected'
+                  ? 'text-red-700'
+                  : 'text-yellow-700'
+              }`}>
+                {notification.message}
+              </p>
+              <div className="text-xs text-gray-500 mt-2">
+                {notification.timestamp.toLocaleTimeString('pt-BR', { 
+                  hour: '2-digit', 
+                  minute: '2-digit' 
+                })}
+              </div>
+            </div>
+            <button
+              onClick={() => setNotifications(prev => 
+                prev.filter(n => n.id !== notification.id)
+              )}
+              className="text-gray-400 hover:text-gray-600 ml-2"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// 🔧 COMPONENTE PRINCIPAL COM PROVIDERS
 const App: React.FC = () => {
   return (
-    <TranslationProvider>
-      <AppContent />
-    </TranslationProvider>
+    <AuthProvider>
+      <TranslationProvider>
+        {/* ✅ NOVO PROVIDER: OpportunitiesProvider */}
+        <OpportunitiesProvider>
+          <AppContent />
+          {/* ✅ NOVO COMPONENTE: Notificações Real-Time */}
+          <NotificationsContainer />
+        </OpportunitiesProvider>
+      </TranslationProvider>
+    </AuthProvider>
   );
 };
 
