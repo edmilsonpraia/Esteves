@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation, LanguageToggle } from '../context/TranslationContext';
 
 interface ContactForm {
   name: string;
@@ -27,9 +28,20 @@ const ContactAfricasHands: React.FC = () => {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const { t } = useTranslation();
 
-  const countries = ['Angola', 'Namíbia', 'África do Sul', 'Outro'];
-  const sectors = ['Saúde', 'Educação', 'Turismo', 'Comércio', 'Transporte', 'Tecnologia', 'Governo', 'ONGs', 'Outro'];
+  const countries = [t('country.angola'), t('country.namibia'), t('country.southAfrica'), t('login.otherSadcCountry')];
+  const sectors = [
+    t('sector.health'), 
+    t('sector.education'), 
+    t('sector.tourism'), 
+    t('sector.commerce'), 
+    t('sector.transport'), 
+    t('sector.technology'), 
+    t('login.sectors.government'), 
+    t('login.sectors.ngos'), 
+    t('login.otherSadcCountry')
+  ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -63,9 +75,9 @@ const ContactAfricasHands: React.FC = () => {
 
   const getCountryFlag = (country: string) => {
     const flags = {
-      'Angola': '🇦🇴',
-      'Namíbia': '🇳🇦',
-      'África do Sul': '🇿🇦'
+      [t('country.angola')]: '🇦🇴',
+      [t('country.namibia')]: '🇳🇦',
+      [t('country.southAfrica')]: '🇿🇦'
     };
     return flags[country as keyof typeof flags] || '🌍';
   };
@@ -73,20 +85,19 @@ const ContactAfricasHands: React.FC = () => {
   const contactInfo = [
     {
       type: 'phone',
-      label: 'Angola',
-      value: '+244 924 166 401',
-      country: 'Angola',
+      label: t('country.angola'),
+      value: t('user.phoneAngola'),
+      country: t('country.angola'),
       city: 'Cunene / Lubango',
       image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=200&fit=crop',
       icon: '📞'
     },
-    
     {
       type: 'email',
-      label: 'E-mail Regional',
+      label: t('login.form.emailRegional'),
       value: 'contato@africashands.com',
-      country: 'África Austral',
-      city: 'Atendimento 24/7',
+      country: t('login.countriesDescription'),
+      city: t('login.footer.support24h'),
       image: 'https://images.unsplash.com/photo-1596526131083-e8c633c948d2?w=400&h=200&fit=crop',
       icon: '✉️'
     }
@@ -94,74 +105,74 @@ const ContactAfricasHands: React.FC = () => {
 
   const officeLocations = [
     {
-      country: 'Angola',
+      country: t('country.angola'),
       flag: '🇦🇴',
       offices: [
         {
           city: 'Cunene',
-          type: 'Escritório Principal',
-          address: 'Rua Principal, Centro',
-          phone: '+244 924 166 401',
+          type: t('offices.mainOffice'),
+          address: t('offices.angolaAddress'),
+          phone: t('user.phoneAngola'),
           email: 'cunene@africashands.com',
           image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=300&h=200&fit=crop',
-          specialties: ['Saúde', 'Educação', 'Agricultura']
+          specialties: [t('sector.health'), t('sector.education'), t('sector.agriculture')]
         },
         {
           city: 'Lubango',
-          type: 'Filial Regional',
+          type: t('offices.regionalBranch'),
           address: 'Av. Norton de Matos',
-          phone: '+244 924 166 401',
+          phone: t('user.phoneAngola'),
           email: 'lubango@africashands.com',
           image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=300&h=200&fit=crop',
-          specialties: ['Turismo', 'Comércio', 'Tecnologia']
+          specialties: [t('sector.tourism'), t('sector.commerce'), t('sector.technology')]
         }
       ]
     },
     {
-      country: 'Namíbia',
+      country: t('country.namibia'),
       flag: '🇳🇦',
       offices: [
         {
           city: 'Oshakati',
-          type: 'Escritório Regional',
+          type: t('offices.regionalOffice'),
           address: 'Main Street, CBD',
           phone: '',
           email: '',
           image: 'https://images.unsplash.com/photo-1554469384-e58fac16e23a?w=300&h=200&fit=crop',
-          specialties: ['Mineração', 'Turismo', 'Sustentabilidade']
+          specialties: [t('sector.mining'), t('sector.tourism'), t('sector.sustainability')]
         },
         {
           city: 'Windhoek',
-          type: 'Centro de Parcerias',
+          type: t('offices.partnershipCenter'),
           address: 'Independence Avenue',
           phone: '',
           email: '',
           image: 'https://images.unsplash.com/photo-1590736969955-71cc94901144?w=300&h=200&fit=crop',
-          specialties: ['Governo', 'Educação', 'Inovação']
+          specialties: [t('login.sectors.government'), t('sector.education'), t('sector.innovation')]
         }
       ]
     },
     {
-      country: 'África do Sul',
+      country: t('country.southAfrica'),
       flag: '🇿🇦',
       offices: [
         {
-          city: 'Cidade do Cabo',
-          type: 'Hub de Inovação',
+          city: 'Cape Town',
+          type: t('offices.innovationHub'),
           address: 'V&A Waterfront',
           phone: '',
           email: '',
           image: 'https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=300&h=200&fit=crop',
-          specialties: ['Tecnologia', 'Startups', 'Financeiro']
+          specialties: [t('sector.technology'), t('sector.startups'), t('sector.finance')]
         },
         {
-          city: 'Joanesburgo',
-          type: 'Centro de Negócios',
+          city: 'Johannesburg',
+          type: t('offices.businessCenter'),
           address: 'Sandton City',
           phone: '',
           email: '',
           image: 'https://images.unsplash.com/photo-1577948000111-9c970dfe3743?w=300&h=200&fit=crop',
-          specialties: ['Corporativo', 'Mineração', 'Logística']
+          specialties: [t('sector.corporate'), t('sector.mining'), t('sector.logistics')]
         }
       ]
     }
@@ -170,27 +181,27 @@ const ContactAfricasHands: React.FC = () => {
   const teamMembers = [
     {
       name: 'Valdimir Jacinto Esteves',
-      role: 'Fundador & CEO',
-      country: 'Angola',
+      role: t('team.founderCeo'),
+      country: t('country.angola'),
       image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
       email: 'valdimir@africashands.com',
-      specialties: ['Visão Estratégica', 'Desenvolvimento Regional', 'Parcerias Internacionais']
+      specialties: [t('team.specialties.strategy'), t('team.specialties.regionalDev'), t('team.specialties.partnerships')]
     },
     {
       name: 'Dr. Maria Santos',
-      role: 'Diretora de Saúde Regional',
-      country: 'África do Sul',
+      role: t('team.healthDirector'),
+      country: t('country.southAfrica'),
       image: 'https://images.unsplash.com/photo-1494790108755-2616b332c3c5?w=150&h=150&fit=crop&crop=face',
       email: 'maria.santos@africashands.com',
-      specialties: ['Telemedicina', 'Políticas de Saúde', 'Cooperação Médica']
+      specialties: [t('team.specialties.telemedicine'), t('team.specialties.healthPolicy'), t('team.specialties.medicalCoop')]
     },
     {
       name: 'Prof. John Kazembe',
-      role: 'Diretor de Educação',
-      country: 'Namíbia',
+      role: t('team.educationDirector'),
+      country: t('country.namibia'),
       image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
       email: 'john.kazembe@africashands.com',
-      specialties: ['Intercâmbio Acadêmico', 'Pesquisa', 'Desenvolvimento Educacional']
+      specialties: [t('team.specialties.academicExchange'), t('team.specialties.research'), t('team.specialties.educationDev')]
     }
   ];
 
@@ -206,13 +217,15 @@ const ContactAfricasHands: React.FC = () => {
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-20 text-center">
-          <h1 className="text-5xl font-bold mb-6">Entre em Contato</h1>
+          <div className="flex justify-end mb-4">
+            <LanguageToggle />
+          </div>
+          <h1 className="text-5xl font-bold mb-6">{t('contact.title')}</h1>
           <p className="text-xl mb-4 opacity-90">
-            Conectando Angola 🇦🇴 Namíbia 🇳🇦 África do Sul 🇿🇦
+            {t('contact.subtitle')}
           </p>
           <p className="text-lg opacity-80 max-w-3xl mx-auto">
-            Estamos aqui para ajudar você a explorar oportunidades, construir parcerias 
-            e fazer parte da revolução digital da África Austral.
+            {t('contact.description')}
           </p>
         </div>
       </div>
@@ -222,8 +235,8 @@ const ContactAfricasHands: React.FC = () => {
         {/* Informações de Contato Principais */}
         <section>
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Fale Conosco</h2>
-            <p className="text-lg text-gray-600">Escolha a melhor forma de entrar em contato</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">{t('contact.contactUs')}</h2>
+            <p className="text-lg text-gray-600">{t('contact.chooseBestWay')}</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -243,7 +256,7 @@ const ContactAfricasHands: React.FC = () => {
                   <p className="text-sm text-gray-500 mb-4">{info.city}</p>
                   <p className="text-lg font-semibold text-red-600 mb-4">{info.value}</p>
                   <button className="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium">
-                    {info.type === 'phone' ? '📞 Ligar Agora' : '✉️ Enviar E-mail'}
+                    {info.type === 'phone' ? t('contact.callNow') : t('contact.sendEmail')}
                   </button>
                 </div>
               </div>
@@ -257,7 +270,7 @@ const ContactAfricasHands: React.FC = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
               <span>📝</span>
-              Envie sua Mensagem
+              {t('contact.sendMessage')}
             </h2>
             
             {showSuccess && (
@@ -266,9 +279,9 @@ const ContactAfricasHands: React.FC = () => {
                   <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <p className="text-green-800 font-medium">Mensagem enviada com sucesso! 🎉</p>
+                  <p className="text-green-800 font-medium">{t('contact.successMessage')}</p>
                 </div>
-                <p className="text-green-700 text-sm mt-1">Entraremos em contato em até 24 horas.</p>
+                <p className="text-green-700 text-sm mt-1">{t('contact.successSubmessage')}</p>
               </div>
             )}
 
@@ -276,7 +289,7 @@ const ContactAfricasHands: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                    Nome Completo *
+                    {t('login.form.fullName')} *
                   </label>
                   <input
                     type="text"
@@ -286,13 +299,13 @@ const ContactAfricasHands: React.FC = () => {
                     onChange={handleInputChange}
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    placeholder="Seu nome completo"
+                    placeholder={t('login.form.fullNamePlaceholder')}
                   />
                 </div>
                 
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                    E-mail *
+                    {t('login.form.email')} *
                   </label>
                   <input
                     type="email"
@@ -302,7 +315,7 @@ const ContactAfricasHands: React.FC = () => {
                     onChange={handleInputChange}
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    placeholder="seu@email.com"
+                    placeholder={t('login.form.emailPlaceholder')}
                   />
                 </div>
               </div>
@@ -310,7 +323,7 @@ const ContactAfricasHands: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                    Telefone
+                    {t('contact.phone')}
                   </label>
                   <input
                     type="tel"
@@ -325,7 +338,7 @@ const ContactAfricasHands: React.FC = () => {
                 
                 <div>
                   <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-2">
-                    País *
+                    {t('form.country')} *
                   </label>
                   <select
                     id="country"
@@ -335,7 +348,7 @@ const ContactAfricasHands: React.FC = () => {
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   >
-                    <option value="">Selecione seu país</option>
+                    <option value="">{t('login.form.selectCountry')}</option>
                     {countries.map((country, index) => (
                       <option key={index} value={country}>
                         {getCountryFlag(country)} {country}
@@ -348,7 +361,7 @@ const ContactAfricasHands: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="sector" className="block text-sm font-medium text-gray-700 mb-2">
-                    Setor de Atuação
+                    {t('login.form.sector')}
                   </label>
                   <select
                     id="sector"
@@ -357,7 +370,7 @@ const ContactAfricasHands: React.FC = () => {
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   >
-                    <option value="">Selecione um setor</option>
+                    <option value="">{t('login.form.selectSector')}</option>
                     {sectors.map((sector, index) => (
                       <option key={index} value={sector}>{sector}</option>
                     ))}
@@ -366,7 +379,7 @@ const ContactAfricasHands: React.FC = () => {
 
                 <div>
                   <label htmlFor="organization" className="block text-sm font-medium text-gray-700 mb-2">
-                    Organização
+                    {t('login.form.organization')}
                   </label>
                   <input
                     type="text"
@@ -375,14 +388,14 @@ const ContactAfricasHands: React.FC = () => {
                     value={formData.organization}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    placeholder="Sua empresa/instituição"
+                    placeholder={t('login.form.organizationPlaceholder')}
                   />
                 </div>
               </div>
 
               <div>
                 <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                  Assunto *
+                  {t('contact.subject')} *
                 </label>
                 <input
                   type="text"
@@ -392,13 +405,13 @@ const ContactAfricasHands: React.FC = () => {
                   onChange={handleInputChange}
                   required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  placeholder="Assunto da sua mensagem"
+                  placeholder={t('contact.subjectPlaceholder')}
                 />
               </div>
 
               <div>
                 <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                  Mensagem *
+                  {t('contact.message')} *
                 </label>
                 <textarea
                   id="message"
@@ -408,13 +421,13 @@ const ContactAfricasHands: React.FC = () => {
                   required
                   rows={6}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
-                  placeholder="Descreva detalhadamente sua necessidade, projeto ou pergunta..."
+                  placeholder={t('contact.messagePlaceholder')}
                 ></textarea>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Forma Preferida de Contato
+                  {t('contact.preferredContact')}
                 </label>
                 <div className="flex gap-4">
                   <label className="flex items-center">
@@ -426,7 +439,7 @@ const ContactAfricasHands: React.FC = () => {
                       onChange={handleInputChange}
                       className="mr-2"
                     />
-                    📧 E-mail
+                    📧 {t('contact.email')}
                   </label>
                   <label className="flex items-center">
                     <input
@@ -437,7 +450,7 @@ const ContactAfricasHands: React.FC = () => {
                       onChange={handleInputChange}
                       className="mr-2"
                     />
-                    📞 Telefone
+                    📞 {t('contact.phone')}
                   </label>
                   <label className="flex items-center">
                     <input
@@ -464,12 +477,12 @@ const ContactAfricasHands: React.FC = () => {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Enviando...
+                    {t('contact.sending')}
                   </>
                 ) : (
                   <>
                     <span>🚀</span>
-                    Enviar Mensagem
+                    {t('contact.sendMessageButton')}
                   </>
                 )}
               </button>
@@ -482,24 +495,24 @@ const ContactAfricasHands: React.FC = () => {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <span>🕒</span>
-                Horário de Atendimento
+                {t('contact.openingHours')}
               </h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                  <span className="text-gray-700 font-medium">Segunda - Sexta</span>
+                  <span className="text-gray-700 font-medium">{t('contact.weekdays')}</span>
                   <span className="font-bold text-green-600">08:00 - 17:00</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
-                  <span className="text-gray-700 font-medium">Sábado</span>
+                  <span className="text-gray-700 font-medium">{t('contact.saturday')}</span>
                   <span className="font-bold text-yellow-600">08:00 - 12:00</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
-                  <span className="text-gray-700 font-medium">Domingo</span>
-                  <span className="font-bold text-red-600">Fechado</span>
+                  <span className="text-gray-700 font-medium">{t('contact.sunday')}</span>
+                  <span className="font-bold text-red-600">{t('contact.closed')}</span>
                 </div>
                 <div className="mt-4 p-3 bg-blue-50 rounded-lg text-center">
                   <p className="text-sm text-blue-700">
-                    <strong>🌍 Atendimento 24/7:</strong> E-mail e WhatsApp
+                    <strong>🌍 {t('contact.support247')}:</strong> {t('contact.emailAndWhatsapp')}
                   </p>
                 </div>
               </div>
@@ -509,24 +522,24 @@ const ContactAfricasHands: React.FC = () => {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <span>❓</span>
-                Perguntas Frequentes
+                {t('contact.faq')}
               </h3>
               <div className="space-y-4">
                 <div className="border-l-4 border-red-500 pl-4">
-                  <h4 className="font-semibold text-gray-900 mb-1">Qual o prazo para resposta?</h4>
-                  <p className="text-sm text-gray-600">Respondemos todas as mensagens em até 24 horas úteis.</p>
+                  <h4 className="font-semibold text-gray-900 mb-1">{t('contact.faq1.question')}</h4>
+                  <p className="text-sm text-gray-600">{t('contact.faq1.answer')}</p>
                 </div>
                 <div className="border-l-4 border-green-500 pl-4">
-                  <h4 className="font-semibold text-gray-900 mb-1">Fazem consultoria gratuita?</h4>
-                  <p className="text-sm text-gray-600">Sim! Primeira consulta gratuita para avaliar oportunidades.</p>
+                  <h4 className="font-semibold text-gray-900 mb-1">{t('contact.faq2.question')}</h4>
+                  <p className="text-sm text-gray-600">{t('contact.faq2.answer')}</p>
                 </div>
                 <div className="border-l-4 border-blue-500 pl-4">
-                  <h4 className="font-semibold text-gray-900 mb-1">Atendem em outras cidades?</h4>
-                  <p className="text-sm text-gray-600">Sim, atendemos toda a região SADC via parceiros locais.</p>
+                  <h4 className="font-semibold text-gray-900 mb-1">{t('contact.faq3.question')}</h4>
+                  <p className="text-sm text-gray-600">{t('contact.faq3.answer')}</p>
                 </div>
                 <div className="border-l-4 border-purple-500 pl-4">
-                  <h4 className="font-semibold text-gray-900 mb-1">Como funciona a parceria?</h4>
-                  <p className="text-sm text-gray-600">Avaliamos sua proposta e conectamos com oportunidades relevantes.</p>
+                  <h4 className="font-semibold text-gray-900 mb-1">{t('contact.faq4.question')}</h4>
+                  <p className="text-sm text-gray-600">{t('contact.faq4.answer')}</p>
                 </div>
               </div>
             </div>
@@ -535,9 +548,9 @@ const ContactAfricasHands: React.FC = () => {
             <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-xl p-6 text-white">
               <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
                 <span>🌐</span>
-                Siga-nos nas Redes Sociais
+                {t('contact.socialMedia')}
               </h3>
-              <p className="text-red-100 mb-4">Fique por dentro das novidades e oportunidades</p>
+              <p className="text-red-100 mb-4">{t('contact.socialMediaDescription')}</p>
               <div className="flex gap-3">
                 <button className="bg-white bg-opacity-20 p-3 rounded-lg hover:bg-opacity-30 transition-colors">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -569,9 +582,9 @@ const ContactAfricasHands: React.FC = () => {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-2">
               <span>👥</span>
-              Nossa Equipe Executiva
+              {t('contact.executiveTeam')}
             </h2>
-            <p className="text-lg text-gray-600">Líderes experientes conectando a África Austral</p>
+            <p className="text-lg text-gray-600">{t('contact.executiveTeamDescription')}</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -592,7 +605,7 @@ const ContactAfricasHands: React.FC = () => {
                 <p className="text-gray-600 text-sm mb-4">{getCountryFlag(member.country)} {member.country}</p>
                 
                 <div className="mb-4">
-                  <p className="text-sm text-gray-500 mb-2">Especialidades:</p>
+                  <p className="text-sm text-gray-500 mb-2">{t('contact.specialties')}:</p>
                   <div className="flex flex-wrap gap-1 justify-center">
                     {member.specialties.map((specialty, i) => (
                       <span key={i} className="bg-red-50 text-red-700 px-2 py-1 rounded text-xs">
@@ -603,7 +616,7 @@ const ContactAfricasHands: React.FC = () => {
                 </div>
                 
                 <button className="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
-                  📧 Contatar Diretamente
+                  📧 {t('contact.contactDirectly')}
                 </button>
               </div>
             ))}
@@ -615,9 +628,9 @@ const ContactAfricasHands: React.FC = () => {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-2">
               <span>🏢</span>
-              Nossos Escritórios
+              {t('contact.ourOffices')}
             </h2>
-            <p className="text-lg text-gray-600">Presença física em toda a região da África Austral</p>
+            <p className="text-lg text-gray-600">{t('contact.ourOfficesDescription')}</p>
           </div>
 
           {officeLocations.map((location, index) => (
@@ -664,7 +677,7 @@ const ContactAfricasHands: React.FC = () => {
                       </div>
 
                       <div className="mb-4">
-                        <p className="text-sm text-gray-500 mb-2">Especialidades:</p>
+                        <p className="text-sm text-gray-500 mb-2">{t('contact.specialties')}:</p>
                         <div className="flex flex-wrap gap-2">
                           {office.specialties.map((specialty, i) => (
                             <span key={i} className="bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
@@ -676,10 +689,10 @@ const ContactAfricasHands: React.FC = () => {
 
                       <div className="flex gap-2">
                         <button className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
-                          📞 Ligar
+                          📞 {t('contact.call')}
                         </button>
                         <button className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium">
-                          📧 E-mail
+                          📧 {t('contact.email')}
                         </button>
                       </div>
                     </div>
@@ -694,27 +707,27 @@ const ContactAfricasHands: React.FC = () => {
         <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center flex items-center justify-center gap-2">
             <span>🗺️</span>
-            Nossa Presença Regional
+            {t('contact.regionalPresence')}
           </h2>
           
           {/* Placeholder para Mapa Interativo */}
           <div className="bg-gradient-to-br from-blue-50 to-green-50 rounded-lg h-96 flex items-center justify-center mb-8 border-2 border-dashed border-gray-300">
             <div className="text-center">
               <div className="text-6xl mb-4">🌍</div>
-              <h3 className="text-xl font-bold text-gray-700 mb-2">Mapa Interativo da África Austral</h3>
-              <p className="text-gray-500 mb-4">Localização dos nossos escritórios e parceiros</p>
+              <h3 className="text-xl font-bold text-gray-700 mb-2">{t('contact.interactiveMap')}</h3>
+              <p className="text-gray-500 mb-4">{t('contact.officesAndPartners')}</p>
               <div className="flex justify-center space-x-8 text-sm">
                 <span className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  🇦🇴 Angola (2 escritórios)
+                  🇦🇴 {t('country.angola')} (2 {t('contact.offices')})
                 </span>
                 <span className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                  🇳🇦 Namíbia (2 escritórios)
+                  🇳🇦 {t('country.namibia')} (2 {t('contact.offices')})
                 </span>
                 <span className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  🇿🇦 África do Sul (2 escritórios)
+                  🇿🇦 {t('country.southAfrica')} (2 {t('contact.offices')})
                 </span>
               </div>
             </div>
@@ -724,58 +737,57 @@ const ContactAfricasHands: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="text-center p-4 bg-red-50 rounded-lg">
               <div className="text-2xl font-bold text-red-600">6</div>
-              <div className="text-sm text-gray-600">Escritórios</div>
+              <div className="text-sm text-gray-600">{t('contact.offices')}</div>
             </div>
             <div className="text-center p-4 bg-blue-50 rounded-lg">
               <div className="text-2xl font-bold text-blue-600">3</div>
-              <div className="text-sm text-gray-600">Países</div>
+              <div className="text-sm text-gray-600">{t('contact.countries')}</div>
             </div>
             <div className="text-center p-4 bg-green-50 rounded-lg">
               <div className="text-2xl font-bold text-green-600">95M+</div>
-              <div className="text-sm text-gray-600">População Atendida</div>
+              <div className="text-sm text-gray-600">{t('contact.populationServed')}</div>
             </div>
             <div className="text-center p-4 bg-purple-50 rounded-lg">
               <div className="text-2xl font-bold text-purple-600">24/7</div>
-              <div className="text-sm text-gray-600">Suporte Online</div>
+              <div className="text-sm text-gray-600">{t('contact.onlineSupport')}</div>
             </div>
           </div>
         </section>
 
         {/* Call to Action Final */}
         <section className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 rounded-xl p-12 text-white text-center">
-          <h2 className="text-3xl font-bold mb-4">🚀 Pronto para Começar sua Jornada?</h2>
+          <h2 className="text-3xl font-bold mb-4">🚀 {t('contact.readyToStart')}</h2>
           <p className="text-red-100 mb-8 max-w-3xl mx-auto text-lg">
-            Nossa equipe está pronta para transformar suas ideias em oportunidades reais. 
-            Conecte-se conosco e faça parte da revolução digital da África Austral!
+            {t('contact.readyToStartDescription')}
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="bg-white bg-opacity-10 rounded-lg p-6">
               <div className="text-3xl mb-3">⚡</div>
-              <h3 className="font-bold mb-2">Resposta Rápida</h3>
-              <p className="text-sm text-red-100">Retorno em até 24h para todas as consultas</p>
+              <h3 className="font-bold mb-2">{t('contact.quickResponse')}</h3>
+              <p className="text-sm text-red-100">{t('contact.quickResponseDescription')}</p>
             </div>
             <div className="bg-white bg-opacity-10 rounded-lg p-6">
               <div className="text-3xl mb-3">🎯</div>
-              <h3 className="font-bold mb-2">Consultoria Especializada</h3>
-              <p className="text-sm text-red-100">Experts em cooperação regional africana</p>
+              <h3 className="font-bold mb-2">{t('contact.specializedConsulting')}</h3>
+              <p className="text-sm text-red-100">{t('contact.specializedConsultingDescription')}</p>
             </div>
             <div className="bg-white bg-opacity-10 rounded-lg p-6">
               <div className="text-3xl mb-3">🌍</div>
-              <h3 className="font-bold mb-2">Rede Regional</h3>
-              <p className="text-sm text-red-100">Conexões em Angola, Namíbia e África do Sul</p>
+              <h3 className="font-bold mb-2">{t('contact.regionalNetwork')}</h3>
+              <p className="text-sm text-red-100">{t('contact.regionalNetworkDescription')}</p>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="bg-white text-red-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition-colors text-lg">
-              💬 Iniciar Conversa
+              💬 {t('contact.startConversation')}
             </button>
             <button className="border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-white hover:text-red-600 transition-colors text-lg">
-              📅 Agendar Reunião
+              📅 {t('contact.scheduleMeeting')}
             </button>
             <button className="border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-white hover:text-red-600 transition-colors text-lg">
-              📋 Solicitar Proposta
+              📋 {t('contact.requestProposal')}
             </button>
           </div>
         </section>
@@ -783,35 +795,35 @@ const ContactAfricasHands: React.FC = () => {
         {/* Informações Legais e Desenvolvedor */}
         <section className="bg-gray-100 rounded-xl p-8 text-center">
           <div className="mb-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Africa's Hands</h3>
-            <p className="text-gray-600">Conectando a África Austral através da tecnologia e cooperação</p>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">{t('company.name')}</h3>
+            <p className="text-gray-600">{t('company.description')}</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-6">
             <div>
-              <h4 className="font-semibold text-gray-900 mb-2">🏢 Empresa</h4>
-              <p className="text-sm text-gray-600">Escritório Esteves</p>
-              <p className="text-sm text-gray-600">Reg. Comercial: AO123456789</p>
+              <h4 className="font-semibold text-gray-900 mb-2">🏢 {t('contact.company')}</h4>
+              <p className="text-sm text-gray-600">{t('contact.estevesOffice')}</p>
+              <p className="text-sm text-gray-600">{t('contact.commercialReg')}: AO123456789</p>
             </div>
             <div>
-              <h4 className="font-semibold text-gray-900 mb-2">📍 Sede Principal</h4>
-              <p className="text-sm text-gray-600">Cunene, Angola</p>
-              <p className="text-sm text-gray-600">Província do Cunene</p>
+              <h4 className="font-semibold text-gray-900 mb-2">📍 {t('contact.headquarters')}</h4>
+              <p className="text-sm text-gray-600">{t('offices.angola')}</p>
+              <p className="text-sm text-gray-600">{t('contact.cuneneProvince')}</p>
             </div>
             <div>
-              <h4 className="font-semibold text-gray-900 mb-2">⚖️ Legal</h4>
-              <p className="text-sm text-gray-600">Política de Privacidade</p>
-              <p className="text-sm text-gray-600">Termos de Uso</p>
+              <h4 className="font-semibold text-gray-900 mb-2">⚖️ {t('contact.legal')}</h4>
+              <p className="text-sm text-gray-600">{t('login.footer.privacyPolicy')}</p>
+              <p className="text-sm text-gray-600">{t('login.footer.termsOfUse')}</p>
             </div>
           </div>
 
           <div className="border-t border-gray-300 pt-6">
             <p className="text-sm text-gray-600 mb-2">
-              <strong>Desenvolvido por:</strong> Valdimir Jacinto Esteves
+              <strong>{t('login.footer.developedBy')}:</strong> {t('company.developer')}
             </p>
             <p className="text-xs text-gray-500">
-              © 2024 Africa's Hands. Todos os direitos reservados. 
-              Plataforma regional de cooperação e desenvolvimento.
+              © 2024 {t('company.name')}. {t('contact.allRightsReserved')}. 
+              {t('contact.platformDescription')}
             </p>
           </div>
         </section>

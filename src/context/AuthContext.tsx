@@ -33,6 +33,8 @@ interface AuthContextType {
   }) => Promise<void>;
   logout: () => Promise<void>;
   checkUserRole: () => Promise<'admin' | 'user' | null>;
+  loginWithFacebook: () => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -529,6 +531,78 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // 🚀 FUNÇÃO: Login com Facebook
+  const loginWithFacebook = async (): Promise<void> => {
+    try {
+      console.log('🔐 Tentando login com Facebook...');
+      setIsLoading(true);
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'facebook',
+        options: {
+          redirectTo: window.location.origin,
+          scopes: 'email,public_profile'
+        }
+      });
+
+      if (error) throw error;
+
+      console.log('✅ Redirecionando para Facebook...');
+      // O onAuthStateChange vai processar o resto quando retornar
+    } catch (error: any) {
+      console.error('❌ Falha no login com Facebook:', error);
+      setIsLoading(false);
+      
+      if (error.message?.includes('OAuth provider not enabled')) {
+        throw new Error('Login com Facebook não está habilitado');
+      }
+      
+      if (error.message?.includes('popup_closed_by_user')) {
+        throw new Error('Login cancelado pelo usuário');
+      }
+      
+      throw new Error(error.message || 'Erro no login com Facebook');
+    }
+  };
+
+  // 🚀 FUNÇÃO: Login com Google
+  const loginWithGoogle = async (): Promise<void> => {
+    try {
+      console.log('🔐 Tentando login com Google...');
+      setIsLoading(true);
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin,
+          scopes: 'email profile',
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      console.log('✅ Redirecionando para Google...');
+      // O onAuthStateChange vai processar o resto quando retornar
+    } catch (error: any) {
+      console.error('❌ Falha no login com Google:', error);
+      setIsLoading(false);
+      
+      if (error.message?.includes('OAuth provider not enabled')) {
+        throw new Error('Login com Google não está habilitado');
+      }
+      
+      if (error.message?.includes('popup_closed_by_user')) {
+        throw new Error('Login cancelado pelo usuário');
+      }
+      
+      throw new Error(error.message || 'Erro no login com Google');
+    }
+  };
+
   // Logout
   const logout = async (): Promise<void> => {
     try {
@@ -576,7 +650,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       login,
       register,
       logout,
-      checkUserRole
+      checkUserRole,
+      loginWithFacebook,
+      loginWithGoogle
     }}>
       {children}
     </AuthContext.Provider>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from '../context/TranslationContext';
+import { useTranslation, LanguageToggle } from '../context/TranslationContext';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 
@@ -123,7 +123,7 @@ const AdminDashboard: React.FC = () => {
       ]);
     } catch (err) {
       console.error('Erro ao carregar dados admin:', err);
-      setError('Erro ao carregar dados do painel administrativo');
+      setError(t('common.error'));
       loadFallbackData();
     } finally {
       setLoading(false);
@@ -154,8 +154,8 @@ const AdminDashboard: React.FC = () => {
         {
           id: '1',
           title: 'Programa de Intercâmbio Médico Luanda',
-          country: 'Angola',
-          sector: 'Saúde',
+          country: t('country.angola'),
+          sector: t('sector.health'),
           type: 'education',
           organization: 'Hospital Geral de Luanda',
           deadline: '2024-08-15',
@@ -171,8 +171,8 @@ const AdminDashboard: React.FC = () => {
         {
           id: '2',
           title: 'Centro de Formação Técnica Benguela',
-          country: 'Angola',
-          sector: 'Educação',
+          country: t('country.angola'),
+          sector: t('sector.education'),
           type: 'project',
           organization: 'Instituto Técnico de Benguela',
           deadline: '2024-09-10',
@@ -259,7 +259,7 @@ const AdminDashboard: React.FC = () => {
           message: 'Preciso de informações sobre hospitais especializados em cardiologia em Luanda.',
           status: 'pending',
           created_at: '2024-06-18T09:15:00Z',
-          user_country: 'Angola'
+          user_country: t('country.angola')
         },
         {
           id: '2',
@@ -271,7 +271,7 @@ const AdminDashboard: React.FC = () => {
           message: 'Interessada em programas de mestrado em medicina na UCT.',
           status: 'processing',
           created_at: '2024-06-17T16:45:00Z',
-          user_country: 'África do Sul'
+          user_country: t('country.southAfrica')
         },
         {
           id: '3',
@@ -283,7 +283,7 @@ const AdminDashboard: React.FC = () => {
           message: 'Preciso de transporte seguro entre Windhoek e Walvis Bay.',
           status: 'completed',
           created_at: '2024-06-16T11:20:00Z',
-          user_country: 'Namíbia'
+          user_country: t('country.namibia')
         }
       ]);
     }
@@ -383,12 +383,12 @@ const AdminDashboard: React.FC = () => {
 
       setShowEditModal(false);
       setEditingOpportunity(null);
-      alert('Oportunidade atualizada com sucesso! ✅');
+      alert(t('messages.opportunityUpdated'));
       
     } catch (err: any) {
       console.error('❌ Erro completo ao editar oportunidade:', err);
       
-      let errorMessage = 'Erro ao atualizar oportunidade';
+      let errorMessage = t('common.error');
       if (err.message?.includes('duplicate key')) {
         errorMessage = 'Já existe uma oportunidade com este título';
       } else if (err.message?.includes('foreign key')) {
@@ -423,10 +423,10 @@ const AdminDashboard: React.FC = () => {
       setApplications(prev => prev.filter(app => app.opportunity_id !== opportunityId));
 
       setDeleteConfirm(null);
-      alert('Oportunidade removida com sucesso! 🗑️');
+      alert(t('messages.opportunityDeleted'));
     } catch (err) {
       console.error('Erro ao deletar oportunidade:', err);
-      alert('Erro ao remover oportunidade');
+      alert(t('common.error'));
     }
   };
 
@@ -456,12 +456,12 @@ const AdminDashboard: React.FC = () => {
         opp.id === opportunityId ? { ...opp, status: newStatus as any } : opp
       ));
 
-      alert(`Oportunidade ${newStatus === 'active' ? 'ativada' : 'pausada'} com sucesso! ${newStatus === 'active' ? '▶️' : '⏸️'}`);
+      alert(t('messages.statusChanged'));
       
     } catch (err: any) {
       console.error('❌ Erro completo ao alterar status:', err);
       
-      let errorMessage = 'Erro ao alterar status da oportunidade';
+      let errorMessage = t('common.error');
       if (err.message?.includes('not found')) {
         errorMessage = 'Oportunidade não encontrada';
       } else if (err.message) {
@@ -500,10 +500,10 @@ const AdminDashboard: React.FC = () => {
         app.id === applicationId ? { ...app, status: 'approved' } : app
       ));
 
-      alert('Candidatura aprovada com sucesso!');
+      alert(t('messages.applicationApproved'));
     } catch (err) {
       console.error('Erro ao aprovar candidatura:', err);
-      alert('Erro ao aprovar candidatura');
+      alert(t('common.error'));
     }
   };
 
@@ -520,10 +520,10 @@ const AdminDashboard: React.FC = () => {
         app.id === applicationId ? { ...app, status: 'rejected' } : app
       ));
 
-      alert('Candidatura rejeitada.');
+      alert(t('messages.applicationRejected'));
     } catch (err) {
       console.error('Erro ao rejeitar candidatura:', err);
-      alert('Erro ao rejeitar candidatura');
+      alert(t('common.error'));
     }
   };
 
@@ -540,30 +540,30 @@ const AdminDashboard: React.FC = () => {
         req.id === requestId ? { ...req, status: newStatus as any } : req
       ));
 
-      alert(`Solicitação marcada como ${newStatus}`);
+      alert(t('messages.requestProcessed'));
     } catch (err) {
       console.error('Erro ao processar solicitação:', err);
-      alert('Erro ao processar solicitação');
+      alert(t('common.error'));
     }
   };
 
   const getCountryFlag = (country: string) => {
     const flags = {
-      'Angola': '🇦🇴',
-      'Namíbia': '🇳🇦',
-      'África do Sul': '🇿🇦'
+      [t('country.angola')]: '🇦🇴',
+      [t('country.namibia')]: '🇳🇦',
+      [t('country.southAfrica')]: '🇿🇦'
     };
     return flags[country as keyof typeof flags] || '🌍';
   };
 
   const getSectorIcon = (sector: string) => {
     const icons = {
-      'Saúde': '🏥',
-      'Educação': '🎓',
-      'Turismo': '🏨',
-      'Comércio': '🛒',
-      'Transporte': '✈️',
-      'Tecnologia': '💻'
+      [t('sector.health')]: '🏥',
+      [t('sector.education')]: '🎓',
+      [t('sector.tourism')]: '🏨',
+      [t('sector.commerce')]: '🛒',
+      [t('sector.transport')]: '✈️',
+      [t('sector.technology')]: '💻'
     };
     return icons[sector as keyof typeof icons] || '💼';
   };
@@ -584,14 +584,14 @@ const AdminDashboard: React.FC = () => {
 
   const getStatusLabel = (status: string) => {
     const labels = {
-      'pending': 'Pendente',
-      'approved': 'Aprovada',
-      'rejected': 'Rejeitada',
-      'processing': 'Processando',
-      'completed': 'Completa',
-      'cancelled': 'Cancelada',
-      'active': 'Ativa',
-      'inactive': 'Inativa'
+      'pending': t('applications.status.pending'),
+      'approved': t('applications.status.approved'),
+      'rejected': t('applications.status.rejected'),
+      'processing': t('requests.status.processing'),
+      'completed': t('requests.status.completed'),
+      'cancelled': t('requests.status.cancelled'),
+      'active': t('status.active'),
+      'inactive': t('status.inactive')
     };
     return labels[status as keyof typeof labels] || status;
   };
@@ -611,8 +611,8 @@ const AdminDashboard: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-red-600 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Carregando Painel Administrativo</h2>
-          <p className="text-gray-600">Sincronizando dados dos usuários...</p>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('admin.loadingTitle')}</h2>
+          <p className="text-gray-600">{t('admin.loadingSubtitle')}</p>
         </div>
       </div>
     );
@@ -623,17 +623,18 @@ const AdminDashboard: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Painel Administrativo</h1>
-          <p className="text-gray-600">Gestão de oportunidades, candidaturas e solicitações dos usuários</p>
+          <h1 className="text-3xl font-bold text-gray-900">{t('admin.title')}</h1>
+          <p className="text-gray-600">{t('admin.subtitle')}</p>
           {user && (
             <p className="text-sm text-gray-500 mt-1">
-              Administrador: {user.email}
+              {t('admin.administrator')} {user.email}
             </p>
           )}
         </div>
         
-        {/* ✅ RESTAURADO: Botão para navegar para CreateProject */}
-        <div className="flex gap-3">
+        {/* ✅ RESTAURADO: Botão para navegar para CreateProject + Language Toggle */}
+        <div className="flex gap-3 items-center">
+          <LanguageToggle />
           <button 
             onClick={() => {
               console.log('🚀 Navegando para página de criação de oportunidades...');
@@ -644,7 +645,7 @@ const AdminDashboard: React.FC = () => {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Nova Oportunidade
+            {t('admin.newOpportunity')}
           </button>
         </div>
       </div>
@@ -654,7 +655,7 @@ const AdminDashboard: React.FC = () => {
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Oportunidades Ativas</p>
+              <p className="text-sm font-medium text-gray-600">{t('stats.activeOpportunities')}</p>
               <p className="text-2xl font-bold text-green-600">{stats.activeOpportunities}</p>
             </div>
             <div className="p-3 bg-green-100 rounded-full">
@@ -662,14 +663,14 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
           <div className="mt-4">
-            <span className="text-sm text-gray-500">Total: {stats.totalOpportunities}</span>
+            <span className="text-sm text-gray-500">{t('stats.total')} {stats.totalOpportunities}</span>
           </div>
         </div>
 
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Candidaturas Pendentes</p>
+              <p className="text-sm font-medium text-gray-600">{t('stats.pendingApplications')}</p>
               <p className="text-2xl font-bold text-yellow-600">{stats.pendingApplications}</p>
             </div>
             <div className="p-3 bg-yellow-100 rounded-full">
@@ -677,14 +678,14 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
           <div className="mt-4">
-            <span className="text-sm text-gray-500">Total: {stats.totalApplications}</span>
+            <span className="text-sm text-gray-500">{t('stats.total')} {stats.totalApplications}</span>
           </div>
         </div>
 
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Solicitações Pendentes</p>
+              <p className="text-sm font-medium text-gray-600">{t('stats.pendingRequests')}</p>
               <p className="text-2xl font-bold text-orange-600">{stats.pendingServiceRequests}</p>
             </div>
             <div className="p-3 bg-orange-100 rounded-full">
@@ -692,14 +693,14 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
           <div className="mt-4">
-            <span className="text-sm text-gray-500">Total: {stats.totalServiceRequests}</span>
+            <span className="text-sm text-gray-500">{t('stats.total')} {stats.totalServiceRequests}</span>
           </div>
         </div>
 
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Usuários Ativos</p>
+              <p className="text-sm font-medium text-gray-600">{t('stats.activeUsers')}</p>
               <p className="text-2xl font-bold text-purple-600">{stats.totalUsers}</p>
             </div>
             <div className="p-3 bg-purple-100 rounded-full">
@@ -707,7 +708,7 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
           <div className="mt-4">
-            <span className="text-sm text-gray-500">Conexões: {stats.totalConnections}</span>
+            <span className="text-sm text-gray-500">{t('stats.connections')} {stats.totalConnections}</span>
           </div>
         </div>
       </div>
@@ -717,11 +718,11 @@ const AdminDashboard: React.FC = () => {
         <div className="border-b border-gray-200">
           <nav className="flex space-x-8 px-6" aria-label="Tabs">
             {[
-              { id: 'overview', name: 'Visão Geral', icon: '📊' },
-              { id: 'applications', name: `Candidaturas (${stats.pendingApplications})`, icon: '📋' },
-              { id: 'requests', name: `Solicitações (${stats.pendingServiceRequests})`, icon: '🛎️' },
-              { id: 'opportunities', name: 'Oportunidades', icon: '🚀' },
-              { id: 'users', name: 'Usuários', icon: '👥' }
+              { id: 'overview', name: t('tabs.overview'), icon: '📊' },
+              { id: 'applications', name: `${t('tabs.applications')} (${stats.pendingApplications})`, icon: '📋' },
+              { id: 'requests', name: `${t('tabs.requests')} (${stats.pendingServiceRequests})`, icon: '🛎️' },
+              { id: 'opportunities', name: t('tabs.opportunities'), icon: '🚀' },
+              { id: 'users', name: t('tabs.users'), icon: '👥' }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -746,15 +747,15 @@ const AdminDashboard: React.FC = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Atividade Recente */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Atividade Recente</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('overview.recentActivity')}</h3>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                       <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
                         <span className="text-sm">📋</span>
                       </div>
                       <div>
-                        <p className="text-sm font-medium">Nova candidatura recebida</p>
-                        <p className="text-xs text-gray-500">Dr. João Santos - há 2 horas</p>
+                        <p className="text-sm font-medium">{t('overview.newApplication')}</p>
+                        <p className="text-xs text-gray-500">Dr. João Santos - {t('overview.hoursAgo')}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
@@ -762,8 +763,8 @@ const AdminDashboard: React.FC = () => {
                         <span className="text-sm">🛎️</span>
                       </div>
                       <div>
-                        <p className="text-sm font-medium">Solicitação de serviço</p>
-                        <p className="text-xs text-gray-500">Ana Costa - há 5 horas</p>
+                        <p className="text-sm font-medium">{t('overview.serviceRequest')}</p>
+                        <p className="text-xs text-gray-500">Ana Costa - {t('overview.fiveHoursAgo')}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
@@ -771,8 +772,8 @@ const AdminDashboard: React.FC = () => {
                         <span className="text-sm">✅</span>
                       </div>
                       <div>
-                        <p className="text-sm font-medium">Solicitação processada</p>
-                        <p className="text-xs text-gray-500">Carlos Mumbala - há 1 dia</p>
+                        <p className="text-sm font-medium">{t('overview.requestProcessed')}</p>
+                        <p className="text-xs text-gray-500">Carlos Mumbala - {t('overview.oneDayAgo')}</p>
                       </div>
                     </div>
                   </div>
@@ -780,9 +781,9 @@ const AdminDashboard: React.FC = () => {
 
                 {/* Estatísticas por País */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Atividade por País</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('overview.activityByCountry')}</h3>
                   <div className="space-y-3">
-                    {['Angola', 'Namíbia', 'África do Sul'].map((country) => {
+                    {[t('country.angola'), t('country.namibia'), t('country.southAfrica')].map((country) => {
                       const countryRequests = serviceRequests.filter(r => r.user_country === country).length;
                       const countryApplications = applications.filter(a => a.opportunity?.country === country).length;
                       
@@ -792,12 +793,12 @@ const AdminDashboard: React.FC = () => {
                             <span className="text-2xl">{getCountryFlag(country)}</span>
                             <div>
                               <p className="font-medium">{country}</p>
-                              <p className="text-sm text-gray-600">{countryApplications} candidaturas • {countryRequests} solicitações</p>
+                              <p className="text-sm text-gray-600">{countryApplications} {t('overview.applicationsCount')} • {countryRequests} {t('overview.requestsCount')}</p>
                             </div>
                           </div>
                           <div className="text-right">
                             <p className="text-lg font-bold text-gray-900">{countryApplications + countryRequests}</p>
-                            <p className="text-xs text-gray-500">Total</p>
+                            <p className="text-xs text-gray-500">{t('stats.total').replace(':', '')}</p>
                           </div>
                         </div>
                       );
@@ -812,13 +813,13 @@ const AdminDashboard: React.FC = () => {
           {selectedTab === 'applications' && (
             <div>
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">Gestão de Candidaturas</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{t('applications.title')}</h3>
                 <div className="flex gap-2">
                   <select className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
-                    <option>Todas as candidaturas</option>
-                    <option>Pendentes</option>
-                    <option>Aprovadas</option>
-                    <option>Rejeitadas</option>
+                    <option>{t('applications.allApplications')}</option>
+                    <option>{t('applications.pending')}</option>
+                    <option>{t('applications.approved')}</option>
+                    <option>{t('applications.rejected')}</option>
                   </select>
                 </div>
               </div>
@@ -841,20 +842,20 @@ const AdminDashboard: React.FC = () => {
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                           <div>
-                            <p className="text-sm text-gray-600"><strong>Candidato:</strong> {application.user_name}</p>
-                            <p className="text-sm text-gray-600"><strong>Email:</strong> {application.user_email}</p>
-                            <p className="text-sm text-gray-600"><strong>Data:</strong> {formatDate(application.application_date)}</p>
+                            <p className="text-sm text-gray-600"><strong>{t('applications.candidate')}</strong> {application.user_name}</p>
+                            <p className="text-sm text-gray-600"><strong>{t('applications.email')}</strong> {application.user_email}</p>
+                            <p className="text-sm text-gray-600"><strong>{t('applications.date')}</strong> {formatDate(application.application_date)}</p>
                           </div>
                           <div>
-                            <p className="text-sm text-gray-600"><strong>Organização:</strong> {application.opportunity?.organization}</p>
-                            <p className="text-sm text-gray-600"><strong>Localização:</strong> {application.opportunity?.location}</p>
-                            <p className="text-sm text-gray-600"><strong>Prazo:</strong> {application.opportunity?.deadline}</p>
+                            <p className="text-sm text-gray-600"><strong>{t('applications.organization')}</strong> {application.opportunity?.organization}</p>
+                            <p className="text-sm text-gray-600"><strong>{t('applications.location')}</strong> {application.opportunity?.location}</p>
+                            <p className="text-sm text-gray-600"><strong>{t('applications.deadline')}</strong> {application.opportunity?.deadline}</p>
                           </div>
                         </div>
 
                         {application.message && (
                           <div className="bg-gray-50 p-3 rounded-lg mb-3">
-                            <p className="text-sm text-gray-700"><strong>Mensagem:</strong></p>
+                            <p className="text-sm text-gray-700"><strong>{t('applications.message')}</strong></p>
                             <p className="text-sm text-gray-600 mt-1">{application.message}</p>
                           </div>
                         )}
@@ -865,19 +866,19 @@ const AdminDashboard: React.FC = () => {
                               onClick={() => handleApproveApplication(application.id)}
                               className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition-colors"
                             >
-                              ✅ Aprovar
+                              ✅ {t('applications.approve')}
                             </button>
                             <button
                               onClick={() => handleRejectApplication(application.id)}
                               className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition-colors"
                             >
-                              ❌ Rejeitar
+                              ❌ {t('applications.reject')}
                             </button>
                             <button
                               onClick={() => setSelectedItem(application)}
                               className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors"
                             >
-                              👁️ Ver Detalhes
+                              👁️ {t('applications.viewDetails')}
                             </button>
                           </div>
                         )}
@@ -889,8 +890,8 @@ const AdminDashboard: React.FC = () => {
                 {applications.length === 0 && (
                   <div className="text-center py-12">
                     <div className="text-4xl mb-4">📋</div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhuma candidatura</h3>
-                    <p className="text-gray-600">Ainda não há candidaturas para revisar.</p>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">{t('applications.noApplications')}</h3>
+                    <p className="text-gray-600">{t('applications.noApplicationsDesc')}</p>
                   </div>
                 )}
               </div>
@@ -901,13 +902,13 @@ const AdminDashboard: React.FC = () => {
           {selectedTab === 'requests' && (
             <div>
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">Solicitações de Serviços</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{t('requests.title')}</h3>
                 <div className="flex gap-2">
                   <select className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
-                    <option>Todas as solicitações</option>
-                    <option>Pendentes</option>
-                    <option>Processando</option>
-                    <option>Completas</option>
+                    <option>{t('requests.allRequests')}</option>
+                    <option>{t('requests.status.pending')}</option>
+                    <option>{t('requests.processing')}</option>
+                    <option>{t('requests.completed')}</option>
                   </select>
                 </div>
               </div>
@@ -927,18 +928,18 @@ const AdminDashboard: React.FC = () => {
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                           <div>
-                            <p className="text-sm text-gray-600"><strong>Nome:</strong> {request.name}</p>
-                            <p className="text-sm text-gray-600"><strong>Email:</strong> {request.email}</p>
-                            <p className="text-sm text-gray-600"><strong>Telefone:</strong> {request.phone}</p>
+                            <p className="text-sm text-gray-600"><strong>{t('requests.name')}</strong> {request.name}</p>
+                            <p className="text-sm text-gray-600"><strong>{t('applications.email')}</strong> {request.email}</p>
+                            <p className="text-sm text-gray-600"><strong>{t('requests.phone')}</strong> {request.phone}</p>
                           </div>
                           <div>
-                            <p className="text-sm text-gray-600"><strong>País:</strong> {request.user_country}</p>
-                            <p className="text-sm text-gray-600"><strong>Data:</strong> {formatDate(request.created_at)}</p>
+                            <p className="text-sm text-gray-600"><strong>{t('requests.country')}</strong> {request.user_country}</p>
+                            <p className="text-sm text-gray-600"><strong>{t('applications.date')}</strong> {formatDate(request.created_at)}</p>
                           </div>
                         </div>
 
                         <div className="bg-gray-50 p-3 rounded-lg mb-3">
-                          <p className="text-sm text-gray-700"><strong>Detalhes da Solicitação:</strong></p>
+                          <p className="text-sm text-gray-700"><strong>{t('requests.details')}</strong></p>
                           <p className="text-sm text-gray-600 mt-1">{request.message}</p>
                         </div>
 
@@ -949,13 +950,13 @@ const AdminDashboard: React.FC = () => {
                                 onClick={() => handleProcessServiceRequest(request.id, 'processing')}
                                 className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors"
                               >
-                                🔄 Processar
+                                🔄 {t('requests.process')}
                               </button>
                               <button
                                 onClick={() => handleProcessServiceRequest(request.id, 'completed')}
                                 className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition-colors"
                               >
-                                ✅ Marcar como Completa
+                                ✅ {t('requests.markComplete')}
                               </button>
                             </>
                           )}
@@ -965,7 +966,7 @@ const AdminDashboard: React.FC = () => {
                               onClick={() => handleProcessServiceRequest(request.id, 'completed')}
                               className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition-colors"
                             >
-                              ✅ Marcar como Completa
+                              ✅ {t('requests.markComplete')}
                             </button>
                           )}
 
@@ -975,14 +976,14 @@ const AdminDashboard: React.FC = () => {
                             rel="noopener noreferrer"
                             className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-600 transition-colors inline-flex items-center gap-2"
                           >
-                            📱 WhatsApp
+                            📱 {t('requests.whatsapp')}
                           </a>
                           
                           <a
                             href={`mailto:${request.email}?subject=Africa's Hands - ${request.service_type}&body=Olá ${request.name}, recebemos sua solicitação sobre ${request.service_type}.`}
                             className="bg-gray-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700 transition-colors inline-flex items-center gap-2"
                           >
-                            📧 Email
+                            📧 {t('requests.emailAction')}
                           </a>
                         </div>
                       </div>
@@ -993,8 +994,8 @@ const AdminDashboard: React.FC = () => {
                 {serviceRequests.length === 0 && (
                   <div className="text-center py-12">
                     <div className="text-4xl mb-4">🛎️</div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhuma solicitação</h3>
-                    <p className="text-gray-600">Ainda não há solicitações de serviços.</p>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">{t('requests.noRequests')}</h3>
+                    <p className="text-gray-600">{t('requests.noRequestsDesc')}</p>
                   </div>
                 )}
               </div>
@@ -1006,9 +1007,9 @@ const AdminDashboard: React.FC = () => {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Gestão de Oportunidades</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">{t('opportunities.title')}</h3>
                   <p className="text-sm text-gray-500">
-                    {opportunities.length} oportunidade{opportunities.length !== 1 ? 's' : ''} no sistema
+                    {opportunities.length} {opportunities.length === 1 ? t('opportunities.opportunityCount') : t('opportunities.opportunitiesCount')} {t('opportunities.systemCount')}
                   </p>
                 </div>
                 <button 
@@ -1018,7 +1019,7 @@ const AdminDashboard: React.FC = () => {
                   }}
                   className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition-colors"
                 >
-                  + Nova Oportunidade
+                  + {t('admin.newOpportunity')}
                 </button>
               </div>
 
@@ -1061,7 +1062,7 @@ const AdminDashboard: React.FC = () => {
                             }}
                             className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition-colors"
                           >
-                            ✏️ Editar
+                            ✏️ {t('opportunities.edit')}
                           </button>
                           
                           <button 
@@ -1071,14 +1072,14 @@ const AdminDashboard: React.FC = () => {
                             }}
                             className={`${opportunity.status === 'active' ? 'bg-orange-600 hover:bg-orange-700' : 'bg-green-600 hover:bg-green-700'} text-white px-3 py-1 rounded text-xs transition-colors`}
                           >
-                            {opportunity.status === 'active' ? '⏸️ Pausar' : '▶️ Ativar'}
+                            {opportunity.status === 'active' ? `⏸️ ${t('opportunities.pause')}` : `▶️ ${t('opportunities.activate')}`}
                           </button>
                           
                           <button 
                             onClick={() => setDeleteConfirm(opportunity.id)}
                             className="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700 transition-colors"
                           >
-                            🗑️ Apagar
+                            🗑️ {t('opportunities.delete')}
                           </button>
                         </div>
                       </div>
@@ -1089,8 +1090,8 @@ const AdminDashboard: React.FC = () => {
                 {opportunities.length === 0 && (
                   <div className="col-span-2 text-center py-12">
                     <div className="text-4xl mb-4">🚀</div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhuma oportunidade</h3>
-                    <p className="text-gray-600 mb-4">Crie a primeira oportunidade para começar.</p>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">{t('opportunities.noOpportunities')}</h3>
+                    <p className="text-gray-600 mb-4">{t('opportunities.noOpportunitiesDesc')}</p>
                     <button 
                       onClick={() => {
                         console.log('🚀 Navegando para CreateProject (primeira oportunidade)...');
@@ -1098,7 +1099,7 @@ const AdminDashboard: React.FC = () => {
                       }}
                       className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition-colors"
                     >
-                      + Criar Primeira Oportunidade
+                      + {t('opportunities.createFirst')}
                     </button>
                   </div>
                 )}
@@ -1110,28 +1111,28 @@ const AdminDashboard: React.FC = () => {
           {selectedTab === 'users' && (
             <div>
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">Gestão de Usuários</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{t('users.title')}</h3>
                 <div className="flex gap-2">
                   <input
                     type="search"
-                    placeholder="Buscar usuários..."
+                    placeholder={t('users.searchPlaceholder')}
                     className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-64"
                   />
                   <select className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
-                    <option>Todos os países</option>
-                    <option>Angola</option>
-                    <option>Namíbia</option>
-                    <option>África do Sul</option>
+                    <option>{t('users.allCountries')}</option>
+                    <option>{t('country.angola')}</option>
+                    <option>{t('country.namibia')}</option>
+                    <option>{t('country.southAfrica')}</option>
                   </select>
                 </div>
               </div>
 
               <div className="text-center py-12">
                 <div className="text-4xl mb-4">👥</div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Gestão de Usuários</h3>
-                <p className="text-gray-600 mb-4">Esta funcionalidade será implementada em breve.</p>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">{t('users.title')}</h3>
+                <p className="text-gray-600 mb-4">{t('users.comingSoon')}</p>
                 <button className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition-colors">
-                  Ver Todos os Usuários
+                  {t('users.viewAll')}
                 </button>
               </div>
             </div>
@@ -1145,7 +1146,7 @@ const AdminDashboard: React.FC = () => {
           <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-gray-900">Editar Oportunidade</h2>
+                <h2 className="text-xl font-bold text-gray-900">{t('edit.title')}</h2>
                 <button
                   onClick={() => setShowEditModal(false)}
                   className="text-gray-400 hover:text-gray-600 p-2"
@@ -1161,13 +1162,13 @@ const AdminDashboard: React.FC = () => {
               {/* Validação no início do modal */}
               {!editingOpportunity ? (
                 <div className="text-center py-8">
-                  <p className="text-gray-500">Carregando dados da oportunidade...</p>
+                  <p className="text-gray-500">{t('common.loading')}</p>
                 </div>
               ) : (
                 <>
               {/* Título */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Título</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('edit.opportunityTitle')}</label>
                 <input
                   type="text"
                   value={editingOpportunity.title || ''}
@@ -1178,7 +1179,7 @@ const AdminDashboard: React.FC = () => {
 
               {/* Descrição */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Descrição</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('edit.description')}</label>
                 <textarea
                   value={editingOpportunity.description || ''}
                   onChange={(e) => setEditingOpportunity({...editingOpportunity, description: e.target.value})}
@@ -1190,32 +1191,32 @@ const AdminDashboard: React.FC = () => {
               {/* País e Setor */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">País</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('edit.country')}</label>
                   <select
                     value={editingOpportunity.country || ''}
                     onChange={(e) => setEditingOpportunity({...editingOpportunity, country: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   >
-                    <option value="">Selecionar país</option>
-                    <option value="Angola">Angola</option>
-                    <option value="Namíbia">Namíbia</option>
-                    <option value="África do Sul">África do Sul</option>
+                    <option value="">{t('edit.selectCountry')}</option>
+                    <option value={t('country.angola')}>{t('country.angola')}</option>
+                    <option value={t('country.namibia')}>{t('country.namibia')}</option>
+                    <option value={t('country.southAfrica')}>{t('country.southAfrica')}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Setor</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('edit.sector')}</label>
                   <select
                     value={editingOpportunity.sector || ''}
                     onChange={(e) => setEditingOpportunity({...editingOpportunity, sector: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   >
-                    <option value="">Selecionar setor</option>
-                    <option value="Saúde">Saúde</option>
-                    <option value="Educação">Educação</option>
-                    <option value="Turismo">Turismo</option>
-                    <option value="Comércio">Comércio</option>
-                    <option value="Transporte">Transporte</option>
-                    <option value="Tecnologia">Tecnologia</option>
+                    <option value="">{t('edit.selectSector')}</option>
+                    <option value={t('sector.health')}>{t('sector.health')}</option>
+                    <option value={t('sector.education')}>{t('sector.education')}</option>
+                    <option value={t('sector.tourism')}>{t('sector.tourism')}</option>
+                    <option value={t('sector.commerce')}>{t('sector.commerce')}</option>
+                    <option value={t('sector.transport')}>{t('sector.transport')}</option>
+                    <option value={t('sector.technology')}>{t('sector.technology')}</option>
                   </select>
                 </div>
               </div>
@@ -1223,7 +1224,7 @@ const AdminDashboard: React.FC = () => {
               {/* Organização e Localização */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Organização</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('edit.organization')}</label>
                   <input
                     type="text"
                     value={editingOpportunity.organization || ''}
@@ -1232,7 +1233,7 @@ const AdminDashboard: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Localização</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('edit.location')}</label>
                   <input
                     type="text"
                     value={editingOpportunity.location || ''}
@@ -1244,7 +1245,7 @@ const AdminDashboard: React.FC = () => {
 
               {/* Prazo */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Prazo para Candidaturas</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('edit.deadline')}</label>
                 <input
                   type="date"
                   value={editingOpportunity.deadline || ''}
@@ -1257,7 +1258,7 @@ const AdminDashboard: React.FC = () => {
               {/* Orçamento e Requirements */}
               <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Orçamento (USD) - Opcional</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('edit.budget')}</label>
                   <input
                     type="number"
                     value={editingOpportunity.budget || ''}
@@ -1273,7 +1274,7 @@ const AdminDashboard: React.FC = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Requisitos</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('edit.requirements')}</label>
                   <div className="space-y-2">
                     {(editingOpportunity.requirements || []).map((req, index) => (
                       <div key={index} className="flex gap-2">
@@ -1289,7 +1290,7 @@ const AdminDashboard: React.FC = () => {
                             });
                           }}
                           className="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
-                          placeholder={`Requisito ${index + 1}`}
+                          placeholder={`${t('edit.requirement')} ${index + 1}`}
                         />
                         <button
                           type="button"
@@ -1317,7 +1318,7 @@ const AdminDashboard: React.FC = () => {
                       }}
                       className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-red-300 hover:text-red-600 transition-colors text-sm"
                     >
-                      + Adicionar Requisito
+                      + {t('edit.addRequirement')}
                     </button>
                   </div>
                 </div>
@@ -1326,28 +1327,28 @@ const AdminDashboard: React.FC = () => {
               {/* Tipo e Status */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('edit.type')}</label>
                   <select
                     value={editingOpportunity.type || 'project'}
                     onChange={(e) => setEditingOpportunity({...editingOpportunity, type: e.target.value as any})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   >
-                    <option value="project">Projeto</option>
-                    <option value="partnership">Parceria</option>
-                    <option value="funding">Financiamento</option>
-                    <option value="education">Educação</option>
+                    <option value="project">{t('type.project')}</option>
+                    <option value="partnership">{t('type.partnership')}</option>
+                    <option value="funding">{t('type.funding')}</option>
+                    <option value="education">{t('type.education')}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('edit.status')}</label>
                   <select
                     value={editingOpportunity.status || 'active'}
                     onChange={(e) => setEditingOpportunity({...editingOpportunity, status: e.target.value as any})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   >
-                    <option value="active">Ativa</option>
-                    <option value="inactive">Inativa</option>
-                    <option value="expired">Expirada</option>
+                    <option value="active">{t('status.active')}</option>
+                    <option value="inactive">{t('status.inactive')}</option>
+                    <option value="expired">{t('status.expired')}</option>
                   </select>
                 </div>
               </div>
@@ -1361,7 +1362,7 @@ const AdminDashboard: React.FC = () => {
                     onChange={(e) => setEditingOpportunity({...editingOpportunity, featured: e.target.checked})}
                     className="mr-2 w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
                   />
-                  <span className="text-sm font-medium text-gray-700">⭐ Marcar como destaque</span>
+                  <span className="text-sm font-medium text-gray-700">{t('edit.featured')}</span>
                 </label>
               </div>
 
@@ -1375,7 +1376,7 @@ const AdminDashboard: React.FC = () => {
                   }}
                   className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-medium"
                 >
-                  Cancelar
+                  {t('edit.cancel')}
                 </button>
                 <button
                   onClick={() => {
@@ -1384,12 +1385,12 @@ const AdminDashboard: React.FC = () => {
                     
                     // ✅ Validação básica mais robusta
                     if (!editingOpportunity?.title?.trim() || !editingOpportunity?.description?.trim()) {
-                      alert('Por favor, preencha pelo menos o título e descrição');
+                      alert(t('messages.fillRequiredFields'));
                       return;
                     }
                     
                     if (!editingOpportunity?.country || !editingOpportunity?.sector) {
-                      alert('Por favor, selecione o país e setor');
+                      alert(t('messages.selectCountryAndSector'));
                       return;
                     }
                     
@@ -1398,7 +1399,7 @@ const AdminDashboard: React.FC = () => {
                   disabled={!editingOpportunity?.title?.trim() || !editingOpportunity?.description?.trim()}
                   className="flex-1 bg-red-600 text-white py-3 rounded-lg font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  💾 Salvar Alterações
+                  💾 {t('edit.save')}
                 </button>
               </div>
               </>
@@ -1414,22 +1415,22 @@ const AdminDashboard: React.FC = () => {
           <div className="bg-white rounded-xl max-w-md w-full p-6">
             <div className="text-center">
               <div className="text-4xl mb-4">⚠️</div>
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Confirmar Exclusão</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">{t('delete.title')}</h2>
               <p className="text-gray-600 mb-6">
-                Tem certeza que deseja apagar esta oportunidade? Esta ação não pode ser desfeita e também removerá todas as candidaturas relacionadas.
+                {t('delete.message')}
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setDeleteConfirm(null)}
                   className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-medium"
                 >
-                  Cancelar
+                  {t('edit.cancel')}
                 </button>
                 <button
                   onClick={() => handleDeleteOpportunity(deleteConfirm)}
                   className="flex-1 bg-red-600 text-white py-3 rounded-lg font-medium hover:bg-red-700 transition-colors"
                 >
-                  🗑️ Apagar
+                  🗑️ {t('delete.confirm')}
                 </button>
               </div>
             </div>
@@ -1443,7 +1444,7 @@ const AdminDashboard: React.FC = () => {
           <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-gray-900">Detalhes da Candidatura</h2>
+                <h2 className="text-xl font-bold text-gray-900">{t('details.title')}</h2>
                 <button
                   onClick={() => setSelectedItem(null)}
                   className="text-gray-400 hover:text-gray-600 p-2"
@@ -1456,12 +1457,12 @@ const AdminDashboard: React.FC = () => {
             </div>
             
             <div className="p-6">
-              <p className="text-gray-600">Detalhes completos serão implementados aqui.</p>
+              <p className="text-gray-600">{t('details.placeholder')}</p>
               <button
                 onClick={() => setSelectedItem(null)}
                 className="mt-4 bg-gray-600 text-white px-4 py-2 rounded-lg"
               >
-                Fechar
+                {t('details.close')}
               </button>
             </div>
           </div>
@@ -1474,7 +1475,7 @@ const AdminDashboard: React.FC = () => {
           <div className="flex">
             <span className="text-yellow-400 mr-3">⚠️</span>
             <div>
-              <h3 className="text-sm font-medium text-yellow-800">Aviso</h3>
+              <h3 className="text-sm font-medium text-yellow-800">{t('common.warning')}</h3>
               <p className="text-sm text-yellow-700 mt-1">{error}</p>
             </div>
           </div>
