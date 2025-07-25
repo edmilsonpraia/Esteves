@@ -117,8 +117,11 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, isSidebarOpen }) => {
         {/* Right Section */}
         <div className="flex items-center gap-2">
           
-          {/* Language Toggle Button */}
-          <LanguageToggle />
+          {/* Language Toggle Button - Modificado para ser mais visível */}
+          <div className="relative group">
+            <LanguageToggle />
+            <div className="absolute inset-0 -z-10 bg-gray-100 opacity-0 group-hover:opacity-100 rounded-lg transition-opacity duration-200"></div>
+          </div>
           
           {/* Mobile Search */}
           <button 

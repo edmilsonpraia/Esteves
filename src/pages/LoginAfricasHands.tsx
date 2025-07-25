@@ -39,15 +39,15 @@ const LoginAfricasHands: React.FC = () => {
   ];
 
   const sectors = [
-    { value: 'Saúde', label: '🏥 Saúde', icon: '🏥' },
-    { value: 'Educação', label: '🎓 Educação', icon: '🎓' },
-    { value: 'Turismo', label: '🏨 Turismo', icon: '🏨' },
-    { value: 'Comércio', label: '🛒 Comércio', icon: '🛒' },
-    { value: 'Transporte', label: '✈️ Transporte', icon: '✈️' },
-    { value: 'Tecnologia', label: '💻 Tecnologia', icon: '💻' },
-    { value: 'Gestão Executiva', label: '👨‍💼 Gestão Executiva', icon: '👨‍💼' },
-    { value: 'Governo', label: '🏛️ Governo', icon: '🏛️' },
-    { value: 'ONGs', label: '🤝 ONGs', icon: '🤝' }
+    { value: 'Saúde', label: `🏥 ${t('sector.health')}`, icon: '🏥' },
+    { value: 'Educação', label: `🎓 ${t('sector.education')}`, icon: '🎓' },
+    { value: 'Turismo', label: `🏨 ${t('sector.tourism')}`, icon: '🏨' },
+    { value: 'Comércio', label: `🛒 ${t('sector.commerce')}`, icon: '🛒' },
+    { value: 'Transporte', label: `✈️ ${t('sector.transport')}`, icon: '✈️' },
+    { value: 'Tecnologia', label: `💻 ${t('sector.technology')}`, icon: '💻' },
+    { value: 'Gestão Executiva', label: `👨‍💼 ${t('login.sectors.executive')}`, icon: '👨‍💼' },
+    { value: 'Governo', label: `🏛️ ${t('login.sectors.government')}`, icon: '🏛️' },
+    { value: 'ONGs', label: `🤝 ${t('login.sectors.ngos')}`, icon: '🤝' }
   ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -67,18 +67,18 @@ const LoginAfricasHands: React.FC = () => {
     }
 
     if (!formData.email.includes('@')) {
-      setErrorMessage('Por favor, insira um email válido');
+      setErrorMessage(t('login.errors.invalidEmail'));
       return false;
     }
 
     if (formData.password.length < 6) {
-      setErrorMessage('A senha deve ter pelo menos 6 caracteres');
+      setErrorMessage(t('login.errors.passwordTooShort'));
       return false;
     }
 
     if (!isLogin) {
       if (!formData.name || !formData.country) {
-        setErrorMessage('Nome e país são obrigatórios para registro');
+        setErrorMessage(t('login.errors.nameCountryRequired'));
         return false;
       }
     } else {
@@ -104,7 +104,7 @@ const LoginAfricasHands: React.FC = () => {
       if (isLogin) {
         // Login
         await login(formData.email, formData.password);
-        setSuccessMessage('Login realizado com sucesso! Redirecionando...');
+        setSuccessMessage(t('login.messages.loginSuccess'));
         
         // ✅ REMOÇÃO DO REDIRECIONAMENTO PROBLEMÁTICO
         // O redirecionamento agora é gerenciado pelo App.tsx
@@ -127,7 +127,7 @@ const LoginAfricasHands: React.FC = () => {
           role: formData.email.includes('admin') ? 'admin' : 'user'
         });
         
-        setSuccessMessage('Conta criada com sucesso! Faça login para continuar.');
+        setSuccessMessage(t('login.messages.registerSuccess'));
         setIsLogin(true); // Mudar para tela de login
         
         // Limpar formulário
@@ -146,15 +146,15 @@ const LoginAfricasHands: React.FC = () => {
       
       // Tratar diferentes tipos de erro
       if (error.message?.includes('Invalid login credentials')) {
-        setErrorMessage('Email ou senha incorretos');
+        setErrorMessage(t('login.errors.invalidCredentials'));
       } else if (error.message?.includes('Email not confirmed')) {
-        setErrorMessage('Por favor, confirme seu email antes de fazer login');
+        setErrorMessage(t('login.errors.emailNotConfirmed'));
       } else if (error.message?.includes('User already registered')) {
-        setErrorMessage('Este email já está registrado. Tente fazer login.');
+        setErrorMessage(t('login.errors.userAlreadyExists'));
       } else if (error.message?.includes('Password should be at least 6 characters')) {
-        setErrorMessage('A senha deve ter pelo menos 6 caracteres');
+        setErrorMessage(t('login.errors.passwordTooShort'));
       } else {
-        setErrorMessage(error.message || 'Erro na autenticação. Tente novamente.');
+        setErrorMessage(error.message || t('login.errors.authenticationError'));
       }
     } finally {
       setIsLoading(false);
@@ -167,12 +167,12 @@ const LoginAfricasHands: React.FC = () => {
 
   const handleForgotPassword = () => {
     if (!formData.email) {
-      setErrorMessage('Digite seu email primeiro');
+      setErrorMessage(t('login.errors.enterEmailFirst'));
       return;
     }
     
     // Implementar reset de senha com Supabase
-    alert(`Email de recuperação será enviado para: ${formData.email}`);
+    alert(`${t('login.messages.recoveryEmailSent')}: ${formData.email}`);
   };
 
   const fillDemoCredentials = (type: 'admin' | 'user') => {
@@ -277,9 +277,12 @@ const LoginAfricasHands: React.FC = () => {
       {/* Right Side - Login Form */}
       <div className="lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center">
         <div className="max-w-md mx-auto w-full">
-          {/* Language Toggle */}
+          {/* Language Toggle - Modificado para ser mais visível */}
           <div className="flex justify-end mb-6">
-            <LanguageToggle />
+            <div className="relative group">
+              <LanguageToggle />
+              <div className="absolute inset-0 -z-10 bg-gray-100 opacity-0 group-hover:opacity-100 rounded-lg transition-opacity duration-200"></div>
+            </div>
           </div>
 
           {/* Header */}
@@ -359,7 +362,7 @@ const LoginAfricasHands: React.FC = () => {
             {!isLogin && (
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                  Nome Completo *
+                  {t('login.form.fullName')} *
                 </label>
                 <input
                   type="text"
@@ -369,7 +372,7 @@ const LoginAfricasHands: React.FC = () => {
                   onChange={handleInputChange}
                   required={!isLogin}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  placeholder="Seu nome completo"
+                  placeholder={t('login.form.fullNamePlaceholder')}
                 />
               </div>
             )}
@@ -391,7 +394,7 @@ const LoginAfricasHands: React.FC = () => {
               />
               {isLogin && (
                 <p className="text-xs text-gray-500 mt-1">
-                  💡 Use emails reais como admin@gmail.com ou user@gmail.com
+                  💡 {t('login.form.emailTip')}
                 </p>
               )}
             </div>
@@ -432,7 +435,7 @@ const LoginAfricasHands: React.FC = () => {
               </div>
               {!isLogin && (
                 <p className="text-xs text-gray-500 mt-1">
-                  Mínimo de 6 caracteres
+                  {t('login.form.passwordRequirement')}
                 </p>
               )}
             </div>
@@ -464,7 +467,7 @@ const LoginAfricasHands: React.FC = () => {
               <>
                 <div>
                   <label htmlFor="sector" className="block text-sm font-medium text-gray-700 mb-2">
-                    Setor de Atuação
+                    {t('login.form.sector')}
                   </label>
                   <select
                     id="sector"
@@ -473,7 +476,7 @@ const LoginAfricasHands: React.FC = () => {
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   >
-                    <option value="">Selecione um setor</option>
+                    <option value="">{t('login.form.selectSector')}</option>
                     {sectors.map((sector) => (
                       <option key={sector.value} value={sector.value}>
                         {sector.label}
@@ -484,7 +487,7 @@ const LoginAfricasHands: React.FC = () => {
 
                 <div>
                   <label htmlFor="organization" className="block text-sm font-medium text-gray-700 mb-2">
-                    Organização/Empresa
+                    {t('login.form.organization')}
                   </label>
                   <input
                     type="text"
@@ -493,7 +496,7 @@ const LoginAfricasHands: React.FC = () => {
                     value={formData.organization || ''}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    placeholder="Nome da sua organização"
+                    placeholder={t('login.form.organizationPlaceholder')}
                   />
                 </div>
               </>

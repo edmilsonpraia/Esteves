@@ -268,23 +268,24 @@ export const LanguageToggle: React.FC = () => {
   const { language, setLanguage } = useTranslation();
 
   return (
-    <div className="flex items-center gap-2 bg-white bg-opacity-20 rounded-lg p-1">
+    <div className="flex items-center gap-1 bg-white bg-opacity-20 rounded-lg p-1 border border-white border-opacity-30 shadow-sm">
       <button
         onClick={() => setLanguage('pt')}
-        className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+        className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
           language === 'pt' 
-            ? 'bg-white text-red-600 shadow-sm' 
-            : 'text-white hover:bg-white hover:bg-opacity-20'
+            ? 'bg-white text-red-600 shadow-md' 
+            : 'text-white hover:bg-white hover:bg-opacity-30 hover:text-red-50'
         }`}
       >
         PT
       </button>
+      <div className="h-5 w-px bg-white bg-opacity-40"></div>
       <button
         onClick={() => setLanguage('en')}
-        className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+        className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
           language === 'en' 
-            ? 'bg-white text-red-600 shadow-sm' 
-            : 'text-white hover:bg-white hover:bg-opacity-20'
+            ? 'bg-white text-red-600 shadow-md' 
+            : 'text-white hover:bg-white hover:bg-opacity-30 hover:text-red-50'
         }`}
       >
         EN
