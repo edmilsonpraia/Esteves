@@ -1,43 +1,124 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
+    
+    <!-- Meta tags básicas -->
+    <title>
+      Africa's Hands</title>
+    <meta name="description" content="Descrição detalhada do seu site que aparecerá nos resultados de busca." />
+    <meta name="keywords" content="palavras-chave, relevantes, para, seu, negócio" />
+    <meta name="author" content="" />
+    
+    <!-- Favicon e ícones -->
+    <link rel="icon" href="%PUBLIC_URL%/logo.png" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="%PUBLIC_URL%/logo.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="%PUBLIC_URL%/logo.png" />
+    
+    <!-- Manifest -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
-
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://seusite.com/" />
+    <meta property="og:title" content="
+    Africa's Hands" />
+    <meta property="og:description" content="Descrição detalhada do seu site que aparecerá nos resultados de busca." />
+    <meta property="og:image" content="https://seusite.com/logo.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:locale" content="pt_BR" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@seusuario" />
+    <meta name="twitter:creator" content="@seusuario" />
+    <meta name="twitter:title" content="ELVES - Seu Título Personalizado" />
+    <meta name="twitter:description" content="Descrição detalhada do seu site que aparecerá nos resultados de busca." />
+    <meta name="twitter:image" content="https://seusite.com/logo.png" />
+    
+    <!-- Schema.org para Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "ELVES",
+      "legalName": "ELVES Ltda",
+      "url": "https://seusite.com",
+      "logo": "https://seusite.com/logo.png",
+      "foundingDate": "2023",
+      "founders": [
+        {
+          "@type": "Person",
+          "name": "Nome do Fundador"
+        }
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Rua Exemplo, 123",
+        "addressLocality": "São Paulo",
+        "addressRegion": "SP",
+        "postalCode": "00000-000",
+        "addressCountry": "BR"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer service",
+        "telephone": "+55 11 99999-9999",
+        "email": "contato@seusite.com"
+      },
+      "sameAs": [
+        "https://facebook.com/seufacebook",
+        "https://instagram.com/seuinstagram",
+        "https://linkedin.com/company/seulinkedin"
+      ]
+    }
+    </script>
+    
+    <!-- Preconnect para melhor performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Apple Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="ELVES" />
+    
+    <!-- Microsoft -->
+    <meta name="msapplication-TileImage" content="%PUBLIC_URL%/logo.png" />
+    <meta name="msapplication-TileColor" content="#000000" />
+    <meta name="msapplication-config" content="%PUBLIC_URL%/browserconfig.xml" />
+    
+    <!-- PWA -->
+    <meta name="mobile-web-app-capable" content="yes" />
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>
+      <div style="text-align: center; padding: 20px; background: #f8f9fa; color: #333;">
+        <h1 style="color: #dc3545;">JavaScript Desativado</h1>
+        <p>Para utilizar todas as funcionalidades do site ELVES, por favor ative o JavaScript no seu navegador.</p>
+        <p>Se precisar de ajuda, <a href="https://enable-javascript.com/" target="_blank" rel="noopener">clique aqui</a> para instruções.</p>
+      </div>
+    </noscript>
     <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
+    
+    <!-- Scripts opcionais -->
+    <script>
+      // Verifica se o navegador suporta service worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then(registration => {
+              console.log('ServiceWorker registrado com sucesso: ', registration.scope);
+            })
+            .catch(error => {
+              console.log('Falha no registro do ServiceWorker: ', error);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
