@@ -531,7 +531,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // 🚀 FUNÇÃO: Login com Facebook
+  // 🚀 FUNÇÃO: Login com Facebook - CORRIGIDA
   const loginWithFacebook = async (): Promise<void> => {
     try {
       console.log('🔐 Tentando login com Facebook...');
@@ -540,7 +540,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'facebook',
         options: {
-          redirectTo: window.location.origin,
+          // ✅ REMOVIDO: redirectTo: window.location.origin
+          // Deixar o Supabase gerenciar o callback automaticamente
           scopes: 'email,public_profile'
         }
       });
@@ -565,7 +566,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // 🚀 FUNÇÃO: Login com Google
+  // 🚀 FUNÇÃO: Login com Google - CORRIGIDA
   const loginWithGoogle = async (): Promise<void> => {
     try {
       console.log('🔐 Tentando login com Google...');
@@ -574,7 +575,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin,
+          // ✅ REMOVIDO: redirectTo: window.location.origin
+          // Deixar o Supabase gerenciar o callback automaticamente
           scopes: 'email profile',
           queryParams: {
             access_type: 'offline',
