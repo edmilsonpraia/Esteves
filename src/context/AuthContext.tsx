@@ -39,6 +39,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+// URL base para callbacks - atualizada para garantir consistência
+const SUPABASE_CALLBACK_URL = 'https://lvegldhtgalibbkmhzfz.supabase.co/auth/v1/callback';
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<'admin' | 'user' | null>(null);
@@ -531,7 +534,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // 🚀 FUNÇÃO: Login com Facebook - CORRIGIDA
+  // 🚀 FUNÇÃO: Login com Facebook - ATUALIZADA
   const loginWithFacebook = async (): Promise<void> => {
     try {
       console.log('🔐 Tentando login com Facebook...');
@@ -540,8 +543,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'facebook',
         options: {
-          // ✅ FORÇAR SEMPRE SUPABASE CALLBACK
-          redirectTo: 'https://lvegldhtgalibbkmhzfz.supabase.co/auth/v1/callback',
+          redirectTo: SUPABASE_CALLBACK_URL,
           scopes: 'email,public_profile'
         }
       });
@@ -549,7 +551,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error;
 
       console.log('✅ Redirecionando para Facebook...');
-      console.log('🔧 DEBUG - URL de callback forçada:', 'https://lvegldhtgalibbkmhzfz.supabase.co/auth/v1/callback');
       // O onAuthStateChange vai processar o resto quando retornar
     } catch (error: any) {
       console.error('❌ Falha no login com Facebook:', error);
@@ -567,7 +568,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // 🚀 FUNÇÃO: Login com Google - VERSÃO DEBUG FORÇADA
+  // 🚀 FUNÇÃO: Login com Google - ATUALIZADA
   const loginWithGoogle = async (): Promise<void> => {
     try {
       console.log('🔐 Tentando login com Google...');
@@ -576,8 +577,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          // ✅ FORÇAR SEMPRE SUPABASE CALLBACK
-          redirectTo: 'https://lvegldhtgalibbkmhzfz.supabase.co/auth/v1/callback',
+          redirectTo: SUPABASE_CALLBACK_URL,
           scopes: 'email profile',
           queryParams: {
             access_type: 'offline',
@@ -589,7 +589,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error;
 
       console.log('✅ Redirecionando para Google...');
-      console.log('🔧 DEBUG - URL de callback forçada:', 'https://lvegldhtgalibbkmhzfz.supabase.co/auth/v1/callback');
       // O onAuthStateChange vai processar o resto quando retornar
     } catch (error: any) {
       console.error('❌ Falha no login com Google:', error);
