@@ -25,9 +25,15 @@ import UserDashboard from './pages/UserDashboard';
 import Header from './components/Header';
 import IconWrapper from './components/IconWrapper';
 import Sidebar from './components/Sidebar';
+import AuthCallback from './components/AuthCallback'; // ✅ NOVO COMPONENTE
 
-// 🔍 COMPONENTE DE DEBUG - Remover em produção
-const DebugAuthInfo: React.FC = () => {
+  // 🔍 COMPONENTE DE DEBUG - Remover em produção
+const DebugAuthInfo: React.FC<{
+  currentMode: string;
+  currentPage: string;
+  setCurrentMode: (mode: 'login' | 'admin' | 'user' | 'callback') => void;
+  setCurrentPage: (page: string) => void;
+}> = ({ currentMode, currentPage, setCurrentMode, setCurrentPage }) => {
   const { user, userRole, isAuthenticated, isLoading } = useAuth();
   
   return (
@@ -40,6 +46,9 @@ const DebugAuthInfo: React.FC = () => {
         <p><strong>user.id:</strong> {user?.id || '❌ null'}</p>
         <p><strong>user.email:</strong> {user?.email || '❌ null'}</p>
         <p><strong>user.name:</strong> {user?.name || '❌ null'}</p>
+        <p><strong>currentMode:</strong> <span className="text-blue-300">{currentMode}</span></p>
+        <p><strong>currentPage:</strong> <span className="text-green-300">{currentPage}</span></p>
+        <p><strong>URL:</strong> <span className="text-purple-300">{window.location.pathname}</span></p>
       </div>
       
       <button 
@@ -73,6 +82,24 @@ const DebugAuthInfo: React.FC = () => {
       >
         Verificar Banco
       </button>
+      
+      {/* ✅ BOTÃO DE TESTE: Forçar redirecionamento */}
+      {isAuthenticated && userRole && (
+        <button 
+          onClick={() => {
+            console.log('🔄 Forçando redirecionamento manual...');
+            if (userRole === 'admin') {
+              setCurrentMode('admin');
+            } else {
+              setCurrentMode('user');
+            }
+            setCurrentPage('dashboard');
+          }}
+          className="mt-2 bg-green-600 hover:bg-green-700 px-2 py-1 rounded text-xs w-full"
+        >
+          🚀 Forçar Dashboard
+        </button>
+      )}
     </div>
   );
 };
@@ -212,30 +239,153 @@ const MainLayout: React.FC<{
 // 🔧 COMPONENTE PRINCIPAL DA APLICAÇÃO
 const AppContent: React.FC = () => {
   const { isAuthenticated, userRole, isLoading, user, logout } = useAuth();
-  const [currentMode, setCurrentMode] = useState<'login' | 'admin' | 'user'>('login');
+  const [currentMode, setCurrentMode] = useState<'login' | 'admin' | 'user' | 'callback'>('login');
   const [currentPage, setCurrentPage] = useState<string>('dashboard');
 
-  // 🔧 LÓGICA DE REDIRECIONAMENTO
+  // ✅ NOVA LÓGICA: Detectar se está na rota de callback OAuth
   useEffect(() => {
+    const pathname = window.location.pathname;
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // Verificar se é callback OAuth
+    if (pathname === '/auth/callback' || urlParams.get('code') || urlParams.get('error')) {
+      console.log('🔄 Detectado callback OAuth, processando...', {
+        pathname,
+        hasCode: !!urlParams.get('code'),
+        hasError: !!urlParams.get('error')
+      });
+      setCurrentMode('callback');
+      return;
+    }
+    
+    // ✅ LÓGICA MELHORADA: Verificar autenticação mais robusta
     console.log('🔄 Verificando modo atual:', {
       isAuthenticated,
       userRole,
-      isLoading
+      isLoading,
+      pathname,
+      user: user?.email
     });
 
-    if (isAuthenticated && userRole && !isLoading) {
+    // Se está carregando, não fazer nada ainda
+    if (isLoading) {
+      console.log('⏳ Ainda carregando, aguardando...');
+      return;
+    }
+
+    // Se está autenticado e tem role, redirecionar para dashboard
+    if (isAuthenticated && userRole && user) {
+      console.log('✅ Usuário autenticado detectado:', {
+        email: user.email,
+        role: userRole,
+        isAuthenticated
+      });
+      
       if (userRole === 'admin') {
         console.log('🎯 Redirecionando para dashboard admin');
         setCurrentMode('admin');
+        setCurrentPage('dashboard');
       } else if (userRole === 'user') {
         console.log('🎯 Redirecionando para dashboard user');
         setCurrentMode('user');
+        setCurrentPage('dashboard');
       }
-    } else if (!isAuthenticated && !isLoading) {
-      console.log('🎯 Redirecionando para login');
+    } 
+    // Se não está autenticado e não está carregando, ir para login
+    else if (!isAuthenticated && !isLoading) {
+      console.log('❌ Usuário não autenticado, redirecionando para login');
       setCurrentMode('login');
     }
-  }, [isAuthenticated, userRole, isLoading]);
+  }, [isAuthenticated, userRole, isLoading, user]);
+
+  // ✅ NOVA LÓGICA: Redirecionar após sucesso do callback
+  useEffect(() => {
+    // Listener para evento de sucesso OAuth (mais responsivo)
+    const handleOAuthSuccess = (event: any) => {
+      const { userRole, user } = event.detail;
+      console.log('🔔 Evento OAuth success recebido, redirecionando IMEDIATAMENTE para:', userRole, user?.email);
+      
+      // Redirecionamento IMEDIATO
+      if (userRole === 'admin') {
+        setCurrentMode('admin');
+        setCurrentPage('dashboard');
+      } else {
+        setCurrentMode('user');
+        setCurrentPage('dashboard');
+      }
+      
+      // Limpar URL
+      window.history.replaceState({}, document.title, '/');
+    };
+    
+    window.addEventListener('oauth-success', handleOAuthSuccess);
+    
+    // ✅ MELHORAR: Verificação contínua para redirecionamento automático
+    if (currentMode === 'callback') {
+      console.log('📍 Estamos no modo callback, verificando condições...', {
+        isAuthenticated,
+        userRole,
+        isLoading,
+        user: user?.email
+      });
+      
+      // Se já está autenticado, redirecionar imediatamente
+      if (isAuthenticated && userRole && user && !isLoading) {
+        console.log('✅ Usuário já autenticado no callback, redirecionando AGORA...');
+        
+        if (userRole === 'admin') {
+          setCurrentMode('admin');
+          setCurrentPage('dashboard');
+        } else {
+          setCurrentMode('user');
+          setCurrentPage('dashboard');
+        }
+        
+        // Limpar URL
+        window.history.replaceState({}, document.title, '/');
+      }
+    }
+    
+    return () => {
+      window.removeEventListener('oauth-success', handleOAuthSuccess);
+    };
+  }, [currentMode, isAuthenticated, userRole, isLoading, user]);
+
+  // ✅ FORÇAR REDIRECIONAMENTO SE FICAR MUITO TEMPO NO CALLBACK
+  useEffect(() => {
+    if (currentMode === 'callback') {
+      console.log('⏰ Modo callback ativo, definindo timeout de segurança...');
+      
+      // Timeout de segurança mais curto: 3 segundos
+      const timeoutId = setTimeout(() => {
+        console.log('⚠️ TIMEOUT: Forçando redirecionamento após 3 segundos no callback');
+        
+        // Tentar detectar se há uma sessão ativa
+        supabase.auth.getSession().then(({ data: { session }, error }) => {
+          if (session?.user) {
+            console.log('✅ Sessão encontrada no timeout, redirecionando...');
+            const email = session.user.email?.toLowerCase() || '';
+            const isAdmin = email.includes('admin') || email.includes('@africashands.com');
+            
+            if (isAdmin) {
+              setCurrentMode('admin');
+            } else {
+              setCurrentMode('user');
+            }
+            setCurrentPage('dashboard');
+          } else {
+            console.log('❌ Nenhuma sessão no timeout, voltando ao login...');
+            setCurrentMode('login');
+          }
+        }).catch(() => {
+          console.log('❌ Erro no timeout, voltando ao login...');
+          setCurrentMode('login');
+        });
+      }, 3000); // Reduzido para 3 segundos
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [currentMode]);
 
   // 🔧 FUNÇÃO DE LOGOUT
   const handleLogout = async () => {
@@ -244,6 +394,9 @@ const AppContent: React.FC = () => {
       await logout();
       setCurrentMode('login');
       setCurrentPage('dashboard');
+      
+      // Limpar URL se necessário
+      window.history.replaceState({}, document.title, '/');
     } catch (error) {
       console.error('❌ Erro ao fazer logout:', error);
     }
@@ -298,6 +451,10 @@ const AppContent: React.FC = () => {
   // 🔧 RENDERIZAÇÃO POR MODO
   const renderCurrentMode = () => {
     switch (currentMode) {
+      // ✅ NOVO CASO: Processar callback OAuth
+      case 'callback':
+        return <AuthCallback />;
+      
       case 'admin':
         return (
           <MainLayout 
@@ -332,13 +489,20 @@ const AppContent: React.FC = () => {
   return (
     <div className="App">
       {/* 🔍 COMPONENTE DE DEBUG - Apenas em desenvolvimento */}
-      {process.env.NODE_ENV === 'development' && <DebugAuthInfo />}
+      {process.env.NODE_ENV === 'development' && (
+        <DebugAuthInfo 
+          currentMode={currentMode}
+          currentPage={currentPage}
+          setCurrentMode={setCurrentMode}
+          setCurrentPage={setCurrentPage}
+        />
+      )}
       
       {/* 📱 CONTEÚDO PRINCIPAL */}
       {renderCurrentMode()}
       
       {/* 🔧 LOGOUT BUTTON PARA MOBILE - Apenas quando autenticado */}
-      {isAuthenticated && (
+      {isAuthenticated && currentMode !== 'callback' && (
         <div className="fixed top-4 right-4 z-50 md:hidden">
           <button
             onClick={handleLogout}

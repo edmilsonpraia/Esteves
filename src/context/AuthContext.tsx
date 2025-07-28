@@ -39,8 +39,16 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-// URL base para callbacks - atualizada para garantir consistência
-const SUPABASE_CALLBACK_URL = 'https://lvegldhtgalibbkmhzfz.supabase.co/auth/v1/callback';
+// 🔧 CONFIGURAÇÃO CORRETA DE URLs
+const getRedirectURL = () => {
+  // Em produção, sempre usar Supabase
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://lvegldhtgalibbkmhzfz.supabase.co/auth/v1/callback';
+  }
+  
+  // Em desenvolvimento, usar localhost com callback personalizado
+  return `${window.location.origin}/auth/callback`;
+};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -343,6 +351,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // 🔧 ADICIONAR: Tratamento de callback OAuth
+  useEffect(() => {
+    // Detectar se está retornando de OAuth
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    const errorDescription = urlParams.get('error_description');
+    
+    if (error) {
+      console.error('❌ Erro OAuth detectado na URL:', {
+        error,
+        errorDescription: decodeURIComponent(errorDescription || '')
+      });
+      
+      // Limpar URL de erro
+      window.history.replaceState({}, document.title, window.location.pathname);
+      
+      // Mostrar erro específico
+      if (error === 'server_error' && errorDescription?.includes('Unable to exchange external code')) {
+        console.error('🔧 ERRO: Problema na configuração OAuth - verificar URLs no Google Cloud Console');
+      }
+    }
+  }, []);
+
   // 🚀 INICIALIZAÇÃO ROBUSTA
   useEffect(() => {
     let isMounted = true;
@@ -399,28 +430,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     initAuth();
 
-    // Listener para mudanças de autenticação
+    // 🔧 MELHORAR: Listener de auth state
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!isMounted) return;
         
-        console.log('🔄 Evento de autenticação:', event, session?.user?.email);
+        console.log('🔄 Evento de autenticação:', event, {
+          userEmail: session?.user?.email,
+          hasSession: !!session
+        });
         
         if (event === 'SIGNED_IN' && session?.user) {
-          console.log('🔐 Login detectado para:', session.user.email);
+          console.log('🔐 Login OAuth detectado para:', session.user.email);
           
           setIsLoading(true);
           
-          const userData = await getOrCreateProfile(session.user);
-          
-          if (isMounted && userData) {
-            setUser(userData);
-            setUserRole(userData.role);
-            setIsLoading(false);
-            console.log('✅ Login processado com sucesso:', {
-              email: userData.email,
-              role: userData.role
-            });
+          try {
+            const userData = await getOrCreateProfile(session.user);
+            
+            if (isMounted && userData) {
+              setUser(userData);
+              setUserRole(userData.role);
+              console.log('✅ Login OAuth processado com sucesso:', {
+                email: userData.email,
+                role: userData.role
+              });
+            }
+          } catch (error) {
+            console.error('❌ Erro ao processar login OAuth:', error);
+          } finally {
+            if (isMounted) {
+              setIsLoading(false);
+            }
           }
         } else if (event === 'SIGNED_OUT') {
           console.log('👋 Logout detectado');
@@ -534,75 +575,96 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // 🚀 FUNÇÃO: Login com Facebook - ATUALIZADA
+  // 🚀 FUNÇÃO: Login com Google - CORRIGIDA
+  const loginWithGoogle = async (): Promise<void> => {
+    try {
+      console.log('🔐 Iniciando login com Google...');
+      setIsLoading(true);
+      
+      const redirectURL = getRedirectURL();
+      console.log('📍 URL de redirecionamento:', redirectURL);
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectURL,
+          scopes: 'email profile',
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'select_account', // Força seleção de conta
+          }
+        }
+      });
+
+      if (error) {
+        console.error('❌ Erro configuração OAuth Google:', error);
+        throw error;
+      }
+
+      console.log('✅ Redirecionando para Google...', data);
+      // O onAuthStateChange processará o retorno
+    } catch (error: any) {
+      console.error('❌ Falha no login com Google:', error);
+      setIsLoading(false);
+      
+      // Tratamento específico de erros
+      if (error.message?.includes('OAuth provider not enabled')) {
+        throw new Error('Login com Google não está habilitado no Supabase');
+      }
+      
+      if (error.message?.includes('popup_closed_by_user')) {
+        throw new Error('Login cancelado pelo usuário');
+      }
+      
+      if (error.message?.includes('redirect_uri_mismatch')) {
+        throw new Error('Erro de configuração: URLs não coincidem');
+      }
+      
+      throw new Error(error.message || 'Erro no login com Google');
+    }
+  };
+
+  // 🚀 FUNÇÃO: Login com Facebook - CORRIGIDA
   const loginWithFacebook = async (): Promise<void> => {
     try {
-      console.log('🔐 Tentando login com Facebook...');
+      console.log('🔐 Iniciando login com Facebook...');
       setIsLoading(true);
+      
+      const redirectURL = getRedirectURL();
+      console.log('📍 URL de redirecionamento:', redirectURL);
       
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'facebook',
         options: {
-          redirectTo: SUPABASE_CALLBACK_URL,
+          redirectTo: redirectURL,
           scopes: 'email,public_profile'
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Erro configuração OAuth Facebook:', error);
+        throw error;
+      }
 
-      console.log('✅ Redirecionando para Facebook...');
-      // O onAuthStateChange vai processar o resto quando retornar
+      console.log('✅ Redirecionando para Facebook...', data);
+      // O onAuthStateChange processará o retorno
     } catch (error: any) {
       console.error('❌ Falha no login com Facebook:', error);
       setIsLoading(false);
       
       if (error.message?.includes('OAuth provider not enabled')) {
-        throw new Error('Login com Facebook não está habilitado');
+        throw new Error('Login com Facebook não está habilitado no Supabase');
       }
       
       if (error.message?.includes('popup_closed_by_user')) {
         throw new Error('Login cancelado pelo usuário');
+      }
+      
+      if (error.message?.includes('redirect_uri_mismatch')) {
+        throw new Error('Erro de configuração: URLs não coincidem');
       }
       
       throw new Error(error.message || 'Erro no login com Facebook');
-    }
-  };
-
-  // 🚀 FUNÇÃO: Login com Google - ATUALIZADA
-  const loginWithGoogle = async (): Promise<void> => {
-    try {
-      console.log('🔐 Tentando login com Google...');
-      setIsLoading(true);
-      
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: SUPABASE_CALLBACK_URL,
-          scopes: 'email profile',
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          }
-        }
-      });
-
-      if (error) throw error;
-
-      console.log('✅ Redirecionando para Google...');
-      // O onAuthStateChange vai processar o resto quando retornar
-    } catch (error: any) {
-      console.error('❌ Falha no login com Google:', error);
-      setIsLoading(false);
-      
-      if (error.message?.includes('OAuth provider not enabled')) {
-        throw new Error('Login com Google não está habilitado');
-      }
-      
-      if (error.message?.includes('popup_closed_by_user')) {
-        throw new Error('Login cancelado pelo usuário');
-      }
-      
-      throw new Error(error.message || 'Erro no login com Google');
     }
   };
 
