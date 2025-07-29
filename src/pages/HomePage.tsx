@@ -1,7 +1,24 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation, LanguageToggle } from '../context/TranslationContext';
 
 const HomePage: React.FC = () => {
   const [progressWidth, setProgressWidth] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  // ✅ SEMPRE chamar o hook - sem condições
+  const { t, language } = useTranslation();
+
+  // ✅ FUNÇÃO PARA TOGGLE DO MENU MOBILE
+  const toggleMobileMenu = () => {
+    console.log('Toggle menu:', !mobileMenuOpen); // Debug
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  // ✅ FUNÇÃO PARA FECHAR MENU
+  const closeMobileMenu = () => {
+    console.log('Fechando menu'); // Debug
+    setMobileMenuOpen(false);
+  };
 
   useEffect(() => {
     // Progress Bar
@@ -15,62 +32,23 @@ const HomePage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Mobile Menu Toggle
-    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
-    const navLinks = document.querySelector('.nav-links');
-    
-    if (mobileMenuToggle && navLinks) {
-      const handleToggle = () => {
-        navLinks.classList.toggle('active');
-        const icon = mobileMenuToggle.querySelector('i');
-        if (icon) {
-          icon.classList.toggle('fa-bars');
-          icon.classList.toggle('fa-times');
-        }
-      };
-      
-      mobileMenuToggle.addEventListener('click', handleToggle);
-      return () => mobileMenuToggle.removeEventListener('click', handleToggle);
-    }
-  }, []);
-
-  useEffect(() => {
-    // Header Scroll Effect
-    const handleHeaderScroll = () => {
-      const header = document.querySelector('.header') as HTMLElement;
-      if (header) {
-        if (window.scrollY > 100) {
-          header.style.background = 'rgba(255, 255, 255, 0.98)';
-          header.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
-        } else {
-          header.style.background = 'rgba(255, 255, 255, 0.95)';
-          header.style.boxShadow = 'none';
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleHeaderScroll);
-    return () => window.removeEventListener('scroll', handleHeaderScroll);
-  }, []);
-
-  useEffect(() => {
     // Smooth Scroll for Anchor Links
     const handleAnchorClick = (e: Event) => {
       const target = e.target as HTMLAnchorElement;
       const href = target.getAttribute('href');
       
-      // ✅ CORREÇÃO: Ignorar links vazios (#) ou externos
       if (!href || href === '#' || href.startsWith('http') || href.startsWith('mailto')) {
-        return; // Deixa o comportamento padrão
+        return;
       }
       
       if (href.startsWith('#')) {
         e.preventDefault();
+        closeMobileMenu(); // Fechar menu mobile ao clicar
         const targetElement = document.querySelector(href);
         if (targetElement) {
           const headerElement = document.querySelector('.header') as HTMLElement;
-          const headerHeight = headerElement?.offsetHeight || 0;
-          const targetPosition = (targetElement as HTMLElement).offsetTop - headerHeight;
+          const headerHeight = headerElement?.offsetHeight || 80;
+          const targetPosition = (targetElement as HTMLElement).offsetTop - headerHeight - 20;
           
           window.scrollTo({
             top: targetPosition,
@@ -91,98 +69,6 @@ const HomePage: React.FC = () => {
     };
   }, []);
 
-  useEffect(() => {
-    // Counter Animation for Stats
-    const animateCounter = (element: HTMLElement, target: number, duration = 2000) => {
-      let start = 0;
-      const increment = target / (duration / 16);
-      
-      const updateCounter = () => {
-        start += increment;
-        if (start < target) {
-          element.textContent = Math.floor(start).toLocaleString();
-          requestAnimationFrame(updateCounter);
-        } else {
-          element.textContent = target.toLocaleString();
-        }
-      };
-      
-      updateCounter();
-    };
-
-    // Intersection Observer for animations
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const element = entry.target as HTMLElement;
-          element.style.opacity = '1';
-          element.style.transform = 'translateY(0)';
-        }
-      });
-    }, observerOptions);
-
-    // Observe elements for animation
-    const animateElements = document.querySelectorAll('.feature-card, .benefit, .impact-stat');
-    
-    animateElements.forEach(el => {
-      const element = el as HTMLElement;
-      element.style.opacity = '0';
-      element.style.transform = 'translateY(30px)';
-      element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-      observer.observe(element);
-    });
-
-    // Stats counter animation
-    const statsObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const statNumbers = entry.target.querySelectorAll('.stat-number');
-          statNumbers.forEach(stat => {
-            const element = stat as HTMLElement;
-            const text = element.textContent || '';
-            let target = 0;
-            
-            if (text.includes('95M+')) {
-              target = 95;
-              element.textContent = '0M+';
-            } else if (text.includes('3')) {
-              target = 3;
-              element.textContent = '0';
-            } else if (text.includes('6')) {
-              target = 6;
-              element.textContent = '0';
-            }
-            
-            if (target > 0) {
-              animateCounter(element, target);
-              if (text.includes('M+')) {
-                setTimeout(() => {
-                  element.textContent = target + 'M+';
-                }, 2000);
-              }
-            }
-          });
-          statsObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.5 });
-
-    const heroStats = document.querySelector('.hero-stats');
-    if (heroStats) {
-      statsObserver.observe(heroStats);
-    }
-
-    return () => {
-      observer.disconnect();
-      statsObserver.disconnect();
-    };
-  }, []);
-
   return (
     <div>
       <style dangerouslySetInnerHTML={{
@@ -195,7 +81,7 @@ const HomePage: React.FC = () => {
         }
 
         body {
-          font-family: 'Inter', sans-serif;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           line-height: 1.6;
           color: #333;
           overflow-x: hidden;
@@ -207,75 +93,196 @@ const HomePage: React.FC = () => {
           padding: 0 20px;
         }
 
-        /* Header */
+        /* Header - Otimizado para Mobile */
         .header {
           position: fixed;
           top: 0;
           width: 100%;
-          background: rgba(255, 255, 255, 0.95);
+          background: rgba(255, 255, 255, 0.98);
           backdrop-filter: blur(10px);
           z-index: 1000;
           transition: all 0.3s ease;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+          height: 70px; /* ✅ ALTURA FIXA */
         }
 
         .nav {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 1rem 2rem;
+          padding: 0.8rem 1rem;
           max-width: 1200px;
           margin: 0 auto;
+          height: 100%;
+        }
+
+        .nav-brand {
+          flex: 1;
         }
 
         .nav-brand h1 {
           color: #e74c3c;
-          font-size: 1.5rem;
+          font-size: 1.3rem;
           font-weight: 700;
+          margin: 0;
+          line-height: 1.2;
         }
 
         .nav-subtitle {
           color: #666;
-          font-size: 0.8rem;
+          font-size: 0.7rem;
           font-weight: 500;
+          margin: 0;
+          line-height: 1;
         }
 
-        .nav-links {
+        .nav-right {
           display: flex;
           align-items: center;
-          gap: 2rem;
+          gap: 0.8rem;
         }
 
-        .nav-links a {
-          text-decoration: none;
-          color: #333;
-          font-weight: 500;
-          transition: color 0.3s ease;
-        }
-
-        .nav-links a:hover {
-          color: #e74c3c;
-        }
-
+        /* Mobile Menu Button - MELHORADO */
         .mobile-menu-toggle {
-          display: none;
-          font-size: 1.5rem;
+          display: block;
+          background: rgba(231, 76, 60, 0.1);
+          border: 2px solid #e74c3c;
+          font-size: 1.2rem;
           color: #e74c3c;
           cursor: pointer;
+          padding: 0.6rem;
+          border-radius: 6px;
+          transition: all 0.3s ease;
+          width: 44px;
+          height: 44px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .mobile-menu-toggle:hover {
+          background: #e74c3c;
+          color: white;
+          transform: scale(1.05);
+        }
+
+        .mobile-menu-toggle:active {
+          transform: scale(0.95);
+        }
+
+        /* Menu Mobile Overlay */
+        .nav-links {
+          position: fixed;
+          top: 70px;
+          left: 0;
+          width: 100%;
+          height: calc(100vh - 70px);
+          background: rgba(255, 255, 255, 0.98);
+          backdrop-filter: blur(15px);
+          transform: translateX(-100%);
+          transition: transform 0.3s ease;
+          z-index: 999;
+          padding: 0;
+          overflow-y: auto;
+        }
+
+        .nav-links.active {
+          transform: translateX(0);
+        }
+
+        .nav-menu {
+          display: flex;
+          flex-direction: column;
+          gap: 0;
+          padding: 2rem 0;
+        }
+
+        .nav-menu a {
+          text-decoration: none;
+          color: #333;
+          font-weight: 600;
+          font-size: 1.2rem;
+          padding: 1.2rem 2rem;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a:active {
+          background: rgba(231, 76, 60, 0.1);
+          color: #e74c3c;
+          transform: translateX(10px);
+        }
+
+        .nav-menu a::before {
+          content: '🔗';
+          font-size: 1.2rem;
+        }
+
+        .nav-menu a[href="#sobre"]::before { content: '📋'; }
+        .nav-menu a[href="#recursos"]::before { content: '🛠️'; }
+        .nav-menu a[href="#impacto"]::before { content: '📊'; }
+        .nav-menu a[href="#contato"]::before { content: '📞'; }
+
+        /* Botão principal no menu mobile */
+        .mobile-cta-button {
+          margin: 2rem;
+          background: linear-gradient(135deg, #e74c3c, #c0392b);
+          color: white;
+          padding: 1.2rem 2rem;
+          border-radius: 12px;
+          text-decoration: none;
+          font-weight: 700;
+          text-align: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.8rem;
+          font-size: 1.2rem;
+          box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+          transition: all 0.3s ease;
+          border: none;
+        }
+
+        .mobile-cta-button:hover,
+        .mobile-cta-button:active {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        /* Language Toggle Mobile */
+        .language-toggle-mobile {
+          margin: 1rem 2rem;
+          display: flex;
+          justify-content: center;
+        }
+
+        /* Desktop Navigation - Escondida no mobile */
+        .desktop-nav {
+          display: none;
         }
 
         /* Buttons */
         .btn-primary {
           background: linear-gradient(135deg, #e74c3c, #c0392b);
           color: white;
-          padding: 12px 24px;
+          padding: 0.8rem 1.5rem;
           border-radius: 8px;
           text-decoration: none;
           font-weight: 600;
           display: inline-flex;
           align-items: center;
-          gap: 8px;
+          gap: 0.5rem;
           transition: all 0.3s ease;
           box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+          white-space: nowrap;
+          font-size: 0.9rem;
+          border: none;
+          cursor: pointer;
         }
 
         .btn-primary:hover {
@@ -286,15 +293,18 @@ const HomePage: React.FC = () => {
         .btn-secondary {
           background: transparent;
           color: #e74c3c;
-          padding: 12px 24px;
+          padding: 0.8rem 1.5rem;
           border: 2px solid #e74c3c;
           border-radius: 8px;
           text-decoration: none;
           font-weight: 600;
           display: inline-flex;
           align-items: center;
-          gap: 8px;
+          gap: 0.5rem;
           transition: all 0.3s ease;
+          white-space: nowrap;
+          font-size: 0.9rem;
+          cursor: pointer;
         }
 
         .btn-secondary:hover {
@@ -303,38 +313,32 @@ const HomePage: React.FC = () => {
           transform: translateY(-2px);
         }
 
-        /* Hero Section */
+        /* Hero Section - ESPAÇAMENTO CORRIGIDO */
         .hero {
           min-height: 100vh;
           display: flex;
           align-items: center;
           background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
-          padding-top: 120px;
+          padding: 120px 0 40px 0; /* ✅ MAIS ESPAÇO NO TOPO */
         }
 
         .hero-content {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 2rem;
-          align-items: center;
           max-width: 1200px;
           margin: 0 auto;
-          padding: 0 2rem;
+          padding: 0 1rem;
         }
 
         .hero-main-content {
-          max-width: 800px;
-          margin: 0 auto;
           text-align: center;
         }
 
         .hero-title {
-          font-size: 3.5rem;
+          font-size: 2rem;
           font-weight: 700;
-          line-height: 1.2;
+          line-height: 1.3;
           margin-bottom: 1.5rem;
-          margin-top: 2rem;
           color: #2c3e50;
+          margin-top: 2rem; /* ✅ ESPAÇO EXTRA DO HEADER */
         }
 
         .highlight {
@@ -343,97 +347,80 @@ const HomePage: React.FC = () => {
         }
 
         .hero-description {
-          font-size: 1.2rem;
+          font-size: 1rem;
           color: #666;
-          margin-bottom: 2rem;
+          margin-bottom: 1.5rem;
           line-height: 1.6;
+          padding: 0 1rem;
         }
 
+        /* Hero Highlight Section - Mobile Otimizada */
         .hero-highlight-section {
           background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-          border-radius: 20px;
-          padding: 2.5rem;
+          border-radius: 16px;
+          padding: 1.5rem;
           margin: 2rem 0;
           border-left: 6px solid #e74c3c;
-          box-shadow: 0 12px 35px rgba(0, 0, 0, 0.1);
-          position: relative;
-          overflow: hidden;
-        }
-
-        .hero-highlight-section::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          right: 0;
-          width: 100px;
-          height: 100px;
-          background: radial-gradient(circle, rgba(231, 76, 60, 0.1) 0%, transparent 70%);
-          border-radius: 50%;
-          transform: translate(50%, -50%);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
         .hero-highlight-section h3 {
           color: #e74c3c;
-          font-size: 1.4rem;
+          font-size: 1.2rem;
           font-weight: 700;
           margin-bottom: 1rem;
           display: flex;
           align-items: center;
+          justify-content: center;
           gap: 0.5rem;
+          text-align: center;
         }
 
+        .hero-highlight-section > p {
+          text-align: center;
+          margin-bottom: 1rem;
+          color: #666;
+          font-weight: 500;
+        }
+
+        /* Services Grid - Mobile */
         .services-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 1rem;
-          margin: 1.5rem 0;
+          grid-template-columns: 1fr;
+          gap: 0.8rem;
+          margin: 1rem 0;
         }
 
         .service-item {
           display: flex;
           align-items: center;
-          gap: 1rem;
-          padding: 1.2rem;
+          gap: 0.8rem;
+          padding: 1rem;
           background: white;
-          border-radius: 12px;
+          border-radius: 10px;
           border: 2px solid #f1f3f4;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: all 0.3s ease;
           font-weight: 500;
-          position: relative;
-          overflow: hidden;
+          font-size: 0.9rem;
         }
 
-        .service-item::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(231, 76, 60, 0.1), transparent);
-          transition: left 0.5s ease;
-        }
-
-        .service-item:hover::before {
-          left: 100%;
-        }
-
-        .service-item:hover {
+        .service-item:active {
+          transform: scale(0.98);
           border-color: #e74c3c;
           background: #fff5f5;
-          transform: translateY(-3px) scale(1.02);
-          box-shadow: 0 8px 25px rgba(231, 76, 60, 0.15);
         }
 
         .service-item .check-icon {
           color: #22c55e;
           font-weight: bold;
-          font-size: 1.1rem;
+          font-size: 1rem;
+          flex-shrink: 0;
         }
 
         .service-item .service-icon {
           color: #e74c3c;
-          font-size: 1.3rem;
+          font-size: 1.1rem;
+          flex-shrink: 0;
         }
 
         .regional-emphasis {
@@ -446,12 +433,6 @@ const HomePage: React.FC = () => {
           box-shadow: 0 8px 25px rgba(231, 76, 60, 0.25);
         }
 
-        .regional-emphasis p {
-          margin: 0;
-          font-size: 1.1rem;
-          font-weight: 500;
-        }
-
         .regional-flags {
           display: flex;
           justify-content: center;
@@ -460,7 +441,7 @@ const HomePage: React.FC = () => {
         }
 
         .regional-flags span {
-          font-size: 2rem;
+          font-size: 1.8rem;
           filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
         }
 
@@ -475,7 +456,7 @@ const HomePage: React.FC = () => {
         }
 
         .cta-highlight h4 {
-          font-size: 1.3rem;
+          font-size: 1.1rem;
           font-weight: 700;
           margin-bottom: 0.5rem;
           display: flex;
@@ -484,33 +465,11 @@ const HomePage: React.FC = () => {
           gap: 0.5rem;
         }
 
-        .cta-highlight p {
-          margin: 0;
-          font-size: 1rem;
-          opacity: 0.95;
-        }
-
-        .office-credit {
-          background: #f8f9fa;
-          padding: 1rem 1.5rem;
-          border-radius: 10px;
-          text-align: center;
-          margin-top: 1.5rem;
-          border: 1px solid #e9ecef;
-        }
-
-        .office-credit p {
-          margin: 0;
-          color: #666;
-          font-size: 0.9rem;
-          font-weight: 500;
-        }
-
         .process-steps {
           display: flex;
           flex-direction: column;
-          gap: 1rem;
-          margin-top: 1.5rem;
+          gap: 0.8rem;
+          margin-top: 1rem;
         }
 
         .process-step {
@@ -526,260 +485,161 @@ const HomePage: React.FC = () => {
         .step-number {
           background: #e74c3c;
           color: white;
-          width: 32px;
-          height: 32px;
+          width: 28px;
+          height: 28px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           font-weight: bold;
-          font-size: 0.9rem;
+          font-size: 0.8rem;
+          flex-shrink: 0;
         }
 
         .step-content h5 {
           margin: 0 0 0.3rem 0;
           color: #2c3e50;
           font-weight: 600;
+          font-size: 0.9rem;
         }
 
         .step-content p {
           margin: 0;
           color: #666;
-          font-size: 0.9rem;
+          font-size: 0.8rem;
         }
 
+        .office-credit {
+          background: #f8f9fa;
+          padding: 1rem;
+          border-radius: 10px;
+          text-align: center;
+          margin-top: 1rem;
+          border: 1px solid #e9ecef;
+        }
+
+        .office-credit p {
+          margin: 0;
+          color: #666;
+          font-size: 0.8rem;
+          font-weight: 500;
+        }
+
+        /* Hero Stats - Mobile */
         .hero-stats {
           display: flex;
-          gap: 2rem;
-          margin-bottom: 2rem;
+          justify-content: space-around;
+          gap: 1rem;
+          margin: 2rem 0;
+          padding: 0 1rem;
         }
 
         .stat {
           text-align: center;
+          flex: 1;
         }
 
         .stat-number {
           display: block;
-          font-size: 2rem;
+          font-size: 1.6rem;
           font-weight: 700;
           color: #e74c3c;
         }
 
         .stat-label {
-          font-size: 0.9rem;
+          font-size: 0.8rem;
           color: #666;
           text-transform: uppercase;
-          letter-spacing: 1px;
+          letter-spacing: 0.5px;
         }
 
+        /* Hero Buttons - Mobile */
         .hero-buttons {
           display: flex;
+          flex-direction: column;
           gap: 1rem;
-          flex-wrap: wrap;
-        }
-
-        .hero-image {
-          position: relative;
-          display: flex;
-          justify-content: center;
           align-items: center;
+          margin-top: 2rem;
         }
 
-        .image-placeholder {
+        .hero-buttons .btn-primary,
+        .hero-buttons .btn-secondary {
           width: 100%;
-          max-width: 500px;
-          height: 350px;
-          background: linear-gradient(135deg, #e74c3c, #c0392b);
-          border-radius: 20px;
-          display: flex;
-          align-items: center;
+          max-width: 300px;
           justify-content: center;
-          color: white;
-          font-size: 4rem;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-          transition: transform 0.3s ease;
+          padding: 1rem;
+          font-size: 1rem;
         }
 
-        .image-placeholder:hover {
-          transform: scale(1.05);
+        /* Sections - ESPAÇAMENTO MELHORADO */
+        .section {
+          padding: 4rem 0;
+          scroll-margin-top: 90px; /* ✅ ESPAÇO PARA O HEADER FIXO */
         }
 
-        .floating-card {
-          position: absolute;
-          background: white;
-          padding: 1rem 1.5rem;
-          border-radius: 12px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-weight: 600;
-          animation: float 3s ease-in-out infinite;
-        }
-
-        .floating-card i {
-          color: #e74c3c;
-          font-size: 1.2rem;
-        }
-
-        .card-1 {
-          top: 10%;
-          left: -10%;
-          animation-delay: 0s;
-        }
-
-        .card-2 {
-          top: 50%;
-          right: -15%;
-          animation-delay: 1s;
-        }
-
-        .card-3 {
-          bottom: 10%;
-          left: -5%;
-          animation-delay: 2s;
-        }
-
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-
-        /* Section Headers */
         .section-header {
           text-align: center;
-          margin-bottom: 4rem;
+          margin-bottom: 2rem;
+          padding: 0 1rem;
         }
 
         .section-header h2 {
-          font-size: 2.5rem;
+          font-size: 1.8rem;
           font-weight: 700;
           color: #2c3e50;
           margin-bottom: 1rem;
         }
 
         .section-header p {
-          font-size: 1.1rem;
+          font-size: 1rem;
           color: #666;
-          max-width: 600px;
-          margin: 0 auto;
         }
 
         /* About Section */
         .about {
-          padding: 6rem 0;
           background: #f8f9fa;
-        }
-
-        .about-content {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 4rem;
-          align-items: center;
-        }
-
-        .about-text h3 {
-          font-size: 2rem;
-          font-weight: 600;
-          color: #2c3e50;
-          margin-bottom: 1.5rem;
-        }
-
-        .about-text p {
-          font-size: 1.1rem;
-          color: #666;
-          margin-bottom: 2rem;
-          line-height: 1.7;
-        }
-
-        .benefits {
-          display: flex;
-          flex-direction: column;
-          gap: 1.5rem;
-        }
-
-        .benefit {
-          display: flex;
-          align-items: flex-start;
-          gap: 1rem;
-        }
-
-        .benefit i {
-          color: #e74c3c;
-          font-size: 1.5rem;
-          margin-top: 0.2rem;
-        }
-
-        .benefit h4 {
-          font-size: 1.1rem;
-          font-weight: 600;
-          color: #2c3e50;
-          margin-bottom: 0.5rem;
-        }
-
-        .benefit p {
-          color: #666;
-          margin: 0;
-        }
-
-        .about-image {
-          width: 100%;
-          height: 400px;
-          background: linear-gradient(135deg, #2c3e50, #34495e);
-          border-radius: 15px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-size: 3rem;
-          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+          padding: 4rem 0;
         }
 
         /* Features Section */
         .features {
-          padding: 6rem 0;
-          background: white;
+          padding: 4rem 0;
         }
 
         .features-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 2rem;
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+          padding: 0 1rem;
         }
 
         .feature-card {
           background: white;
-          padding: 2.5rem;
+          padding: 2rem 1.5rem;
           border-radius: 15px;
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
           text-align: center;
-          transition: all 0.3s ease;
           border: 1px solid #f0f0f0;
         }
 
-        .feature-card:hover {
-          transform: translateY(-10px);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-        }
-
         .feature-icon {
-          width: 80px;
-          height: 80px;
+          width: 60px;
+          height: 60px;
           background: linear-gradient(135deg, #e74c3c, #c0392b);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          margin: 0 auto 1.5rem;
+          margin: 0 auto 1rem;
         }
 
         .feature-icon i {
           color: white;
-          font-size: 2rem;
+          font-size: 1.5rem;
         }
 
         .feature-card h3 {
-          font-size: 1.3rem;
+          font-size: 1.1rem;
           font-weight: 600;
           color: #2c3e50;
           margin-bottom: 1rem;
@@ -788,54 +648,21 @@ const HomePage: React.FC = () => {
         .feature-card p {
           color: #666;
           line-height: 1.6;
-          margin-bottom: 1.5rem;
-        }
-
-        .feature-link {
-          color: #e74c3c;
-          text-decoration: none;
-          font-weight: 600;
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          transition: gap 0.3s ease;
-        }
-
-        .feature-link:hover {
-          gap: 1rem;
+          font-size: 0.9rem;
         }
 
         /* Impact Section */
         .impact {
-          padding: 6rem 0;
+          padding: 4rem 0;
           background: linear-gradient(135deg, #2c3e50, #34495e);
           color: white;
         }
 
-        .impact-content {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 4rem;
-          align-items: center;
-        }
-
-        .impact-text h2 {
-          font-size: 2.5rem;
-          font-weight: 700;
-          margin-bottom: 1.5rem;
-        }
-
-        .impact-text p {
-          font-size: 1.1rem;
-          line-height: 1.7;
-          margin-bottom: 2rem;
-          opacity: 0.9;
-        }
-
         .impact-stats {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 1.5rem;
+          grid-template-columns: 1fr;
+          gap: 1rem;
+          padding: 0 1rem;
         }
 
         .impact-stat {
@@ -846,141 +673,59 @@ const HomePage: React.FC = () => {
           backdrop-filter: blur(10px);
         }
 
-        .impact-stat h3 {
-          font-size: 1rem;
-          font-weight: 600;
-          margin-bottom: 0.5rem;
-          color: #e74c3c;
-        }
-
-        .impact-stat span {
-          display: block;
-          font-size: 1.5rem;
-          font-weight: 700;
-          margin-bottom: 0.5rem;
-        }
-
-        .impact-stat p {
-          font-size: 0.9rem;
-          opacity: 0.8;
-          margin: 0;
-        }
-
-        .impact-image {
-          width: 100%;
-          height: 300px;
-          background: linear-gradient(135deg, #3498db, #2980b9);
-          border-radius: 15px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-size: 2.5rem;
-          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-        }
-
         /* CTA Section */
         .cta {
-          padding: 6rem 0;
+          padding: 4rem 0;
           background: linear-gradient(135deg, #e74c3c, #c0392b);
           color: white;
         }
 
         .cta-content {
           text-align: center;
-          max-width: 800px;
-          margin: 0 auto;
-        }
-
-        .cta-content h2 {
-          font-size: 2.5rem;
-          font-weight: 700;
-          margin-bottom: 1.5rem;
-        }
-
-        .cta-content p {
-          font-size: 1.2rem;
-          line-height: 1.6;
-          margin-bottom: 2.5rem;
-          opacity: 0.95;
+          padding: 0 1rem;
         }
 
         .cta-buttons {
           display: flex;
+          flex-direction: column;
           gap: 1rem;
-          justify-content: center;
-          flex-wrap: wrap;
-          margin-bottom: 3rem;
+          align-items: center;
+          margin: 2rem 0;
         }
 
         .cta .btn-primary {
           background: white;
           color: #e74c3c;
-        }
-
-        .cta .btn-primary:hover {
-          background: #f8f9fa;
+          width: 100%;
+          max-width: 300px;
         }
 
         .cta .btn-secondary {
           border-color: white;
           color: white;
-        }
-
-        .cta .btn-secondary:hover {
-          background: white;
-          color: #e74c3c;
-        }
-
-        .cta-image {
-          text-align: center;
-        }
-
-        .cta-image-placeholder {
-          max-width: 400px;
           width: 100%;
-          height: 250px;
-          background: rgba(255, 255, 255, 0.2);
-          border-radius: 15px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-size: 3rem;
-          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+          max-width: 300px;
         }
 
         /* Footer */
         .footer {
           background: #2c3e50;
           color: white;
-          padding: 4rem 0 2rem;
+          padding: 3rem 0 1rem;
         }
 
         .footer-content {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          grid-template-columns: 1fr;
           gap: 2rem;
-          margin-bottom: 2rem;
+          text-align: center;
+          padding: 0 1rem;
         }
 
-        .footer-section h3 {
-          font-size: 1.3rem;
-          font-weight: 600;
-          margin-bottom: 1rem;
-          color: #e74c3c;
-        }
-
+        .footer-section h3,
         .footer-section h4 {
-          font-size: 1.1rem;
-          font-weight: 600;
+          color: #e74c3c;
           margin-bottom: 1rem;
-        }
-
-        .footer-section p {
-          line-height: 1.6;
-          opacity: 0.9;
-          margin-bottom: 1.5rem;
         }
 
         .footer-section ul {
@@ -1006,6 +751,8 @@ const HomePage: React.FC = () => {
         .social-links {
           display: flex;
           gap: 1rem;
+          justify-content: center;
+          margin-top: 1rem;
         }
 
         .social-links a {
@@ -1028,231 +775,16 @@ const HomePage: React.FC = () => {
 
         .footer-bottom {
           border-top: 1px solid rgba(255, 255, 255, 0.1);
-          padding-top: 2rem;
+          padding-top: 1rem;
           text-align: center;
           opacity: 0.8;
+          margin-top: 2rem;
         }
 
         .footer-bottom p {
           margin-bottom: 0.5rem;
+          font-size: 0.9rem;
         }
-
-        /* Responsive Design */
-        /* Responsive Design */
-        @media (max-width: 768px) {
-          .services-grid {
-            grid-template-columns: 1fr;
-            gap: 0.8rem;
-          }
-          
-          .service-item {
-            padding: 1rem;
-            gap: 0.8rem;
-          }
-          
-          .hero-highlight-section {
-            padding: 2rem 1.5rem;
-            margin: 1.5rem 0;
-            border-radius: 16px;
-          }
-          
-          .regional-emphasis {
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-          }
-          
-          .cta-highlight {
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-          }
-          
-          .regional-flags span {
-            font-size: 1.8rem;
-          }
-          
-          .hero {
-            padding-top: 100px;
-          }
-          
-          .hero-title {
-            font-size: 2.2rem;
-            line-height: 1.3;
-            margin-top: 1.5rem;
-          }
-          
-          .hero-description {
-            font-size: 1.1rem;
-          }
-          
-          .hero-stats {
-            flex-direction: row;
-            justify-content: space-around;
-            gap: 1rem;
-          }
-          
-          .stat {
-            flex: 1;
-            min-width: 0;
-          }
-          
-          .stat-number {
-            font-size: 1.6rem;
-          }
-          
-          .stat-label {
-            font-size: 0.8rem;
-          }
-          
-          .process-steps {
-            gap: 0.8rem;
-          }
-          
-          .process-step {
-            padding: 0.8rem;
-          }
-          
-          .step-number {
-            width: 28px;
-            height: 28px;
-            font-size: 0.8rem;
-          }
-          
-          .hero-buttons {
-            flex-direction: column;
-            align-items: center;
-            gap: 0.8rem;
-          }
-          
-          .btn-primary, .btn-secondary {
-            width: 100%;
-            max-width: 280px;
-            justify-content: center;
-            padding: 14px 24px;
-          }
-          
-          .mobile-menu-toggle {
-            display: block;
-          }
-          
-          .nav-links {
-            position: fixed;
-            top: 70px;
-            left: -100%;
-            width: 100%;
-            height: calc(100vh - 70px);
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            padding-top: 2rem;
-            transition: left 0.3s ease;
-            z-index: 999;
-          }
-          
-          .nav-links.active {
-            left: 0;
-          }
-          
-          .nav-links a {
-            padding: 1rem 0;
-            font-size: 1.1rem;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            width: 80%;
-            text-align: center;
-          }
-          
-          .hero-content {
-            grid-template-columns: 1fr;
-            text-align: center;
-            gap: 2rem;
-          }
-          
-          .hero-title {
-            font-size: 2.5rem;
-          }
-          
-          .hero-stats {
-            justify-content: center;
-          }
-          
-          .about-content {
-            grid-template-columns: 1fr;
-            gap: 2rem;
-          }
-          
-          .impact-content {
-            grid-template-columns: 1fr;
-            gap: 2rem;
-          }
-          
-          .impact-stats {
-            grid-template-columns: 1fr;
-          }
-          
-          .cta-buttons {
-            flex-direction: column;
-            align-items: center;
-          }
-          
-          .floating-card {
-            position: static;
-            margin: 1rem 0;
-            animation: none;
-          }
-          
-          .card-1, .card-2, .card-3 {
-            position: static;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .hero-title {
-            font-size: 2rem;
-          }
-          
-          .section-header h2 {
-            font-size: 2rem;
-          }
-          
-          .nav {
-            padding: 1rem;
-          }
-          
-          .container {
-            padding: 0 15px;
-          }
-          
-          .feature-card {
-            padding: 2rem 1.5rem;
-          }
-        }
-
-        /* Smooth Scrolling */
-        html {
-          scroll-behavior: smooth;
-        }
-
-        /* Loading Animation */
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .hero-text > * {
-          animation: fadeInUp 0.8s ease forwards;
-        }
-
-        .hero-text > *:nth-child(1) { animation-delay: 0.1s; }
-        .hero-text > *:nth-child(2) { animation-delay: 0.2s; }
-        .hero-text > *:nth-child(3) { animation-delay: 0.3s; }
-        .hero-text > *:nth-child(4) { animation-delay: 0.4s; }
 
         /* Progress Bar */
         .progress-bar {
@@ -1264,6 +796,136 @@ const HomePage: React.FC = () => {
           z-index: 9999;
           transition: width 0.1s ease;
         }
+
+        /* Overlay quando menu está aberto */
+        .menu-overlay {
+          position: fixed;
+          top: 70px;
+          left: 0;
+          width: 100%;
+          height: calc(100vh - 70px);
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 998;
+          opacity: 0;
+          visibility: hidden;
+          transition: all 0.3s ease;
+        }
+
+        .menu-overlay.active {
+          opacity: 1;
+          visibility: visible;
+        }
+
+        /* Tablet (768px+) */
+        @media (min-width: 768px) {
+          .nav {
+            padding: 1rem 2rem;
+          }
+          
+          .hero-title {
+            font-size: 2.5rem;
+          }
+          
+          .services-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+          
+          .features-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+          
+          .impact-stats {
+            grid-template-columns: repeat(3, 1fr);
+          }
+          
+          .cta-buttons {
+            flex-direction: row;
+            justify-content: center;
+          }
+          
+          .footer-content {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+
+        /* Desktop (1024px+) */
+        @media (min-width: 1024px) {
+          .mobile-menu-toggle {
+            display: none;
+          }
+          
+          .nav-links {
+            position: static;
+            transform: none;
+            height: auto;
+            background: transparent;
+            padding: 0;
+            width: auto;
+          }
+          
+          .nav-menu {
+            flex-direction: row;
+            gap: 2rem;
+            padding: 0;
+          }
+          
+          .nav-menu a {
+            padding: 0;
+            border: none;
+            font-size: 1rem;
+          }
+          
+          .nav-menu a::before {
+            display: none;
+          }
+          
+          .mobile-cta-button {
+            display: none;
+          }
+          
+          .desktop-nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+          }
+          
+          .hero-title {
+            font-size: 3.5rem;
+          }
+          
+          .services-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
+          
+          .features-grid {
+            grid-template-columns: repeat(4, 1fr);
+          }
+          
+          .footer-content {
+            grid-template-columns: repeat(4, 1fr);
+          }
+        }
+
+        /* Smooth Scrolling */
+        html {
+          scroll-behavior: smooth;
+        }
+
+        /* Touch Improvements */
+        @media (hover: none) and (pointer: coarse) {
+          .service-item:hover {
+            transform: none;
+          }
+          
+          .btn-primary:hover,
+          .btn-secondary:hover {
+            transform: none;
+          }
+          
+          .nav-menu a:hover {
+            transform: none;
+          }
+        }
         `
       }} />
 
@@ -1272,96 +934,140 @@ const HomePage: React.FC = () => {
 
       <div className="progress-bar" style={{ width: `${progressWidth}%` }}></div>
       
+      {/* Overlay para fechar menu */}
+      <div 
+        className={`menu-overlay ${mobileMenuOpen ? 'active' : ''}`}
+        onClick={closeMobileMenu}
+      ></div>
+      
       {/* Header */}
       <header className="header">
         <nav className="nav">
           <div className="nav-brand">
-            <h1>Africa's Hands</h1>
-            <span className="nav-subtitle">AO • NA • ZA Regional</span>
+            <h1>{t('company.name') || 'Africa\'s Hands'}</h1>
+            <span className="nav-subtitle">{t('login.slogan') || 'AO • NA • ZA Regional'}</span>
           </div>
-          <div className="nav-links">
-            <a href="#sobre">Sobre</a>
-            <a href="#recursos">Recursos</a>
-            <a href="#impacto">Impacto</a>
-            <a href="#contato">Contato</a>
-            <a 
-              href="#" 
-              onClick={(e) => {
-                e.preventDefault();
-                if ((window as any).navigateToLogin) {
-                  (window as any).navigateToLogin();
-                }
-              }}
-              className="btn-primary"
+          <div className="nav-right">
+            {/* Language Toggle sempre visível */}
+            <LanguageToggle />
+            
+            {/* Mobile Menu Toggle - CORRIGIDO */}
+            <button 
+              className="mobile-menu-toggle"
+              onClick={toggleMobileMenu}
+              aria-label="Menu"
+              type="button"
             >
-              Acessar Plataforma
-            </a>
-          </div>
-          <div className="mobile-menu-toggle">
-            <i className="fas fa-bars"></i>
+              <i className={`fas ${mobileMenuOpen ? 'fa-times' : 'fa-bars'}`}></i>
+            </button>
+            
+            {/* Desktop Navigation */}
+            <div className="desktop-nav">
+              <a href="#sobre">{t('header.about') || 'Sobre'}</a>
+              <a href="#recursos">{t('header.resources') || 'Recursos'}</a>
+              <a href="#impacto">{t('header.impact') || 'Impacto'}</a>
+              <a href="#contato">{t('header.contact') || 'Contato'}</a>
+              <button 
+                onClick={() => {
+                  if ((window as any).navigateToLogin) {
+                    (window as any).navigateToLogin();
+                  }
+                }}
+                className="btn-primary"
+              >
+                {t('header.accessPlatform') || 'Acessar Plataforma'}
+              </button>
+            </div>
           </div>
         </nav>
+        
+        {/* Mobile Navigation Menu */}
+        <div className={`nav-links ${mobileMenuOpen ? 'active' : ''}`}>
+          <div className="nav-menu">
+            <a href="#sobre" onClick={closeMobileMenu}>{t('header.about') || 'Sobre'}</a>
+            <a href="#recursos" onClick={closeMobileMenu}>{t('header.resources') || 'Recursos'}</a>
+            <a href="#impacto" onClick={closeMobileMenu}>{t('header.impact') || 'Impacto'}</a>
+            <a href="#contato" onClick={closeMobileMenu}>{t('header.contact') || 'Contato'}</a>
+          </div>
+          
+          <button 
+            onClick={() => {
+              closeMobileMenu();
+              if ((window as any).navigateToLogin) {
+                (window as any).navigateToLogin();
+              }
+            }}
+            className="mobile-cta-button"
+          >
+            <i className="fas fa-rocket"></i>
+            {t('header.accessPlatform') || 'Acessar Plataforma'}
+          </button>
+          
+          {/* Language Toggle no menu mobile */}
+          <div className="language-toggle-mobile">
+            <LanguageToggle />
+          </div>
+        </div>
       </header>
 
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-content">
-          <div className="hero-text">
+          <div className="hero-main-content">
             <h1 className="hero-title">
-              Conectando <span className="highlight">Angola</span>, 
-              <span className="highlight">Namíbia</span> e 
-              <span className="highlight">África do Sul</span>
+              {t('hero.connecting') || 'Conectando'} <span className="highlight">{t('country.angola') || 'Angola'}</span>, 
+              <span className="highlight">{t('country.namibia') || 'Namíbia'}</span> {t('hero.and') || 'e'} 
+              <span className="highlight">{t('country.southAfrica') || 'África do Sul'}</span>
             </h1>
             <p className="hero-description">
-              Plataforma digital inovadora que promove cooperação regional, 
-              inovação tecnológica e desenvolvimento sustentável na África Austral.
+              {t('hero.description') || 'Plataforma digital inovadora que promove cooperação regional, inovação tecnológica e desenvolvimento sustentável na África Austral.'}
             </p>
 
-            {/* ✅ NOVA SEÇÃO: Destaque dos Serviços */}
+            {/* Hero Highlight Section */}
             <div className="hero-highlight-section">
               <h3>
                 <span>🚫</span>
-                Evite constrangimentos!
+                {t('hero.avoidEmbarrassment') || 'Evite constrangimentos!'}
               </h3>
-              <p style={{ marginBottom: '1rem', color: '#666' }}>
-                <strong>🌍 Procuras serviços de:</strong>
+              <p>
+                <strong>🌍 {t('hero.lookingForServices') || 'Procuras serviços de:'}</strong>
               </p>
               
               <div className="services-grid">
                 <div className="service-item">
                   <span className="check-icon">✅</span>
                   <span className="service-icon">🎓</span>
-                  <span>Educação</span>
+                  <span>{t('sector.education') || 'Educação'}</span>
                 </div>
                 <div className="service-item">
                   <span className="check-icon">✅</span>
                   <span className="service-icon">🏥</span>
-                  <span>Saúde</span>
+                  <span>{t('sector.health') || 'Saúde'}</span>
                 </div>
                 <div className="service-item">
                   <span className="check-icon">✅</span>
                   <span className="service-icon">🚗</span>
-                  <span>Transporte</span>
+                  <span>{t('sector.transport') || 'Transporte'}</span>
                 </div>
                 <div className="service-item">
                   <span className="check-icon">✅</span>
                   <span className="service-icon">🛒</span>
-                  <span>Comércio</span>
+                  <span>{t('sector.commerce') || 'Comércio'}</span>
                 </div>
                 <div className="service-item">
                   <span className="check-icon">✅</span>
                   <span className="service-icon">🏨</span>
-                  <span>Turismo</span>
+                  <span>{t('sector.tourism') || 'Turismo'}</span>
                 </div>
                 <div className="service-item">
                   <span className="check-icon">✅</span>
                   <span className="service-icon">🌟</span>
-                  <span>Oportunidades regionais</span>
+                  <span>{t('hero.regionalOpportunities') || 'Oportunidades regionais'}</span>
                 </div>
               </div>
 
               <div style={{ textAlign: 'center', margin: '1.5rem 0', color: '#e74c3c', fontWeight: '600' }}>
-                👉 <strong>Tudo organizado num único lugar!</strong>
+                👉 <strong>{t('hero.everythingInOnePlace') || 'Tudo organizado num único lugar!'}</strong>
               </div>
 
               <div className="regional-emphasis">
@@ -1371,316 +1077,222 @@ const HomePage: React.FC = () => {
                   <span>🇿🇦</span>
                 </div>
                 <p>
-                  Em <strong>Angola, Namíbia e África do Sul</strong>?<br/>
-                  Agora já podes fazer isso de forma <em>fácil, rápida e segura</em> através do <strong>Africa's Hands</strong>!
+                  {t('hero.inCountries') || 'Em'} <strong>{t('country.angola') || 'Angola'}, {t('country.namibia') || 'Namíbia'} {t('hero.and') || 'e'} {t('country.southAfrica') || 'África do Sul'}</strong>?<br/>
+                  {t('hero.nowYouCan') || 'Agora já podes fazer isso de forma'} <em>{t('hero.easyFastSecure') || 'fácil, rápida e segura'}</em> {t('hero.through') || 'através do'} <strong>{t('company.name') || 'Africa\'s Hands'}</strong>!
                 </p>
               </div>
 
               <div className="cta-highlight">
                 <h4>
                   <span>📝</span>
-                  Cadastra-te gratuitamente e começa a explorar!
+                  {t('hero.registerFree') || 'Cadastra-te gratuitamente e começa a explorar!'}
                 </h4>
-                <p><strong>Africa's Hands</strong> — Descobre, reserva e aproveita com confiança!</p>
+                <p><strong>{t('company.name') || 'Africa\'s Hands'}</strong> — {t('hero.discoverBookEnjoy') || 'Descobre, reserva e aproveita com confiança!'}</p>
               </div>
 
               <div className="process-steps">
                 <div className="process-step">
                   <div className="step-number">1</div>
                   <div className="step-content">
-                    <h5>Registo Gratuito</h5>
-                    <p>Cria a tua conta em segundos</p>
+                    <h5>{t('hero.step1.title') || 'Registo Gratuito'}</h5>
+                    <p>{t('hero.step1.description') || 'Cria a tua conta em segundos'}</p>
                   </div>
                 </div>
                 <div className="process-step">
                   <div className="step-number">2</div>
                   <div className="step-content">
-                    <h5>Explora Serviços</h5>
-                    <p>Encontra o que precisas nos 3 países</p>
+                    <h5>{t('hero.step2.title') || 'Explora Serviços'}</h5>
+                    <p>{t('hero.step2.description') || 'Encontra o que precisas nos 3 países'}</p>
                   </div>
                 </div>
                 <div className="process-step">
                   <div className="step-number">3</div>
                   <div className="step-content">
-                    <h5>Conecta e Aproveita</h5>
-                    <p>Acede a oportunidades regionais</p>
+                    <h5>{t('hero.step3.title') || 'Conecta e Aproveita'}</h5>
+                    <p>{t('hero.step3.description') || 'Acede a oportunidades regionais'}</p>
                   </div>
                 </div>
               </div>
 
               <div className="office-credit">
                 <p>
-                  <strong>📘 Escritório V.J. Esteves e Serviços</strong>
+                  <strong>📘 {t('hero.officeCredit') || 'Escritório V.J. Esteves e Serviços'}</strong>
                 </p>
               </div>
             </div>
+
             <div className="hero-stats">
               <div className="stat">
                 <span className="stat-number">95M+</span>
-                <span className="stat-label">População</span>
+                <span className="stat-label">{t('login.stats.population') || 'População'}</span>
               </div>
               <div className="stat">
                 <span className="stat-number">3</span>
-                <span className="stat-label">Países</span>
+                <span className="stat-label">{t('login.stats.countries') || 'Países'}</span>
               </div>
               <div className="stat">
                 <span className="stat-number">6</span>
-                <span className="stat-label">Setores</span>
+                <span className="stat-label">{t('login.stats.sectors') || 'Setores'}</span>
               </div>
             </div>
+
             <div className="hero-buttons">
               <a href="https://www.africashands.org/" className="btn-primary">
                 <i className="fas fa-rocket"></i>
-                Começar Agora
+                {t('hero.startNow') || 'Começar Agora'}
               </a>
               <a href="#sobre" className="btn-secondary">
                 <i className="fas fa-play"></i>
-                Saiba Mais
+                {t('hero.learnMore') || 'Saiba Mais'}
               </a>
-            </div>
-          </div>
-          <div className="hero-image">
-            <div className="image-placeholder">
-              <i className="fas fa-handshake"></i>
-            </div>
-            <div className="floating-card card-1">
-              <i className="fas fa-handshake"></i>
-              <span>Cooperação</span>
-            </div>
-            <div className="floating-card card-2">
-              <i className="fas fa-lightbulb"></i>
-              <span>Inovação</span>
-            </div>
-            <div className="floating-card card-3">
-              <i className="fas fa-globe-africa"></i>
-              <span>Desenvolvimento</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* About Section */}
-      <section id="sobre" className="about">
-        <div className="container">
-          <div className="section-header">
-            <h2>Sobre o Africa's Hands</h2>
-            <p>Uma plataforma que facilita a colaboração entre Angola, Namíbia e África do Sul</p>
-          </div>
-          <div className="about-content">
-            <div className="about-text">
-              <h3>Transformando a Cooperação Regional</h3>
-              <p>
-                O Africa's Hands é uma plataforma digital inovadora que conecta três países estratégicos 
-                da África Austral através da cooperação regional, promovendo a integração econômica e 
-                o desenvolvimento sustentável.
-              </p>
-              <div className="benefits">
-                <div className="benefit">
-                  <i className="fas fa-expand-arrows-alt"></i>
-                  <div>
-                    <h4>Acesso Ampliado</h4>
-                    <p>Oportunidades em três mercados nacionais</p>
-                  </div>
-                </div>
-                <div className="benefit">
-                  <i className="fas fa-network-wired"></i>
-                  <div>
-                    <h4>Networking Regional</h4>
-                    <p>Conexão com profissionais e instituições</p>
-                  </div>
-                </div>
-                <div className="benefit">
-                  <i className="fas fa-rocket"></i>
-                  <div>
-                    <h4>Inovação Colaborativa</h4>
-                    <p>Projetos de desenvolvimento conjunto</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="about-image">
-              <i className="fas fa-laptop-code"></i>
-            </div>
-          </div>
+      <section id="sobre" className="about section">
+        <div className="section-header">
+          <h2>{t('about.title') || 'Sobre o Africa\'s Hands'}</h2>
+          <p>Uma plataforma que facilita a colaboração entre Angola, Namíbia e África do Sul</p>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="recursos" className="features">
-        <div className="container">
-          <div className="section-header">
-            <h2>Recursos da Plataforma</h2>
-            <p>Soluções integradas para cooperação regional efetiva</p>
+      <section id="recursos" className="features section">
+        <div className="section-header">
+          <h2>{t('features.title') || 'Recursos da Plataforma'}</h2>
+          <p>Soluções integradas para cooperação regional efetiva</p>
+        </div>
+        <div className="features-grid">
+          <div className="feature-card">
+            <div className="feature-icon">
+              <i className="fas fa-heartbeat"></i>
+            </div>
+            <h3>Rede de Saúde Regional</h3>
+            <p>Cooperação em saúde entre os três países, compartilhamento de recursos e conhecimentos médicos.</p>
           </div>
-          <div className="features-grid">
-            <div className="feature-card">
-              <div className="feature-icon">
-                <i className="fas fa-heartbeat"></i>
-              </div>
-              <h3>Rede de Saúde Regional</h3>
-              <p>Cooperação em saúde entre os três países, compartilhamento de recursos e conhecimentos médicos.</p>
-              <a 
-                href="#" 
-                onClick={(e) => {
-                  e.preventDefault();
-                  if ((window as any).navigateToLogin) {
-                    (window as any).navigateToLogin();
-                  }
-                }}
-                className="feature-link"
-              >
-                Saiba mais <i className="fas fa-arrow-right"></i>
-              </a>
+          <div className="feature-card">
+            <div className="feature-icon">
+              <i className="fas fa-graduation-cap"></i>
             </div>
-            <div className="feature-card">
-              <div className="feature-icon">
-                <i className="fas fa-graduation-cap"></i>
-              </div>
-              <h3>Intercâmbio Universitário</h3>
-              <p>Facilitação de intercâmbios educacionais e programas de cooperação acadêmica.</p>
-              <a href="#" className="feature-link">Saiba mais <i className="fas fa-arrow-right"></i></a>
+            <h3>Intercâmbio Universitário</h3>
+            <p>Facilitação de intercâmbios educacionais e programas de cooperação acadêmica.</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">
+              <i className="fas fa-store"></i>
             </div>
-            <div className="feature-card">
-              <div className="feature-icon">
-                <i className="fas fa-store"></i>
-              </div>
-              <h3>Marketplace Regional</h3>
-              <p>Plataforma de comércio transfronteiriço para produtos e serviços regionais.</p>
-              <a href="#" className="feature-link">Saiba mais <i className="fas fa-arrow-right"></i></a>
+            <h3>Marketplace Regional</h3>
+            <p>Plataforma de comércio transfronteiriço para produtos e serviços regionais.</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">
+              <i className="fas fa-lightbulb"></i>
             </div>
-            <div className="feature-card">
-              <div className="feature-icon">
-                <i className="fas fa-lightbulb"></i>
-              </div>
-              <h3>Hub de Inovação</h3>
-              <p>Colaboração em projetos inovadores e desenvolvimento tecnológico conjunto.</p>
-              <a href="#" className="feature-link">Saiba mais <i className="fas fa-arrow-right"></i></a>
-            </div>
+            <h3>Hub de Inovação</h3>
+            <p>Colaboração em projetos inovadores e desenvolvimento tecnológico conjunto.</p>
           </div>
         </div>
       </section>
 
       {/* Impact Section */}
-      <section id="impacto" className="impact">
-        <div className="container">
-          <div className="impact-content">
-            <div className="impact-text">
-              <h2>Impacto Regional</h2>
-              <p>
-                Superando barreiras burocráticas e promovendo a integração efetiva 
-                entre Angola, Namíbia e África do Sul através de soluções digitais inovadoras.
-              </p>
-              <div className="impact-stats">
-                <div className="impact-stat">
-                  <h3>Angola</h3>
-                  <span>33 milhões</span>
-                  <p>População conectada</p>
-                </div>
-                <div className="impact-stat">
-                  <h3>Namíbia</h3>
-                  <span>2,5 milhões</span>
-                  <p>População conectada</p>
-                </div>
-                <div className="impact-stat">
-                  <h3>África do Sul</h3>
-                  <span>59,5 milhões</span>
-                  <p>População conectada</p>
-                </div>
-              </div>
-            </div>
-            <div className="impact-image">
-              <i className="fas fa-globe-africa"></i>
-            </div>
+      <section id="impacto" className="impact section">
+        <div className="section-header">
+          <h2 style={{ color: 'white' }}>{t('impact.title') || 'Impacto Regional'}</h2>
+          <p style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
+            Superando barreiras burocráticas e promovendo a integração efetiva entre Angola, Namíbia e África do Sul.
+          </p>
+        </div>
+        <div className="impact-stats">
+          <div className="impact-stat">
+            <h3>Angola</h3>
+            <span>33 milhões</span>
+            <p>População conectada</p>
+          </div>
+          <div className="impact-stat">
+            <h3>Namíbia</h3>
+            <span>2,5 milhões</span>
+            <p>População conectada</p>
+          </div>
+          <div className="impact-stat">
+            <h3>África do Sul</h3>
+            <span>59,5 milhões</span>
+            <p>População conectada</p>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="cta">
-        <div className="container">
-          <div className="cta-content">
-            <h2>Faça Parte da Transformação Regional</h2>
-            <p>Junte-se à plataforma que está conectando a África Austral e criando oportunidades de cooperação sem precedentes.</p>
-            <div className="cta-buttons">
-                  <a 
-                    href="#" 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if ((window as any).navigateToLogin) {
-                        (window as any).navigateToLogin();
-                      }
-                    }}
-                    className="btn-primary"
-                  >
-                    <i className="fas fa-user-plus"></i>
-                    Registrar-se Agora
-                  </a>
-                  <a 
-                    href="#" 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if ((window as any).navigateToLogin) {
-                        (window as any).navigateToLogin();
-                      }
-                    }}
-                    className="btn-secondary"
-                  >
-                    <i className="fas fa-envelope"></i>
-                    Entrar em Contato
-                  </a>
-            </div>
-          </div>
-          <div className="cta-image">
-            <div className="cta-image-placeholder">
-              <i className="fas fa-users"></i>
-            </div>
+      <section className="cta section">
+        <div className="cta-content">
+          <h2>{t('cta.title') || 'Faça Parte da Transformação Regional'}</h2>
+          <p>Junte-se à plataforma que está conectando a África Austral e criando oportunidades de cooperação sem precedentes.</p>
+          <div className="cta-buttons">
+            <button 
+              onClick={() => {
+                if ((window as any).navigateToLogin) {
+                  (window as any).navigateToLogin();
+                }
+              }}
+              className="btn-primary"
+            >
+              <i className="fas fa-user-plus"></i>
+              Registrar-se Agora
+            </button>
+            <a 
+              href="#contato"
+              className="btn-secondary"
+            >
+              <i className="fas fa-envelope"></i>
+              Entrar em Contato
+            </a>
           </div>
         </div>
       </section>
 
       {/* Footer */}
       <footer id="contato" className="footer">
-        <div className="container">
-          <div className="footer-content">
-            <div className="footer-section">
-              <h3>Africa's Hands</h3>
-              <p>Conectando Angola, Namíbia e África do Sul através da cooperação regional e inovação tecnológica.</p>
-              <div className="social-links">
-                <a href="#"><i className="fab fa-facebook"></i></a>
-                <a href="#"><i className="fab fa-twitter"></i></a>
-                <a href="#"><i className="fab fa-linkedin"></i></a>
-                <a href="#"><i className="fab fa-instagram"></i></a>
-              </div>
-            </div>
-            <div className="footer-section">
-              <h4>Recursos</h4>
-              <ul>
-                <li><a href="#">Rede de Saúde</a></li>
-                <li><a href="#">Intercâmbio Universitário</a></li>
-                <li><a href="#">Marketplace</a></li>
-                <li><a href="#">Hub de Inovação</a></li>
-              </ul>
-            </div>
-            <div className="footer-section">
-              <h4>Países</h4>
-              <ul>
-                <li><a href="#">🇦🇴 Angola</a></li>
-                <li><a href="#">🇳🇦 Namíbia</a></li>
-                <li><a href="#">🇿🇦 África do Sul</a></li>
-              </ul>
-            </div>
-            <div className="footer-section">
-              <h4>Contato</h4>
-              <ul>
-                <li><a href="mailto:info@africashands.org">info@africashands.org</a></li>
-                <li><a href="https://www.africashands.org/">www.africashands.org</a></li>
-              </ul>
+        <div className="footer-content">
+          <div className="footer-section">
+            <h3>{t('company.name') || 'Africa\'s Hands'}</h3>
+            <p>Conectando Angola, Namíbia e África do Sul através da cooperação regional e inovação tecnológica.</p>
+            <div className="social-links">
+              <a href="#" aria-label="Facebook"><i className="fab fa-facebook"></i></a>
+              <a href="#" aria-label="Twitter"><i className="fab fa-twitter"></i></a>
+              <a href="#" aria-label="LinkedIn"><i className="fab fa-linkedin"></i></a>
+              <a href="#" aria-label="Instagram"><i className="fab fa-instagram"></i></a>
             </div>
           </div>
-          <div className="footer-bottom">
-            <p>&copy; 2025 Africa's Hands. Todos os direitos reservados.</p>
-            <p>Desenvolvido por Valdimir Jacinto Esteves</p>
+          <div className="footer-section">
+            <h4>Recursos</h4>
+            <ul>
+              <li><a href="#">Rede de Saúde</a></li>
+              <li><a href="#">Intercâmbio Universitário</a></li>
+              <li><a href="#">Marketplace</a></li>
+              <li><a href="#">Hub de Inovação</a></li>
+            </ul>
           </div>
+          <div className="footer-section">
+            <h4>Países</h4>
+            <ul>
+              <li><a href="#">🇦🇴 Angola</a></li>
+              <li><a href="#">🇳🇦 Namíbia</a></li>
+              <li><a href="#">🇿🇦 África do Sul</a></li>
+            </ul>
+          </div>
+          <div className="footer-section">
+            <h4>{t('footer.contact') || 'Contato'}</h4>
+            <ul>
+              <li><a href="mailto:info@africashands.org">info@africashands.org</a></li>
+              <li><a href="https://www.africashands.org/">www.africashands.org</a></li>
+              <li><a href="tel:+244924166401">📱 +244 924 166 401</a></li>
+            </ul>
+          </div>
+        </div>
+        <div className="footer-bottom">
+          <p>&copy; 2025 {t('company.name') || 'Africa\'s Hands'}. Todos os direitos reservados.</p>
+          <p>Desenvolvido por Valdimir Jacinto Esteves</p>
         </div>
       </footer>
     </div>

@@ -29,6 +29,76 @@ const translations: Translations = {
     'company.developer': 'Valdimir Jacinto Esteves',
     'company.version': 'Versão 2.1.0 • © 2024 Africa\'s Hands',
     
+    // Header
+    'header.about': 'Sobre',
+    'header.resources': 'Recursos',
+    'header.impact': 'Impacto',
+    'header.contact': 'Contato',
+    'header.accessPlatform': 'Acessar Plataforma',
+    
+    // Hero Section
+    'hero.connecting': 'Conectando',
+    'hero.and': 'e',
+    'hero.description': 'Plataforma digital inovadora que promove cooperação regional, inovação tecnológica e desenvolvimento sustentável na África Austral.',
+    'hero.avoidEmbarrassment': 'Evite constrangimentos!',
+    'hero.lookingForServices': 'Procuras serviços de:',
+    'hero.regionalOpportunities': 'Oportunidades regionais',
+    'hero.everythingInOnePlace': 'Tudo organizado num único lugar!',
+    'hero.inCountries': 'Em',
+    'hero.nowYouCan': 'Agora já podes fazer isso de forma',
+    'hero.easyFastSecure': 'fácil, rápida e segura',
+    'hero.through': 'através do',
+    'hero.registerFree': 'Cadastra-te gratuitamente e começa a explorar!',
+    'hero.discoverBookEnjoy': 'Descobre, reserva e aproveita com confiança!',
+    'hero.step1.title': 'Registo Gratuito',
+    'hero.step1.description': 'Cria a tua conta em segundos',
+    'hero.step2.title': 'Explora Serviços',
+    'hero.step2.description': 'Encontra o que precisas nos 3 países',
+    'hero.step3.title': 'Conecta e Aproveita',
+    'hero.step3.description': 'Acede a oportunidades regionais',
+    'hero.officeCredit': 'Escritório V.J. Esteves e Serviços',
+    'hero.startNow': 'Começar Agora',
+    'hero.learnMore': 'Saiba Mais',
+    
+    // About Section
+    'about.title': 'Sobre o Africa\'s Hands',
+    'about.description': 'Uma plataforma que facilita a colaboração entre Angola, Namíbia e África do Sul',
+    
+    // Features Section
+    'features.title': 'Recursos da Plataforma',
+    'features.description': 'Soluções integradas para cooperação regional efetiva',
+    'features.healthNetwork.title': 'Rede de Saúde Regional',
+    'features.healthNetwork.description': 'Cooperação em saúde entre os três países, compartilhamento de recursos e conhecimentos médicos.',
+    'features.universityExchange.title': 'Intercâmbio Universitário',
+    'features.universityExchange.description': 'Facilitação de intercâmbios educacionais e programas de cooperação acadêmica.',
+    'features.regionalMarketplace.title': 'Marketplace Regional',
+    'features.regionalMarketplace.description': 'Plataforma de comércio transfronteiriço para produtos e serviços regionais.',
+    'features.innovationHub.title': 'Hub de Inovação',
+    'features.innovationHub.description': 'Colaboração em projetos inovadores e desenvolvimento tecnológico conjunto.',
+    
+    // Impact Section
+    'impact.title': 'Impacto Regional',
+    'impact.description': 'Superando barreiras burocráticas e promovendo a integração efetiva entre Angola, Namíbia e África do Sul.',
+    'impact.populationConnected': 'População conectada',
+    
+    // CTA Section
+    'cta.title': 'Faça Parte da Transformação Regional',
+    'cta.description': 'Junte-se à plataforma que está conectando a África Austral e criando oportunidades de cooperação sem precedentes.',
+    'cta.registerNow': 'Registrar-se Agora',
+    'cta.contact': 'Entrar em Contato',
+    
+    // Footer
+    'footer.description': 'Conectando Angola, Namíbia e África do Sul através da cooperação regional e inovação tecnológica.',
+    'footer.resources': 'Recursos',
+    'footer.healthNetwork': 'Rede de Saúde',
+    'footer.universityExchange': 'Intercâmbio Universitário',
+    'footer.marketplace': 'Marketplace',
+    'footer.innovationHub': 'Hub de Inovação',
+    'footer.countries': 'Países',
+    'footer.contact': 'Contato',
+    'footer.allRightsReserved': 'Todos os direitos reservados.',
+    'footer.developedBy': 'Desenvolvido por Valdimir Jacinto Esteves',
+    
     // Login
     'login.welcomeBack': 'Bem-vindo de volta!',
     'login.createAccount': 'Criar Conta',
@@ -312,6 +382,76 @@ const translations: Translations = {
     'company.description': 'Connecting Angola, Namibia and South Africa through regional cooperation, technological innovation and sustainable development',
     'company.developer': 'Valdimir Jacinto Esteves',
     'company.version': 'Version 2.1.0 • © 2024 Africa\'s Hands',
+    
+    // Header
+    'header.about': 'About',
+    'header.resources': 'Resources',
+    'header.impact': 'Impact',
+    'header.contact': 'Contact',
+    'header.accessPlatform': 'Access Platform',
+    
+    // Hero Section
+    'hero.connecting': 'Connecting',
+    'hero.and': 'and',
+    'hero.description': 'Innovative digital platform that promotes regional cooperation, technological innovation and sustainable development in Southern Africa.',
+    'hero.avoidEmbarrassment': 'Avoid embarrassment!',
+    'hero.lookingForServices': 'Looking for services in:',
+    'hero.regionalOpportunities': 'Regional opportunities',
+    'hero.everythingInOnePlace': 'Everything organized in one place!',
+    'hero.inCountries': 'In',
+    'hero.nowYouCan': 'Now you can do this in a',
+    'hero.easyFastSecure': 'easy, fast and secure way',
+    'hero.through': 'through',
+    'hero.registerFree': 'Register for free and start exploring!',
+    'hero.discoverBookEnjoy': 'Discover, book and enjoy with confidence!',
+    'hero.step1.title': 'Free Registration',
+    'hero.step1.description': 'Create your account in seconds',
+    'hero.step2.title': 'Explore Services',
+    'hero.step2.description': 'Find what you need in the 3 countries',
+    'hero.step3.title': 'Connect and Enjoy',
+    'hero.step3.description': 'Access regional opportunities',
+    'hero.officeCredit': 'V.J. Esteves Office and Services',
+    'hero.startNow': 'Start Now',
+    'hero.learnMore': 'Learn More',
+    
+    // About Section
+    'about.title': 'About Africa\'s Hands',
+    'about.description': 'A platform that facilitates collaboration between Angola, Namibia and South Africa',
+    
+    // Features Section
+    'features.title': 'Platform Resources',
+    'features.description': 'Integrated solutions for effective regional cooperation',
+    'features.healthNetwork.title': 'Regional Health Network',
+    'features.healthNetwork.description': 'Health cooperation between the three countries, sharing medical resources and knowledge.',
+    'features.universityExchange.title': 'University Exchange',
+    'features.universityExchange.description': 'Facilitation of educational exchanges and academic cooperation programs.',
+    'features.regionalMarketplace.title': 'Regional Marketplace',
+    'features.regionalMarketplace.description': 'Cross-border trade platform for regional products and services.',
+    'features.innovationHub.title': 'Innovation Hub',
+    'features.innovationHub.description': 'Collaboration on innovative projects and joint technological development.',
+    
+    // Impact Section
+    'impact.title': 'Regional Impact',
+    'impact.description': 'Overcoming bureaucratic barriers and promoting effective integration between Angola, Namibia and South Africa.',
+    'impact.populationConnected': 'Population connected',
+    
+    // CTA Section
+    'cta.title': 'Be Part of the Regional Transformation',
+    'cta.description': 'Join the platform that is connecting Southern Africa and creating unprecedented opportunities for cooperation.',
+    'cta.registerNow': 'Register Now',
+    'cta.contact': 'Get in Touch',
+    
+    // Footer
+    'footer.description': 'Connecting Angola, Namibia and South Africa through regional cooperation and technological innovation.',
+    'footer.resources': 'Resources',
+    'footer.healthNetwork': 'Health Network',
+    'footer.universityExchange': 'University Exchange',
+    'footer.marketplace': 'Marketplace',
+    'footer.innovationHub': 'Innovation Hub',
+    'footer.countries': 'Countries',
+    'footer.contact': 'Contact',
+    'footer.allRightsReserved': 'All rights reserved.',
+    'footer.developedBy': 'Developed by Valdimir Jacinto Esteves',
     
     // Login
     'login.welcomeBack': 'Welcome back!',
