@@ -48,13 +48,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const LOADING_TIMEOUT = 3000; // 3 segundos máximo
   const OPERATION_TIMEOUT = 2000; // 2 segundos para operações
 
-  // 🎯 FUNÇÃO MELHORADA: Determinar role baseado no email
+  // 🎯 FUNÇÃO: Determinar role baseado no email
   const determineRoleFromEmail = (email: string): 'admin' | 'user' => {
     if (!email) return 'user';
     
     const cleanEmail = email.toLowerCase().trim();
     
-    // ✅ EMAILS DE ADMINISTRADORES ESPECÍFICOS
     const adminEmails = [
       'admin@gmail.com',
       'admin@africashands.com',
@@ -63,34 +62,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       'administrator@africashands.com'
     ];
     
-    // ✅ DOMÍNIOS DE ADMINISTRADORES
-    const adminDomains = [
-      '@africashands.com'
-    ];
+    const adminDomains = ['@africashands.com'];
+    const adminPatterns = ['admin', 'administrator', 'supervisor', 'manager'];
     
-    // ✅ PADRÕES DE EMAIL ADMIN
-    const adminPatterns = [
-      'admin',
-      'administrator',
-      'supervisor',
-      'manager'
-    ];
-    
-    // Verificar emails específicos
-    if (adminEmails.includes(cleanEmail)) {
-      console.log('🔑 Admin detectado por email específico:', cleanEmail);
-      return 'admin';
-    }
-    
-    // Verificar domínios admin
-    if (adminDomains.some(domain => cleanEmail.includes(domain))) {
-      console.log('🔑 Admin detectado por domínio:', cleanEmail);
-      return 'admin';
-    }
-    
-    // Verificar padrões admin
-    if (adminPatterns.some(pattern => cleanEmail.includes(pattern))) {
-      console.log('🔑 Admin detectado por padrão:', cleanEmail);
+    if (adminEmails.includes(cleanEmail) || 
+        adminDomains.some(domain => cleanEmail.includes(domain)) ||
+        adminPatterns.some(pattern => cleanEmail.includes(pattern))) {
+      console.log('🔑 Admin detectado:', cleanEmail);
       return 'admin';
     }
     
@@ -98,7 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return 'user';
   };
 
-  // 🚀 FUNÇÃO ROBUSTA: Buscar perfil do usuário
+  // 🚀 FUNÇÃO: Buscar perfil do usuário
   const fetchUserProfile = async (userId: string): Promise<any> => {
     try {
       console.log('🔍 [fetchUserProfile] Buscando perfil para ID:', userId);
@@ -107,7 +85,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setTimeout(() => reject(new Error('Timeout na busca do perfil')), OPERATION_TIMEOUT);
       });
 
-      // ✅ BUSCA MAIS ROBUSTA - TENTAR VÁRIAS COLUNAS
       const fetchPromise = supabase
         .from('profiles')
         .select(`
@@ -142,17 +119,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // 🚀 FUNÇÃO ROBUSTA: Criar perfil do usuário - À PROVA DE BALAS
+  // 🚀 FUNÇÃO: Criar perfil do usuário - COM CORREÇÃO OAUTH
   const createUserProfile = async (authUser: any, userData?: any): Promise<any> => {
     console.log('📝 [createUserProfile] Iniciando para:', authUser.email);
     
-    // ✅ IDENTIFICAR TIPO DE USUÁRIO
+    // ✅ CORREÇÃO ESPECÍFICA PARA OAUTH - NUNCA FALHAR
     const isOAuthUser = authUser.app_metadata?.provider && authUser.app_metadata.provider !== 'email';
     const provider = authUser.app_metadata?.provider || 'email';
     
     console.log('🔍 [createUserProfile] Tipo:', isOAuthUser ? 'OAuth' : 'Email', '| Provider:', provider);
     
-    // ✅ DADOS BASE PARA QUALQUER USUÁRIO
+    // Dados base para qualquer usuário
     const baseProfileData = {
       id: authUser.id,
       email: authUser.email,
@@ -183,55 +160,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isOAuth: isOAuthUser
     });
 
-    // ✅ ESTRATÉGIA DIFERENTE PARA OAUTH vs EMAIL
     if (isOAuthUser) {
-      console.log('🔍 [createUserProfile] OAUTH: Verificando perfil existente...');
+      console.log('🔍 [OAuth] Usuário OAuth detectado, usando estratégia à prova de balas');
       
+      // 1. Tentar buscar perfil existente primeiro
       try {
-        // 1. Tentar buscar perfil existente primeiro
         const existingProfile = await fetchUserProfile(authUser.id);
         if (existingProfile) {
-          console.log('✅ [createUserProfile] OAUTH: Perfil existente encontrado');
+          console.log('✅ [OAuth] Perfil existente encontrado');
           return existingProfile;
         }
-        
-        console.log('🆕 [createUserProfile] OAUTH: Criando novo perfil...');
-        
-        // 2. Tentar criar no banco (mas NÃO falhar se der erro)
-        try {
-          const { data, error } = await Promise.race([
-            supabase
-              .from('profiles')
-              .insert(baseProfileData)
-              .select()
-              .single(),
-            new Promise((_, reject) => 
-              setTimeout(() => reject(new Error('Timeout')), OPERATION_TIMEOUT)
-            )
-          ]) as any;
-
-          if (!error && data) {
-            console.log('✅ [createUserProfile] OAUTH: Salvo no banco com sucesso!');
-            return data;
-          } else {
-            console.warn('⚠️ [createUserProfile] OAUTH: Erro no banco (IGNORANDO):', error?.message);
-          }
-        } catch (dbError: any) {
-          console.warn('⚠️ [createUserProfile] OAUTH: Exceção no banco (IGNORANDO):', dbError.message);
-        }
-        
-        // 3. SEMPRE retornar dados válidos para OAuth (NUNCA FALHAR)
-        console.log('🎯 [createUserProfile] OAUTH: RETORNANDO dados em memória (SUCESSO GARANTIDO)');
-        return baseProfileData;
-        
-      } catch (error: any) {
-        console.warn('⚠️ [createUserProfile] OAUTH: Erro geral (IGNORANDO):', error.message);
-        // SEMPRE retornar dados válidos para OAuth
-        return baseProfileData;
+      } catch (error) {
+        console.warn('⚠️ [OAuth] Erro ao buscar perfil existente (continuando):', error);
       }
+
+      // 2. Tentar salvar no banco, mas NUNCA falhar se der erro
+      console.log('🆕 [OAuth] Criando novo perfil...');
+      try {
+        const { data, error } = await Promise.race([
+          supabase
+            .from('profiles')
+            .insert(baseProfileData)
+            .select()
+            .single(),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Timeout')), OPERATION_TIMEOUT)
+          )
+        ]) as any;
+
+        if (!error && data) {
+          console.log('✅ [OAuth] Perfil salvo no banco com sucesso!');
+          return data;
+        } else {
+          console.warn('⚠️ [OAuth] Erro no banco (IGNORANDO):', error?.message);
+        }
+      } catch (dbError: any) {
+        console.warn('⚠️ [OAuth] Erro/timeout no banco (IGNORANDO):', dbError.message);
+      }
+
+      // 3. SEMPRE retornar dados válidos para OAuth (NUNCA FALHAR)
+      console.log('🎯 [OAuth] Retornando dados de fallback (SUCESSO GARANTIDO)');
+      return baseProfileData;
+      
     } else {
-      // ✅ FLUXO NORMAL PARA USUÁRIOS EMAIL (como antes)
-      console.log('📧 [createUserProfile] EMAIL: Usando upsert...');
+      // Fluxo normal para usuários email
+      console.log('📧 [Email] Usando upsert para usuário email...');
       
       try {
         const { data, error } = await Promise.race([
@@ -246,31 +219,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ]) as any;
 
         if (error) {
-          console.warn('⚠️ [createUserProfile] EMAIL: Erro (usando fallback):', error.message);
+          console.warn('⚠️ [Email] Erro (usando fallback):', error.message);
           return baseProfileData;
         }
 
-        console.log('✅ [createUserProfile] EMAIL: Criado com sucesso');
+        console.log('✅ [Email] Criado com sucesso');
         return data;
       } catch (error: any) {
-        console.warn('⚠️ [createUserProfile] EMAIL: Exceção (usando fallback):', error.message);
+        console.warn('⚠️ [Email] Exceção (usando fallback):', error.message);
         return baseProfileData;
       }
     }
   };
 
-  // 🚀 FUNÇÃO ROBUSTA: Obter ou criar perfil - MELHORADA
+  // 🚀 FUNÇÃO: Obter ou criar perfil
   const getOrCreateProfile = async (authUser: any, userData?: any): Promise<User | null> => {
     console.log('🔄 [getOrCreateProfile] Processando para:', authUser.email);
     
     try {
-      const isOAuthUser = authUser.app_metadata?.provider && authUser.app_metadata.provider !== 'email';
-      
-      // ✅ SEMPRE TENTAR BUSCAR PRIMEIRO
+      // Sempre tentar buscar primeiro
       console.log('🔍 [getOrCreateProfile] Buscando perfil existente...');
       let profile = await fetchUserProfile(authUser.id);
       
-      // ✅ SE NÃO ENCONTRAR, CRIAR
+      // Se não encontrar, criar
       if (!profile) {
         console.log('🆕 [getOrCreateProfile] Perfil não encontrado, criando...');
         profile = await createUserProfile(authUser, userData);
@@ -278,7 +249,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log('✅ [getOrCreateProfile] Perfil existente encontrado');
       }
 
-      // ✅ VERIFICAR E CORRIGIR ROLE SE NECESSÁRIO
+      // Verificar e corrigir role se necessário
       if (profile) {
         const roleFromEmail = determineRoleFromEmail(authUser.email);
         
@@ -299,14 +270,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
 
-      // ✅ CONVERTER PARA USER E RETORNAR
+      // Converter para User e retornar
       if (profile) {
         const convertedUser = convertToUser(profile);
         console.log('✅ [getOrCreateProfile] Sucesso final:', {
           email: convertedUser.email,
           role: convertedUser.role,
-          id: convertedUser.id,
-          isOAuth: isOAuthUser
+          id: convertedUser.id
         });
         return convertedUser;
       }
@@ -316,12 +286,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error: any) {
       console.error('❌ [getOrCreateProfile] Erro crítico, usando fallback final:', error.message);
       
-      // 🆘 FALLBACK ABSOLUTO - NUNCA FALHAR
+      // Fallback absoluto - nunca falhar
       const fallbackUser: User = {
         id: authUser.id,
         name: authUser.user_metadata?.full_name || 
               authUser.user_metadata?.name || 
-              authUser.email?.split('@')[0] || 'Usuário OAuth',
+              authUser.email?.split('@')[0] || 'Usuário',
         email: authUser.email,
         role: determineRoleFromEmail(authUser.email),
         country: 'Angola',
@@ -344,7 +314,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // ✅ FUNÇÃO ROBUSTA: Converter perfil para User
+  // ✅ FUNÇÃO: Converter perfil para User
   const convertToUser = (profile: any): User => {
     const user: User = {
       id: profile.id,
@@ -355,7 +325,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       sector: profile.sector || 'Geral',
       organization: profile.organization || 'Africa\'s Hands',
       avatar: profile.avatar_url,
-      verified: profile.verified !== false, // Default true
+      verified: profile.verified !== false,
       preferences: profile.preferences || {
         language: 'pt',
         notifications: true,
@@ -366,7 +336,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return user;
   };
 
-  // 🚀 FUNÇÃO PÚBLICA: Verificar role atual
+  // 🚀 FUNÇÃO: Verificar role atual
   const checkUserRole = async (): Promise<'admin' | 'user' | null> => {
     if (!user) return null;
     
@@ -382,30 +352,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // 🔧 ADICIONAR: Tratamento de callback OAuth
-  useEffect(() => {
-    // Detectar se está retornando de OAuth
-    const urlParams = new URLSearchParams(window.location.search);
-    const error = urlParams.get('error');
-    const errorDescription = urlParams.get('error_description');
-    
-    if (error) {
-      console.error('❌ [OAuth Callback] Erro OAuth detectado na URL:', {
-        error,
-        errorDescription: decodeURIComponent(errorDescription || '')
-      });
-      
-      // Limpar URL de erro
-      window.history.replaceState({}, document.title, window.location.pathname);
-      
-      // Mostrar erro específico
-      if (error === 'server_error' && errorDescription?.includes('Database error saving new user')) {
-        console.log('🔧 [OAuth Callback] CORRIGINDO: Erro de banco para usuário OAuth - usando fallback');
-      }
-    }
-  }, []);
-
-  // 🚀 INICIALIZAÇÃO ROBUSTA
+  // 🚀 INICIALIZAÇÃO
   useEffect(() => {
     let isMounted = true;
     
@@ -461,7 +408,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     initAuth();
 
-    // 🔧 MELHORAR: Listener de auth state
+    // Listener de auth state
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!isMounted) return;
@@ -529,7 +476,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error;
 
       console.log('✅ [Login] Credenciais aceitas, processando login...');
-      // O onAuthStateChange vai processar o resto
     } catch (error: any) {
       console.error('❌ [Login] Falha no login:', error);
       setIsLoading(false);
@@ -579,13 +525,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.user) {
         console.log('✅ [Register] Usuário registrado, criando perfil...');
         
-        // Criar perfil com dados fornecidos
         const profileData = {
           ...userData,
           role: userData.role || determineRoleFromEmail(email)
         };
         
-        // Criar perfil em background
         createUserProfile(data.user, profileData)
           .then(() => console.log('✅ [Register] Perfil criado após registro'))
           .catch(err => console.warn('⚠️ [Register] Erro ao criar perfil após registro (não crítico):', err));
@@ -608,7 +552,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // 🚀 FUNÇÃO: Login com Google - SIMPLIFICADA
+  // Login com Google
   const loginWithGoogle = async (): Promise<void> => {
     try {
       console.log('🔐 [OAuth] Iniciando login com Google...');
@@ -617,7 +561,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          // Deixar Supabase gerenciar redirecionamento automaticamente
           scopes: 'email profile',
           queryParams: {
             access_type: 'offline',
@@ -632,7 +575,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       console.log('✅ [OAuth] Redirecionando para Google...', data);
-      // O onAuthStateChange processará o retorno
     } catch (error: any) {
       console.error('❌ [OAuth] Falha no login com Google:', error);
       setIsLoading(false);
@@ -649,7 +591,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // 🚀 FUNÇÃO: Login com Facebook - SIMPLIFICADA
+  // Login com Facebook
   const loginWithFacebook = async (): Promise<void> => {
     try {
       console.log('🔐 [OAuth] Iniciando login com Facebook...');
@@ -658,7 +600,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'facebook',
         options: {
-          // Deixar Supabase gerenciar redirecionamento automaticamente
           scopes: 'email,public_profile'
         }
       });
@@ -669,7 +610,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       console.log('✅ [OAuth] Redirecionando para Facebook...', data);
-      // O onAuthStateChange processará o retorno
     } catch (error: any) {
       console.error('❌ [OAuth] Falha no login com Facebook:', error);
       setIsLoading(false);
@@ -701,7 +641,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error: any) {
       console.error('❌ [Logout] Erro no logout:', error);
       
-      // Mesmo com erro, limpar estado local
       setUser(null);
       setUserRole(null);
       setIsLoading(false);
