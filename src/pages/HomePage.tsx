@@ -20,6 +20,45 @@ const HomePage: React.FC = () => {
     setMobileMenuOpen(false);
   };
 
+  // ✅ FUNÇÃO PARA NAVEGAR PARA LOGIN (reutilizável)
+  const handleLoginNavigation = () => {
+    if ((window as any).navigateToLogin) {
+      (window as any).navigateToLogin();
+    }
+  };
+
+  // ✅ COMPONENTE INTERNO PARA LINKS DE NAVEGAÇÃO (elimina duplicação)
+  const NavigationLinks = ({ isMobile = false, onLinkClick }: { isMobile?: boolean; onLinkClick?: () => void }) => (
+    <>
+      <a href="#sobre" onClick={onLinkClick} className={isMobile ? 'mobile-link' : 'desktop-link'}>
+        {t('header.about') || 'Sobre'}
+      </a>
+      <a href="#recursos" onClick={onLinkClick} className={isMobile ? 'mobile-link' : 'desktop-link'}>
+        {t('header.resources') || 'Recursos'}
+      </a>
+      <a href="#impacto" onClick={onLinkClick} className={isMobile ? 'mobile-link' : 'desktop-link'}>
+        {t('header.impact') || 'Impacto'}
+      </a>
+      <a href="#contato" onClick={onLinkClick} className={isMobile ? 'mobile-link' : 'desktop-link'}>
+        {t('header.contact') || 'Contato'}
+      </a>
+    </>
+  );
+
+  // ✅ COMPONENTE INTERNO PARA BOTÃO CTA (elimina duplicação)
+  const CTAButton = ({ isMobile = false, onClickAction }: { isMobile?: boolean; onClickAction?: () => void }) => (
+    <button 
+      onClick={() => {
+        if (onClickAction) onClickAction();
+        handleLoginNavigation();
+      }}
+      className={isMobile ? "mobile-cta-button" : "btn-primary"}
+    >
+      {isMobile && <i className="fas fa-rocket"></i>}
+      {t('header.accessPlatform') || 'Acessar Plataforma'}
+    </button>
+  );
+
   useEffect(() => {
     // Progress Bar
     const handleScroll = () => {
@@ -104,7 +143,7 @@ const HomePage: React.FC = () => {
           transition: all 0.3s ease;
           border-bottom: 1px solid rgba(0, 0, 0, 0.1);
           box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-          height: 70px; /* ✅ ALTURA FIXA */
+          height: 70px;
         }
 
         .nav {
@@ -143,7 +182,7 @@ const HomePage: React.FC = () => {
           gap: 0.8rem;
         }
 
-        /* Mobile Menu Button - MELHORADO */
+        /* Mobile Menu Button */
         .mobile-menu-toggle {
           display: block;
           background: rgba(231, 76, 60, 0.1);
@@ -171,24 +210,27 @@ const HomePage: React.FC = () => {
           transform: scale(0.95);
         }
 
-        /* Menu Mobile Overlay */
+        /* Menu Mobile Overlay - COMPLETAMENTE OCULTO */
         .nav-links {
           position: fixed;
           top: 70px;
-          left: 0;
+          left: -100%;
           width: 100%;
           height: calc(100vh - 70px);
           background: rgba(255, 255, 255, 0.98);
           backdrop-filter: blur(15px);
-          transform: translateX(-100%);
-          transition: transform 0.3s ease;
+          transition: left 0.3s ease;
           z-index: 999;
           padding: 0;
           overflow-y: auto;
+          visibility: hidden;
+          opacity: 0;
         }
 
         .nav-links.active {
-          transform: translateX(0);
+          left: 0;
+          visibility: visible;
+          opacity: 1;
         }
 
         .nav-menu {
@@ -228,46 +270,9 @@ const HomePage: React.FC = () => {
         .nav-menu a[href="#impacto"]::before { content: '📊'; }
         .nav-menu a[href="#contato"]::before { content: '📞'; }
 
-        /* Botão principal no menu mobile */
+        /* Buttons - Estilos unificados */
+        .btn-primary,
         .mobile-cta-button {
-          margin: 2rem;
-          background: linear-gradient(135deg, #e74c3c, #c0392b);
-          color: white;
-          padding: 1.2rem 2rem;
-          border-radius: 12px;
-          text-decoration: none;
-          font-weight: 700;
-          text-align: center;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.8rem;
-          font-size: 1.2rem;
-          box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
-          transition: all 0.3s ease;
-          border: none;
-        }
-
-        .mobile-cta-button:hover,
-        .mobile-cta-button:active {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
-        }
-
-        /* Language Toggle Mobile */
-        .language-toggle-mobile {
-          margin: 1rem 2rem;
-          display: flex;
-          justify-content: center;
-        }
-
-        /* Desktop Navigation - Escondida no mobile */
-        .desktop-nav {
-          display: none;
-        }
-
-        /* Buttons */
-        .btn-primary {
           background: linear-gradient(135deg, #e74c3c, #c0392b);
           color: white;
           padding: 0.8rem 1.5rem;
@@ -285,9 +290,23 @@ const HomePage: React.FC = () => {
           cursor: pointer;
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover,
+        .mobile-cta-button:hover,
+        .btn-primary:active,
+        .mobile-cta-button:active {
           transform: translateY(-2px);
           box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        /* Mobile CTA específico */
+        .mobile-cta-button {
+          margin: 2rem;
+          padding: 1.2rem 2rem;
+          border-radius: 12px;
+          text-align: center;
+          justify-content: center;
+          font-size: 1.2rem;
+          font-weight: 700;
         }
 
         .btn-secondary {
@@ -313,13 +332,63 @@ const HomePage: React.FC = () => {
           transform: translateY(-2px);
         }
 
-        /* Hero Section - ESPAÇAMENTO CORRIGIDO */
+        /* Language Toggle Mobile */
+        .language-toggle-mobile {
+          margin: 1rem 2rem;
+          display: flex;
+          justify-content: center;
+        }
+
+        /* Desktop Navigation - Escondida no mobile */
+        .desktop-nav {
+          display: none !important; /* ✅ OCULTO NO MOBILE */
+        }
+
+        /* Mobile (até 1023px) */
+        @media (max-width: 1023px) {
+          .desktop-nav {
+            display: none !important;
+          }
+          
+          .nav-links {
+            position: fixed;
+            top: 70px;
+            left: -100%;
+            width: 100%;
+            height: calc(100vh - 70px);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(15px);
+            transition: left 0.3s ease;
+            z-index: 999;
+            padding: 0;
+            overflow-y: auto;
+            visibility: hidden;
+            opacity: 0;
+          }
+
+          .nav-links.active {
+            left: 0;
+            visibility: visible;
+            opacity: 1;
+          }
+        }
+
+        /* Esconder nav-links por padrão no mobile */
+        .nav-links {
+          display: none;
+        }
+
+        .nav-links.active {
+          display: block;
+        }
+
+        /* Hero Section */
         .hero {
           min-height: 100vh;
           display: flex;
           align-items: center;
           background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
-          padding: 120px 0 40px 0; /* ✅ MAIS ESPAÇO NO TOPO */
+          padding: 120px 0 40px 0;
         }
 
         .hero-content {
@@ -338,7 +407,7 @@ const HomePage: React.FC = () => {
           line-height: 1.3;
           margin-bottom: 1.5rem;
           color: #2c3e50;
-          margin-top: 2rem; /* ✅ ESPAÇO EXTRA DO HEADER */
+          margin-top: 2rem;
         }
 
         .highlight {
@@ -571,10 +640,10 @@ const HomePage: React.FC = () => {
           font-size: 1rem;
         }
 
-        /* Sections - ESPAÇAMENTO MELHORADO */
+        /* Sections */
         .section {
           padding: 4rem 0;
-          scroll-margin-top: 90px; /* ✅ ESPAÇO PARA O HEADER FIXO */
+          scroll-margin-top: 90px;
         }
 
         .section-header {
@@ -816,6 +885,68 @@ const HomePage: React.FC = () => {
           visibility: visible;
         }
 
+        /* Smooth Scrolling */
+        html {
+          scroll-behavior: smooth;
+        }
+
+        /* Touch Improvements */
+        @media (hover: none) and (pointer: coarse) {
+          .service-item:hover,
+          .btn-primary:hover,
+          .btn-secondary:hover,
+          .nav-menu a:hover {
+            transform: none;
+          }
+        }
+
+        /* ===== MOBILE ESPECÍFICO (até 1023px) ===== */
+        @media (max-width: 1023px) {
+          /* OCULTAR COMPLETAMENTE DESKTOP NAV */
+          .desktop-nav,
+          .desktop-link {
+            display: none !important;
+            visibility: hidden !important;
+          }
+          
+          /* MOSTRAR ELEMENTOS MOBILE */
+          .mobile-menu-toggle {
+            display: flex !important;
+            visibility: visible !important;
+          }
+          
+          .mobile-link {
+            display: block !important;
+            visibility: visible !important;
+          }
+          
+          /* Menu mobile por padrão oculto */
+          .nav-links {
+            position: fixed !important;
+            top: 70px;
+            left: -100% !important;
+            width: 100%;
+            height: calc(100vh - 70px);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(15px);
+            transition: left 0.3s ease;
+            z-index: 999;
+            padding: 0;
+            overflow-y: auto;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            display: none !important;
+          }
+
+          /* Menu mobile quando ativo */
+          .nav-links.active {
+            left: 0 !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            display: block !important;
+          }
+        }
+
         /* Tablet (768px+) */
         @media (min-width: 768px) {
           .nav {
@@ -848,47 +979,45 @@ const HomePage: React.FC = () => {
           }
         }
 
-        /* Desktop (1024px+) */
+        /* ===== DESKTOP (1024px+) - FORÇAR DESKTOP NAV ===== */
         @media (min-width: 1024px) {
+          /* OCULTAR COMPLETAMENTE ELEMENTOS MOBILE */
           .mobile-menu-toggle {
-            display: none;
+            display: none !important;
+            visibility: hidden !important;
           }
           
-          .nav-links {
-            position: static;
-            transform: none;
-            height: auto;
-            background: transparent;
-            padding: 0;
-            width: auto;
+          .nav-links,
+          .nav-links.active {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            position: absolute !important;
+            left: -9999px !important;
+            z-index: -1 !important;
           }
           
-          .nav-menu {
-            flex-direction: row;
-            gap: 2rem;
-            padding: 0;
+          .mobile-cta-button,
+          .language-toggle-mobile,
+          .mobile-link {
+            display: none !important;
+            visibility: hidden !important;
           }
           
-          .nav-menu a {
-            padding: 0;
-            border: none;
-            font-size: 1rem;
-          }
-          
-          .nav-menu a::before {
-            display: none;
-          }
-          
-          .mobile-cta-button {
-            display: none;
-          }
-          
+          /* FORÇAR DESKTOP NAV A APARECER */
           .desktop-nav {
-            display: flex;
+            display: flex !important;
+            visibility: visible !important;
             align-items: center;
             gap: 2rem;
           }
           
+          .desktop-link {
+            display: inline-block !important;
+            visibility: visible !important;
+          }
+          
+          /* Layout adjustments */
           .hero-title {
             font-size: 3.5rem;
           }
@@ -905,27 +1034,6 @@ const HomePage: React.FC = () => {
             grid-template-columns: repeat(4, 1fr);
           }
         }
-
-        /* Smooth Scrolling */
-        html {
-          scroll-behavior: smooth;
-        }
-
-        /* Touch Improvements */
-        @media (hover: none) and (pointer: coarse) {
-          .service-item:hover {
-            transform: none;
-          }
-          
-          .btn-primary:hover,
-          .btn-secondary:hover {
-            transform: none;
-          }
-          
-          .nav-menu a:hover {
-            transform: none;
-          }
-        }
         `
       }} />
 
@@ -940,7 +1048,7 @@ const HomePage: React.FC = () => {
         onClick={closeMobileMenu}
       ></div>
       
-      {/* Header */}
+      {/* ===== HEADER - CONTROLE TOTAL DE NAVEGAÇÃO ===== */}
       <header className="header">
         <nav className="nav">
           <div className="nav-brand">
@@ -948,10 +1056,14 @@ const HomePage: React.FC = () => {
             <span className="nav-subtitle">{t('login.slogan') || 'AO • NA • ZA Regional'}</span>
           </div>
           <div className="nav-right">
-            {/* Language Toggle sempre visível */}
-            <LanguageToggle />
+            {/* ===== DESKTOP NAVIGATION - SÓ APARECE EM DESKTOP ===== */}
+            <div className="desktop-nav">
+              <LanguageToggle />
+              <NavigationLinks />
+              <CTAButton />
+            </div>
             
-            {/* Mobile Menu Toggle - CORRIGIDO */}
+            {/* ===== MOBILE BUTTON - SÓ APARECE EM MOBILE ===== */}
             <button 
               className="mobile-menu-toggle"
               onClick={toggleMobileMenu}
@@ -960,50 +1072,17 @@ const HomePage: React.FC = () => {
             >
               <i className={`fas ${mobileMenuOpen ? 'fa-times' : 'fa-bars'}`}></i>
             </button>
-            
-            {/* Desktop Navigation */}
-            <div className="desktop-nav">
-              <a href="#sobre">{t('header.about') || 'Sobre'}</a>
-              <a href="#recursos">{t('header.resources') || 'Recursos'}</a>
-              <a href="#impacto">{t('header.impact') || 'Impacto'}</a>
-              <a href="#contato">{t('header.contact') || 'Contato'}</a>
-              <button 
-                onClick={() => {
-                  if ((window as any).navigateToLogin) {
-                    (window as any).navigateToLogin();
-                  }
-                }}
-                className="btn-primary"
-              >
-                {t('header.accessPlatform') || 'Acessar Plataforma'}
-              </button>
-            </div>
           </div>
         </nav>
         
-        {/* Mobile Navigation Menu */}
+        {/* ===== MOBILE MENU - SÓ QUANDO ATIVADO EM MOBILE ===== */}
         <div className={`nav-links ${mobileMenuOpen ? 'active' : ''}`}>
           <div className="nav-menu">
-            <a href="#sobre" onClick={closeMobileMenu}>{t('header.about') || 'Sobre'}</a>
-            <a href="#recursos" onClick={closeMobileMenu}>{t('header.resources') || 'Recursos'}</a>
-            <a href="#impacto" onClick={closeMobileMenu}>{t('header.impact') || 'Impacto'}</a>
-            <a href="#contato" onClick={closeMobileMenu}>{t('header.contact') || 'Contato'}</a>
+            <NavigationLinks isMobile={true} onLinkClick={closeMobileMenu} />
           </div>
           
-          <button 
-            onClick={() => {
-              closeMobileMenu();
-              if ((window as any).navigateToLogin) {
-                (window as any).navigateToLogin();
-              }
-            }}
-            className="mobile-cta-button"
-          >
-            <i className="fas fa-rocket"></i>
-            {t('header.accessPlatform') || 'Acessar Plataforma'}
-          </button>
+          <CTAButton isMobile={true} onClickAction={closeMobileMenu} />
           
-          {/* Language Toggle no menu mobile */}
           <div className="language-toggle-mobile">
             <LanguageToggle />
           </div>
@@ -1230,11 +1309,7 @@ const HomePage: React.FC = () => {
           <p>Junte-se à plataforma que está conectando a África Austral e criando oportunidades de cooperação sem precedentes.</p>
           <div className="cta-buttons">
             <button 
-              onClick={() => {
-                if ((window as any).navigateToLogin) {
-                  (window as any).navigateToLogin();
-                }
-              }}
+              onClick={handleLoginNavigation}
               className="btn-primary"
             >
               <i className="fas fa-user-plus"></i>
