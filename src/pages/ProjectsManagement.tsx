@@ -469,583 +469,600 @@ const ProjectsManagement: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Gestão de Projetos Regionais</h1>
-          <p className="text-gray-600">Acompanhe e gerencie todos os projetos da África Austral 🇦🇴🇳🇦🇿🇦</p>
+      <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
+        <div className="text-center sm:text-left">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Gestão de Projetos Regionais</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Acompanhe e gerencie todos os projetos da África Austral 🇦🇴🇳🇦🇿🇦</p>
         </div>
         
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <button 
             onClick={() => setShowCreateModal(true)}
-            className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-700 transition-colors"
+            className="bg-red-600 text-white px-4 py-3 sm:py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-red-700 transition-colors text-sm sm:text-base font-medium"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Novo Projeto
+            <span>Novo Projeto</span>
           </button>
-          <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-200 transition-colors">
+          <button className="bg-gray-100 text-gray-700 px-4 py-3 sm:py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors text-sm sm:text-base">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            Exportar Relatório
+            <span className="hidden sm:inline">Exportar Relatório</span>
+            <span className="sm:hidden">Exportar</span>
           </button>
         </div>
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-6">
+        <div className="bg-white p-3 sm:p-6 rounded-lg shadow border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total de Projetos</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-500">Total Projetos</p>
+              <p className="text-lg sm:text-2xl font-bold text-gray-900">{stats.total}</p>
             </div>
-            <div className="p-3 bg-blue-100 rounded-full">
-              <span className="text-2xl">📊</span>
+            <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-100 rounded-full flex items-center justify-center">
+              <span className="text-lg sm:text-2xl">📊</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-white p-3 sm:p-6 rounded-lg shadow border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Em Andamento</p>
-              <p className="text-2xl font-bold text-yellow-600">{stats.active}</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-500">Ativos</p>
+              <p className="text-lg sm:text-2xl font-bold text-yellow-600">{stats.active}</p>
             </div>
-            <div className="p-3 bg-yellow-100 rounded-full">
-              <span className="text-2xl">⚡</span>
+            <div className="w-8 h-8 sm:w-12 sm:h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+              <span className="text-lg sm:text-2xl">🚀</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-white p-3 sm:p-6 rounded-lg shadow border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Concluídos</p>
-              <p className="text-2xl font-bold text-green-600">{stats.completed}</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-500">Concluídos</p>
+              <p className="text-lg sm:text-2xl font-bold text-green-600">{stats.completed}</p>
             </div>
-            <div className="p-3 bg-green-100 rounded-full">
-              <span className="text-2xl">✅</span>
+            <div className="w-8 h-8 sm:w-12 sm:h-12 bg-green-100 rounded-full flex items-center justify-center">
+              <span className="text-lg sm:text-2xl">✅</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-white p-3 sm:p-6 rounded-lg shadow border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Planejamento</p>
-              <p className="text-2xl font-bold text-blue-600">{stats.planning}</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-500">Planejamento</p>
+              <p className="text-lg sm:text-2xl font-bold text-blue-600">{stats.planning}</p>
             </div>
-            <div className="p-3 bg-blue-100 rounded-full">
-              <span className="text-2xl">📋</span>
+            <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-100 rounded-full flex items-center justify-center">
+              <span className="text-lg sm:text-2xl">📋</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-white p-3 sm:p-6 rounded-lg shadow border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Orçamento Total</p>
-              <p className="text-2xl font-bold text-purple-600">
-                ${(stats.totalBudget / 1000).toFixed(0)}K
-              </p>
+              <p className="text-xs sm:text-sm font-medium text-gray-500">Orçamento Total</p>
+              <p className="text-sm sm:text-xl font-bold text-green-600">${(stats.totalBudget / 1000).toFixed(0)}K</p>
             </div>
-            <div className="p-3 bg-purple-100 rounded-full">
-              <span className="text-2xl">💰</span>
+            <div className="w-8 h-8 sm:w-12 sm:h-12 bg-green-100 rounded-full flex items-center justify-center">
+              <span className="text-lg sm:text-2xl">💰</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-white p-3 sm:p-6 rounded-lg shadow border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Progresso Médio</p>
-              <p className="text-2xl font-bold text-indigo-600">{stats.avgProgress}%</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-500">Progresso Médio</p>
+              <p className="text-lg sm:text-2xl font-bold text-red-600">{stats.avgProgress}%</p>
             </div>
-            <div className="p-3 bg-indigo-100 rounded-full">
-              <span className="text-2xl">📈</span>
+            <div className="w-8 h-8 sm:w-12 sm:h-12 bg-red-100 rounded-full flex items-center justify-center">
+              <span className="text-lg sm:text-2xl">⚡</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
+      {/* Search and Filters */}
+      <div className="bg-white p-4 sm:p-6 rounded-lg shadow border border-gray-200">
+        <div className="space-y-4">
+          {/* Search Bar */}
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
             <input
               type="text"
-              placeholder="Nome, cliente ou descrição..."
+              placeholder="Buscar projetos por nome, cliente ou descrição..."
+              className="block w-full pl-10 pr-3 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500 text-sm sm:text-base"
               value={filters.search}
-              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
             />
           </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-            <select
-              value={filters.status}
-              onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-            >
-              <option value="all">Todos os Status</option>
-              {statuses.map(status => (
-                <option key={status} value={status}>{getStatusLabel(status)}</option>
-              ))}
-            </select>
+
+          {/* Filter Controls */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <div>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Status</label>
+              <select
+                value={filters.status}
+                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-red-500 focus:border-red-500"
+              >
+                <option value="all">Todos</option>
+                {statuses.map(status => (
+                  <option key={status} value={status}>{getStatusLabel(status)}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">País</label>
+              <select
+                value={filters.country}
+                onChange={(e) => setFilters(prev => ({ ...prev, country: e.target.value }))}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-red-500 focus:border-red-500"
+              >
+                <option value="all">Todos</option>
+                {countries.map(country => (
+                  <option key={country} value={country}>{getCountryFlag(country)} {country}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Setor</label>
+              <select
+                value={filters.sector}
+                onChange={(e) => setFilters(prev => ({ ...prev, sector: e.target.value }))}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-red-500 focus:border-red-500"
+              >
+                <option value="all">Todos</option>
+                {sectors.map(sector => (
+                  <option key={sector} value={sector}>{getSectorIcon(sector)} {sector}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Prioridade</label>
+              <select
+                value={filters.priority}
+                onChange={(e) => setFilters(prev => ({ ...prev, priority: e.target.value }))}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-red-500 focus:border-red-500"
+              >
+                <option value="all">Todas</option>
+                {priorities.map(priority => (
+                  <option key={priority} value={priority}>{getPriorityLabel(priority)}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">País</label>
-            <select
-              value={filters.country}
-              onChange={(e) => setFilters({ ...filters, country: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-            >
-              <option value="all">Todos os Países</option>
-              {countries.map(country => (
-                <option key={country} value={country}>{getCountryFlag(country)} {country}</option>
-              ))}
-            </select>
+          {/* Active Filters Display */}
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(filters).map(([key, value]) => {
+              if (value && value !== 'all' && key !== 'search') {
+                return (
+                  <span key={key} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    {key === 'status' ? getStatusLabel(value) :
+                     key === 'country' ? `${getCountryFlag(value)} ${value}` :
+                     key === 'sector' ? `${getSectorIcon(value)} ${value}` :
+                     key === 'priority' ? getPriorityLabel(value) : value}
+                    <button
+                      onClick={() => setFilters(prev => ({ ...prev, [key]: 'all' }))}
+                      className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full text-red-400 hover:bg-red-200 hover:text-red-500"
+                    >
+                      ×
+                    </button>
+                  </span>
+                );
+              }
+              return null;
+            })}
+            
+            {filters.search && (
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                "{filters.search}"
+                <button
+                  onClick={() => setFilters(prev => ({ ...prev, search: '' }))}
+                  className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full text-red-400 hover:bg-red-200 hover:text-red-500"
+                >
+                  ×
+                </button>
+              </span>
+            )}
           </div>
+        </div>
+      </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Setor</label>
-            <select
-              value={filters.sector}
-              onChange={(e) => setFilters({ ...filters, sector: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-            >
-              <option value="all">Todos os Setores</option>
-              {sectors.map(sector => (
-                <option key={sector} value={sector}>{getSectorIcon(sector)} {sector}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Prioridade</label>
-            <select
-              value={filters.priority}
-              onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-            >
-              <option value="all">Todas as Prioridades</option>
-              {priorities.map(priority => (
-                <option key={priority} value={priority}>{getPriorityLabel(priority)}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex items-end">
-            <button
-              onClick={() => setFilters({ status: 'all', country: 'all', sector: 'all', priority: 'all', search: '' })}
-              className="w-full bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Limpar Filtros
+      {/* Projects Grid - Mobile Card Layout */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
+            Projetos ({filteredProjects.length})
+          </h2>
+          <div className="flex gap-2">
+            <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+              </svg>
+            </button>
+            <button className="p-2 text-gray-600 bg-gray-100 rounded transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
             </button>
           </div>
         </div>
-      </div>
 
-      {/* Projects Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {filteredProjects.map((project) => {
-          const health = calculateProjectHealth(project);
-          const daysRemaining = Math.ceil((new Date(project.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-          
-          return (
-            <div key={project.id} className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300">
-              <div className="p-6">
-                {/* Project Header */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="text-2xl">{getSectorIcon(project.sector)}</div>
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-1">{project.name}</h3>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-600">{getCountryFlag(project.country)} {project.country}</span>
-                        <span className="text-gray-400">•</span>
-                        <span className="text-sm text-gray-600">{project.client}</span>
-                      </div>
-                    </div>
+        {/* Mobile-first Project Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+          {filteredProjects.map((project) => (
+            <div
+              key={project.id}
+              onClick={() => {
+                setSelectedProject(project);
+                setShowProjectModal(true);
+              }}
+              className="bg-white rounded-lg shadow border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+            >
+              {/* Card Header */}
+              <div className="p-4 sm:p-6">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{getSectorIcon(project.sector)}</span>
+                    <span className="text-lg">{getCountryFlag(project.country)}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(project.status)}`}>
+                      {getStatusLabel(project.status)}
+                    </span>
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(project.priority)}`}>
+                      {getPriorityLabel(project.priority)}
+                    </span>
+                  </div>
+                </div>
+
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+                  {project.name}
+                </h3>
+                
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-2m-2 0H7m5 0v-9a1 1 0 00-1-1h-1a1 1 0 00-1 1v9m4 0V8a1 1 0 00-1-1h-1a1 1 0 00-1 1v13m-4 0h2m-2 0h-2" />
+                    </svg>
+                    <span className="font-medium">{project.client}</span>
                   </div>
                   
-                  <div className="flex items-center gap-2">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getHealthColor(health)}`}>
-                      {getHealthIcon(health)}
-                    </span>
-                    <button
-                      onClick={() => {
-                        setSelectedProject(project);
-                        setShowProjectModal(true);
-                        setActiveTab('overview');
-                      }}
-                      className="text-gray-400 hover:text-gray-600 p-1"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                      </svg>
-                    </button>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span>{project.country}</span>
+                    <span>•</span>
+                    <span>{project.sector}</span>
                   </div>
                 </div>
 
-                {/* Status and Priority */}
-                <div className="flex items-center gap-2 mb-4">
-                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(project.status)}`}>
-                    {getStatusLabel(project.status)}
-                  </span>
-                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${getPriorityColor(project.priority)}`}>
-                    {getPriorityLabel(project.priority)}
-                  </span>
-                </div>
-
-                {/* Description */}
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">{project.description}</p>
+                <p className="text-sm text-gray-600 mb-4 line-clamp-3">
+                  {project.description}
+                </p>
 
                 {/* Progress Bar */}
                 <div className="mb-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium text-gray-700">Progresso</span>
-                    <span className="text-sm font-bold text-gray-900">{project.progress}%</span>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="text-gray-600">Progresso</span>
+                    <span className="font-medium">{project.progress}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-red-600 h-2 rounded-full transition-all duration-300"
+                      className="bg-gradient-to-r from-red-500 to-red-600 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${project.progress}%` }}
                     ></div>
                   </div>
                 </div>
 
-                {/* Budget and Timeline */}
+                {/* Budget Info */}
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Orçamento</p>
-                    <p className="text-sm font-bold text-green-600">
-                      ${project.budget.toLocaleString()}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      Gasto: ${project.spent.toLocaleString()} ({((project.spent / project.budget) * 100).toFixed(1)}%)
-                    </p>
+                    <p className="text-xs text-gray-500">Orçamento</p>
+                    <p className="text-sm font-bold text-green-600">${project.budget.toLocaleString()}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Prazo</p>
-                    <p className="text-sm font-bold text-gray-900">
-                      {new Date(project.endDate).toLocaleDateString('pt-BR')}
-                    </p>
-                    <p className={`text-xs ${daysRemaining < 0 ? 'text-red-600' : daysRemaining < 30 ? 'text-yellow-600' : 'text-gray-500'}`}>
-                      {daysRemaining < 0 ? `${Math.abs(daysRemaining)} dias atrasado` : `${daysRemaining} dias restantes`}
-                    </p>
+                    <p className="text-xs text-gray-500">Gasto</p>
+                    <p className="text-sm font-bold text-red-600">${project.spent.toLocaleString()}</p>
                   </div>
                 </div>
 
-                {/* Team */}
-                <div className="mb-4">
-                  <p className="text-xs text-gray-500 mb-2">Equipe ({project.team.length})</p>
-                  <div className="flex -space-x-2">
-                    {project.team.slice(0, 3).map((member) => (
-                      <img
-                        key={member.id}
-                        src={member.avatar}
-                        alt={member.name}
-                        className="w-8 h-8 rounded-full border-2 border-white object-cover"
-                        title={`${member.name} - ${member.role}`}
-                      />
-                    ))}
-                    {project.team.length > 3 && (
-                      <div className="w-8 h-8 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center">
-                        <span className="text-xs text-gray-600">+{project.team.length - 3}</span>
-                      </div>
-                    )}
+                {/* Team Avatars */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-500">Equipe:</span>
+                    <div className="flex -space-x-1">
+                      {project.team.slice(0, 3).map((member) => (
+                        <img
+                          key={member.id}
+                          src={member.avatar}
+                          alt={member.name}
+                          className="w-6 h-6 rounded-full border-2 border-white object-cover"
+                          title={member.name}
+                        />
+                      ))}
+                      {project.team.length > 3 && (
+                        <div className="w-6 h-6 rounded-full bg-gray-300 border-2 border-white flex items-center justify-center">
+                          <span className="text-xs text-gray-600">+{project.team.length - 3}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-1">
+                    <span className={`${getHealthColor(calculateProjectHealth(project))}`}>
+                      {getHealthIcon(calculateProjectHealth(project))}
+                    </span>
                   </div>
                 </div>
 
-                {/* Actions */}
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      setSelectedProject(project);
-                      setShowProjectModal(true);
-                      setActiveTab('overview');
-                    }}
-                    className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
-                  >
-                    Ver Detalhes
-                  </button>
-                  <button className="px-3 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                    </svg>
-                  </button>
+                {/* Timeline */}
+                <div className="mt-3 pt-3 border-t border-gray-100">
+                  <div className="flex justify-between text-xs text-gray-500">
+                    <span>Início: {new Date(project.startDate).toLocaleDateString('pt-BR')}</span>
+                    <span>Fim: {new Date(project.endDate).toLocaleDateString('pt-BR')}</span>
+                  </div>
                 </div>
               </div>
             </div>
-          );
-        })}
-      </div>
-
-      {/* Empty State */}
-      {filteredProjects.length === 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-          <div className="text-6xl mb-4">📋</div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Nenhum projeto encontrado</h3>
-          <p className="text-gray-500 mb-6">Não foram encontrados projetos com os filtros aplicados.</p>
-          <button
-            onClick={() => setFilters({ status: 'all', country: 'all', sector: 'all', priority: 'all', search: '' })}
-            className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors"
-          >
-            Limpar Filtros
-          </button>
+          ))}
         </div>
-      )}
+
+        {filteredProjects.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">🔍</div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum projeto encontrado</h3>
+            <p className="text-gray-500">Tente ajustar os filtros ou criar um novo projeto.</p>
+          </div>
+        )}
+      </div>
 
       {/* Create Project Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Criar Novo Projeto</h2>
-                <button
-                  onClick={() => setShowCreateModal(false)}
-                  className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Criar Novo Projeto</h2>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Nome do Projeto</label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-red-500 focus:border-red-500"
+                    placeholder="Digite o nome do projeto"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Cliente</label>
+                  <input
+                    type="text"
+                    value={formData.client}
+                    onChange={(e) => setFormData(prev => ({ ...prev, client: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-red-500 focus:border-red-500"
+                    placeholder="Nome do cliente"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">País</label>
+                  <select
+                    value={formData.country}
+                    onChange={(e) => setFormData(prev => ({ ...prev, country: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-red-500 focus:border-red-500"
+                  >
+                    <option value="">Selecione o país</option>
+                    {countries.map(country => (
+                      <option key={country} value={country}>{getCountryFlag(country)} {country}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Setor</label>
+                  <select
+                    value={formData.sector}
+                    onChange={(e) => setFormData(prev => ({ ...prev, sector: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-red-500 focus:border-red-500"
+                  >
+                    <option value="">Selecione o setor</option>
+                    {sectors.map(sector => (
+                      <option key={sector} value={sector}>{getSectorIcon(sector)} {sector}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Data de Início</label>
+                  <input
+                    type="date"
+                    value={formData.startDate}
+                    onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-red-500 focus:border-red-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Data de Término</label>
+                  <input
+                    type="date"
+                    value={formData.endDate}
+                    onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-red-500 focus:border-red-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Orçamento ($)</label>
+                  <input
+                    type="number"
+                    value={formData.budget}
+                    onChange={(e) => setFormData(prev => ({ ...prev, budget: Number(e.target.value) }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-red-500 focus:border-red-500"
+                    placeholder="0"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Prioridade</label>
+                  <select
+                    value={formData.priority}
+                    onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value as 'low' | 'medium' | 'high' | 'critical' }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-red-500 focus:border-red-500"
+                  >
+                    {priorities.map(priority => (
+                      <option key={priority} value={priority}>{getPriorityLabel(priority)}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Descrição</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  rows={4}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-red-500 focus:border-red-500"
+                  placeholder="Descreva o projeto..."
+                />
               </div>
             </div>
 
-            <div className="p-6">
-              <form onSubmit={(e) => { e.preventDefault(); handleCreateProject(); }} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Nome do Projeto *</label>
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                      placeholder="Ex: Sistema de Telemedicina Regional"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Cliente *</label>
-                    <input
-                      type="text"
-                      value={formData.client}
-                      onChange={(e) => setFormData({ ...formData, client: e.target.value })}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                      placeholder="Ex: Hospital Central"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">País *</label>
-                    <select
-                      value={formData.country}
-                      onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    >
-                      <option value="">Selecione o país</option>
-                      {countries.map(country => (
-                        <option key={country} value={country}>{getCountryFlag(country)} {country}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Setor *</label>
-                    <select
-                      value={formData.sector}
-                      onChange={(e) => setFormData({ ...formData, sector: e.target.value })}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    >
-                      <option value="">Selecione o setor</option>
-                      {sectors.map(sector => (
-                        <option key={sector} value={sector}>{getSectorIcon(sector)} {sector}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Prioridade *</label>
-                    <select
-                      value={formData.priority}
-                      onChange={(e) => setFormData({ ...formData, priority: e.target.value as 'low' | 'medium' | 'high' | 'critical' })}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    >
-                      {priorities.map(priority => (
-                        <option key={priority} value={priority}>{getPriorityLabel(priority)}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Orçamento (USD) *</label>
-                    <input
-                      type="number"
-                      value={formData.budget}
-                      onChange={(e) => setFormData({ ...formData, budget: Number(e.target.value) })}
-                      required
-                      min="0"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                      placeholder="50000"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Data de Início *</label>
-                    <input
-                      type="date"
-                      value={formData.startDate}
-                      onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Data de Término *</label>
-                    <input
-                      type="date"
-                      value={formData.endDate}
-                      onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Descrição *</label>
-                    <textarea
-                      value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      required
-                      rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                      placeholder="Descreva os objetivos e escopo do projeto..."
-                    />
-                  </div>
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowCreateModal(false)}
-                    className="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-medium"
-                  >
-                    Criar Projeto
-                  </button>
-                </div>
-              </form>
+            <div className="p-4 sm:p-6 border-t border-gray-200 bg-gray-50">
+              <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+                <button
+                  onClick={() => setShowCreateModal(false)}
+                  className="w-full sm:w-auto bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleCreateProject}
+                  disabled={!formData.name || !formData.client || !formData.country || !formData.sector}
+                  className="w-full sm:w-auto bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Criar Projeto
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Project Details Modal */}
+      {/* Project Detail Modal */}
       {showProjectModal && selectedProject && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
             {/* Modal Header */}
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="text-2xl">{getSectorIcon(selectedProject.sector)}</div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900">{selectedProject.name}</h2>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-gray-600">{getCountryFlag(selectedProject.country)} {selectedProject.country}</span>
-                      <span className="text-gray-400">•</span>
-                      <span className="text-gray-600">{selectedProject.client}</span>
-                    </div>
-                  </div>
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 bg-white">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-2xl">{getSectorIcon(selectedProject.sector)}</span>
+                  <span className="text-2xl">{getCountryFlag(selectedProject.country)}</span>
+                  <h2 className="text-lg sm:text-2xl font-bold text-gray-900 truncate">{selectedProject.name}</h2>
                 </div>
-                <button
-                  onClick={() => setShowProjectModal(false)}
-                  className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+                <p className="text-sm text-gray-600">{selectedProject.client}</p>
               </div>
+              
+              <button
+                onClick={() => setShowProjectModal(false)}
+                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-colors ml-4"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
-              {/* Tab Navigation */}
-              <div className="mt-6">
-                <nav className="flex space-x-8 overflow-x-auto">
-                  {[
-                    { id: 'overview', name: 'Visão Geral', icon: '📊' },
-                    { id: 'team', name: 'Equipe', icon: '👥' },
-                    { id: 'milestones', name: 'Marcos', icon: '🎯' },
-                    { id: 'risks', name: 'Riscos', icon: '⚠️' },
-                    { id: 'documents', name: 'Documentos', icon: '📁' },
-                    { id: 'timeline', name: 'Timeline', icon: '📅' }
-                  ].map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
-                        activeTab === tab.id
-                          ? 'border-red-500 text-red-600'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                      }`}
-                    >
-                      <span className="mr-1">{tab.icon}</span>
-                      {tab.name}
-                    </button>
-                  ))}
-                </nav>
-              </div>
+            {/* Tab Navigation */}
+            <div className="px-4 sm:px-6 bg-white border-b border-gray-200">
+              <nav className="flex space-x-4 sm:space-x-8 overflow-x-auto">
+                {[
+                  { id: 'overview', name: 'Visão Geral', icon: '📊' },
+                  { id: 'team', name: 'Equipe', icon: '👥' },
+                  { id: 'milestones', name: 'Marcos', icon: '🎯' },
+                  { id: 'risks', name: 'Riscos', icon: '⚠️' },
+                  { id: 'documents', name: 'Docs', icon: '📁' },
+                  { id: 'timeline', name: 'Timeline', icon: '📅' }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`py-3 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+                      activeTab === tab.id
+                        ? 'border-red-500 text-red-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <span className="mr-1 text-base">{tab.icon}</span>
+                    <span className="hidden sm:inline">{tab.name}</span>
+                  </button>
+                ))}
+              </nav>
             </div>
 
             {/* Modal Content */}
-            <div className="p-6">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
               {/* Overview Tab */}
               {activeTab === 'overview' && (
                 <div className="space-y-6">
                   {/* Status Cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-500 mb-1">Status</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
+                      <p className="text-xs sm:text-sm text-gray-500 mb-1">Status</p>
                       <div className="flex items-center gap-2">
                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(selectedProject.status)}`}>
                           {getStatusLabel(selectedProject.status)}
                         </span>
                       </div>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-500 mb-1">Prioridade</p>
+                    <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
+                      <p className="text-xs sm:text-sm text-gray-500 mb-1">Prioridade</p>
                       <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(selectedProject.priority)}`}>
                         {getPriorityLabel(selectedProject.priority)}
                       </span>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-500 mb-1">Progresso</p>
+                    <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
+                      <p className="text-xs sm:text-sm text-gray-500 mb-1">Progresso</p>
                       <p className="text-lg font-bold text-gray-900">{selectedProject.progress}%</p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-500 mb-1">Saúde</p>
+                    <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
+                      <p className="text-xs sm:text-sm text-gray-500 mb-1">Saúde</p>
                       <span className={`${getHealthColor(calculateProjectHealth(selectedProject))}`}>
                         {getHealthIcon(calculateProjectHealth(selectedProject))} {calculateProjectHealth(selectedProject)}
                       </span>
@@ -1055,28 +1072,28 @@ const ProjectsManagement: React.FC = () => {
                   {/* Description */}
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Descrição</h3>
-                    <p className="text-gray-600 leading-relaxed">{selectedProject.description}</p>
+                    <p className="text-gray-600 leading-relaxed text-sm sm:text-base">{selectedProject.description}</p>
                   </div>
 
                   {/* Financial Overview */}
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Resumo Financeiro</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="bg-green-50 p-4 rounded-lg border border-green-200">
                         <p className="text-sm text-green-600 mb-1">Orçamento Total</p>
-                        <p className="text-2xl font-bold text-green-700">
+                        <p className="text-xl sm:text-2xl font-bold text-green-700">
                           ${selectedProject.budget.toLocaleString()}
                         </p>
                       </div>
                       <div className="bg-red-50 p-4 rounded-lg border border-red-200">
                         <p className="text-sm text-red-600 mb-1">Valor Gasto</p>
-                        <p className="text-2xl font-bold text-red-700">
+                        <p className="text-xl sm:text-2xl font-bold text-red-700">
                           ${selectedProject.spent.toLocaleString()}
                         </p>
                       </div>
                       <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                         <p className="text-sm text-blue-600 mb-1">Saldo Restante</p>
-                        <p className="text-2xl font-bold text-blue-700">
+                        <p className="text-xl sm:text-2xl font-bold text-blue-700">
                           ${(selectedProject.budget - selectedProject.spent).toLocaleString()}
                         </p>
                       </div>
@@ -1102,13 +1119,13 @@ const ProjectsManagement: React.FC = () => {
                   {/* Deliverables */}
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Entregas Principais</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {selectedProject.deliverables.map((deliverable, index) => (
                         <div key={index} className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          <span className="text-gray-700">{deliverable}</span>
+                          <span className="text-gray-700 text-sm sm:text-base">{deliverable}</span>
                         </div>
                       ))}
                     </div>
@@ -1118,13 +1135,14 @@ const ProjectsManagement: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Cronograma</h3>
                     <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="flex items-center justify-between text-sm">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm gap-4">
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                           <span className="text-gray-600">Início</span>
                           <span className="font-medium">{new Date(selectedProject.startDate).toLocaleDateString('pt-BR')}</span>
                         </div>
-                        <div className="flex-1 mx-4">
+                        
+                        <div className="flex-1 mx-0 sm:mx-4">
                           <div className="h-1 bg-gray-200 rounded-full">
                             <div 
                               className="h-1 bg-red-500 rounded-full" 
@@ -1132,6 +1150,7 @@ const ProjectsManagement: React.FC = () => {
                             ></div>
                           </div>
                         </div>
+                        
                         <div className="flex items-center gap-2">
                           <span className="text-gray-600">Término</span>
                           <span className="font-medium">{new Date(selectedProject.endDate).toLocaleDateString('pt-BR')}</span>
@@ -1148,31 +1167,31 @@ const ProjectsManagement: React.FC = () => {
               {/* Team Tab */}
               {activeTab === 'team' && (
                 <div className="space-y-6">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <h3 className="text-lg font-semibold text-gray-900">Equipe do Projeto</h3>
                     <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm">
                       Adicionar Membro
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {selectedProject.team.map((member) => (
                       <div key={member.id} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                         <div className="flex items-center gap-3">
                           <img
                             src={member.avatar}
                             alt={member.name}
-                            className="w-12 h-12 rounded-full object-cover"
+                            className="w-12 h-12 rounded-full object-cover flex-shrink-0"
                           />
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-gray-900">{member.name}</h4>
-                            <p className="text-sm text-gray-600">{member.role}</p>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-gray-900 truncate">{member.name}</h4>
+                            <p className="text-sm text-gray-600 truncate">{member.role}</p>
                             <div className="flex items-center gap-2 mt-1">
                               <span className="text-xs">{getCountryFlag(member.country)}</span>
                               <span className="text-xs text-gray-500">{member.country}</span>
                             </div>
                           </div>
-                          <div className="flex gap-1">
+                          <div className="flex gap-1 flex-shrink-0">
                             <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -1201,7 +1220,7 @@ const ProjectsManagement: React.FC = () => {
               {/* Milestones Tab */}
               {activeTab === 'milestones' && (
                 <div className="space-y-6">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <h3 className="text-lg font-semibold text-gray-900">Marcos do Projeto</h3>
                     <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm">
                       Adicionar Marco
@@ -1219,22 +1238,24 @@ const ProjectsManagement: React.FC = () => {
                       }`}>
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                                milestone.completed 
-                                  ? 'bg-green-500 text-white' 
-                                  : 'bg-gray-200 text-gray-600'
-                              }`}>
-                                {milestone.completed ? (
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                  </svg>
-                                ) : (
-                                  <span className="text-xs font-bold">{milestone.id}</span>
-                                )}
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
+                              <div className="flex items-center gap-3">
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
+                                  milestone.completed 
+                                    ? 'bg-green-500 text-white' 
+                                    : 'bg-gray-200 text-gray-600'
+                                }`}>
+                                  {milestone.completed ? (
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  ) : (
+                                    <span className="text-xs font-bold">{milestone.id}</span>
+                                  )}
+                                </div>
+                                <h4 className="font-semibold text-gray-900">{milestone.title}</h4>
                               </div>
-                              <h4 className="font-semibold text-gray-900">{milestone.title}</h4>
-                              <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                              <span className={`px-2 py-1 text-xs font-medium rounded-full self-start ${
                                 milestone.completed 
                                   ? 'bg-green-100 text-green-800'
                                   : new Date(milestone.dueDate) < new Date()
@@ -1254,7 +1275,7 @@ const ProjectsManagement: React.FC = () => {
                               Prazo: {new Date(milestone.dueDate).toLocaleDateString('pt-BR')}
                             </p>
                           </div>
-                          <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+                          <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors ml-4 flex-shrink-0">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                             </svg>
@@ -1276,7 +1297,7 @@ const ProjectsManagement: React.FC = () => {
               {/* Risks Tab */}
               {activeTab === 'risks' && (
                 <div className="space-y-6">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <h3 className="text-lg font-semibold text-gray-900">Riscos do Projeto</h3>
                     <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm">
                       Adicionar Risco
@@ -1286,8 +1307,8 @@ const ProjectsManagement: React.FC = () => {
                   <div className="space-y-4">
                     {selectedProject.risks.map((risk) => (
                       <div key={risk.id} className="bg-white p-4 rounded-lg border border-gray-200">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center gap-3">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 gap-3">
+                          <div className="flex flex-wrap items-center gap-3">
                             <span className={`px-2 py-1 text-xs font-medium rounded-full ${getRiskColor(risk.level)}`}>
                               {risk.level === 'low' ? 'Baixo' : 
                                risk.level === 'medium' ? 'Médio' : 
@@ -1302,7 +1323,7 @@ const ProjectsManagement: React.FC = () => {
                                risk.status === 'mitigated' ? 'Mitigado' : 'Fechado'}
                             </span>
                           </div>
-                          <button className="p-1 text-gray-400 hover:text-gray-600 transition-colors">
+                          <button className="p-1 text-gray-400 hover:text-gray-600 transition-colors self-start">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                             </svg>
@@ -1329,7 +1350,7 @@ const ProjectsManagement: React.FC = () => {
               {/* Documents Tab */}
               {activeTab === 'documents' && (
                 <div className="space-y-6">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <h3 className="text-lg font-semibold text-gray-900">Documentos do Projeto</h3>
                     <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm">
                       Fazer Upload
@@ -1340,26 +1361,26 @@ const ProjectsManagement: React.FC = () => {
                     {selectedProject.documents.map((doc) => (
                       <div key={doc.id} className="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
                               <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                               </svg>
                             </div>
-                            <div>
-                              <h4 className="font-medium text-gray-900">{doc.name}</h4>
-                              <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <div className="min-w-0 flex-1">
+                              <h4 className="font-medium text-gray-900 truncate">{doc.name}</h4>
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-sm text-gray-500">
                                 <span>{doc.type}</span>
-                                <span>•</span>
+                                <span className="hidden sm:inline">•</span>
                                 <span>{doc.size}</span>
-                                <span>•</span>
-                                <span>Por {doc.uploadedBy}</span>
-                                <span>•</span>
+                                <span className="hidden sm:inline">•</span>
+                                <span className="truncate">Por {doc.uploadedBy}</span>
+                                <span className="hidden sm:inline">•</span>
                                 <span>{new Date(doc.uploadedAt).toLocaleDateString('pt-BR')}</span>
                               </div>
                             </div>
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 flex-shrink-0">
                             <button className="p-2 text-gray-400 hover:text-blue-600 transition-colors">
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -1385,15 +1406,72 @@ const ProjectsManagement: React.FC = () => {
                 </div>
               )}
 
-              {/* Timeline Tab */}
+              {/* Timeline Tab - Horizontal scrolling for mobile */}
               {activeTab === 'timeline' && (
                 <div className="space-y-6">
                   <h3 className="text-lg font-semibold text-gray-900">Timeline do Projeto</h3>
                   
                   <div className="relative">
-                    <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+                    <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200 hidden sm:block"></div>
                     
-                    <div className="space-y-6">
+                    {/* Mobile horizontal scroll timeline */}
+                    <div className="sm:hidden">
+                      <div className="flex gap-4 overflow-x-auto pb-4">
+                        {/* Project Created */}
+                        <div className="flex-shrink-0 w-64 bg-white p-4 rounded-lg border border-gray-200">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm">
+                              📋
+                            </div>
+                            <h4 className="font-semibold text-gray-900 text-sm">Projeto Criado</h4>
+                          </div>
+                          <p className="text-gray-600 text-sm mb-1">Projeto iniciado no sistema</p>
+                          <p className="text-xs text-gray-500">
+                            {new Date(selectedProject.createdAt).toLocaleDateString('pt-BR')}
+                          </p>
+                        </div>
+
+                        {/* Milestones */}
+                        {selectedProject.milestones.map((milestone) => (
+                          <div key={milestone.id} className="flex-shrink-0 w-64 bg-white p-4 rounded-lg border border-gray-200">
+                            <div className="flex items-center gap-3 mb-2">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm ${
+                                milestone.completed ? 'bg-green-500' : 'bg-gray-400'
+                              }`}>
+                                {milestone.completed ? '✅' : '⏳'}
+                              </div>
+                              <h4 className="font-semibold text-gray-900 text-sm">{milestone.title}</h4>
+                            </div>
+                            <p className="text-gray-600 text-sm mb-1">{milestone.description}</p>
+                            <p className="text-xs text-gray-500">
+                              Prazo: {new Date(milestone.dueDate).toLocaleDateString('pt-BR')}
+                              {milestone.completed && ' (Concluído)'}
+                            </p>
+                          </div>
+                        ))}
+
+                        {/* Project End */}
+                        <div className="flex-shrink-0 w-64 bg-white p-4 rounded-lg border border-gray-200">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm ${
+                              selectedProject.status === 'completed' ? 'bg-green-500' : 'bg-gray-400'
+                            }`}>
+                              🏁
+                            </div>
+                            <h4 className="font-semibold text-gray-900 text-sm">Fim do Projeto</h4>
+                          </div>
+                          <p className="text-gray-600 text-sm mb-1">
+                            {selectedProject.status === 'completed' ? 'Projeto concluído' : 'Data prevista para conclusão'}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {new Date(selectedProject.endDate).toLocaleDateString('pt-BR')}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Desktop vertical timeline */}
+                    <div className="hidden sm:block space-y-6">
                       {/* Project Created */}
                       <div className="flex items-start gap-4">
                         <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
@@ -1451,24 +1529,24 @@ const ProjectsManagement: React.FC = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-6 border-t border-gray-200 bg-gray-50">
-              <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-500">
+            <div className="p-4 sm:p-6 border-t border-gray-200 bg-gray-50">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                <div className="text-sm text-gray-500 text-center sm:text-left">
                   Última atualização: {new Date(selectedProject.updatedAt).toLocaleDateString('pt-BR')}
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <button
                     onClick={() => setShowProjectModal(false)}
-                    className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                    className="w-full sm:w-auto bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
                   >
                     Fechar
                   </button>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                  <button className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                     Editar Projeto
                   </button>
                   <button
                     onClick={() => handleDeleteProject(selectedProject.id)}
-                    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                    className="w-full sm:w-auto bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
                   >
                     Excluir Projeto
                   </button>
