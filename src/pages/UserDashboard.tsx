@@ -23,15 +23,7 @@ interface Opportunity {
   user_id?: string;
 }
 
-interface Application {
-  id: string;
-  opportunity_id: string;
-  user_id: string;
-  status: 'pending' | 'approved' | 'rejected';
-  application_date: string;
-  message?: string;
-  opportunity?: Opportunity;
-}
+// Removida interface Application não usada
 
 interface ServiceRequest {
   id?: string;
@@ -65,7 +57,7 @@ const UserDashboard: React.FC = () => {
   const [selectedCountry, setSelectedCountry] = useState('all');
   const [selectedSector, setSelectedSector] = useState('all');
   const [showServicesModal, setShowServicesModal] = useState(false);
-  const [selectedService, setSelectedService] = useState('');
+  // const [selectedService, setSelectedService] = useState(''); // Removido - não usado
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [selectedServiceForRequest, setSelectedServiceForRequest] = useState('');
   const [showConnectionsModal, setShowConnectionsModal] = useState(false);
@@ -89,11 +81,11 @@ const UserDashboard: React.FC = () => {
     opportunities,
     userApplications: applications,
     loading: opportunitiesLoading,
-    stats,
+    // stats, // Removido - não usado
     applyToOpportunity,
     filterOpportunities,
-    checkUserApplication,
-    refreshOpportunities
+    checkUserApplication
+    // refreshOpportunities // Removido - não usado
   } = useOpportunities();
 
   // Carregar dados iniciais
@@ -101,7 +93,7 @@ const UserDashboard: React.FC = () => {
     if (user) {
       loadInitialData();
     }
-  }, [user]);
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadInitialData = async () => {
     try {
@@ -222,7 +214,7 @@ const UserDashboard: React.FC = () => {
         status: 'pending'
       };
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('service_requests')
         .insert([serviceRequest])
         .select()
@@ -245,7 +237,7 @@ const UserDashboard: React.FC = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('saved_opportunities')
         .insert([
           {
@@ -350,8 +342,7 @@ const UserDashboard: React.FC = () => {
   };
 
   // Funções auxiliares
-  const openServicesModal = (service: string) => {
-    setSelectedService(service);
+  const openServicesModal = () => {
     setShowServicesModal(true);
   };
 
@@ -390,42 +381,42 @@ const UserDashboard: React.FC = () => {
       count: applications.filter(app => app.opportunity?.sector === t('sector.education')).length, 
       label: t('sector.education'), 
       color: 'text-blue-600',
-      onClick: () => openServicesModal('education')
+      onClick: () => openServicesModal()
     },
     { 
       icon: '🏥', 
       count: applications.filter(app => app.opportunity?.sector === t('sector.health')).length, 
       label: t('sector.health'), 
       color: 'text-green-600',
-      onClick: () => openServicesModal('health')
+      onClick: () => openServicesModal()
     },
     { 
       icon: '🛒', 
       count: applications.filter(app => app.opportunity?.sector === t('sector.commerce')).length, 
       label: t('sector.commerce'), 
       color: 'text-purple-600',
-      onClick: () => openServicesModal('commerce')
+      onClick: () => openServicesModal()
     },
     { 
       icon: '🏨', 
       count: applications.filter(app => app.opportunity?.sector === t('sector.tourism')).length, 
       label: t('sector.tourism'), 
       color: 'text-orange-600',
-      onClick: () => openServicesModal('tourism')
+      onClick: () => openServicesModal()
     },
     { 
       icon: '📍', 
       count: 8, 
       label: t('services.guides'), 
       color: 'text-teal-600',
-      onClick: () => openServicesModal('guides')
+      onClick: () => openServicesModal()
     },
     { 
       icon: '✈️', 
       count: applications.filter(app => app.opportunity?.sector === t('sector.transport')).length, 
       label: t('sector.transport'), 
       color: 'text-indigo-600',
-      onClick: () => openServicesModal('transport')
+      onClick: () => openServicesModal()
     },
     { 
       icon: '🤝', 

@@ -193,17 +193,6 @@ const MainLayout: React.FC<{
   onPageChange: (page: string) => void;
 }> = ({ children, userRole, currentPage, onPageChange }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 flex">

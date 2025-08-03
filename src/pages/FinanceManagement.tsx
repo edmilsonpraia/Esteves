@@ -375,20 +375,7 @@ const FinanceManagement: React.FC = () => {
     return `${getCurrencySymbol(currency)} ${amount.toLocaleString()}`;
   };
 
-  const convertCurrency = (amount: number, fromCurrency: string, toCurrency: string) => {
-    if (fromCurrency === toCurrency) return amount;
-    
-    const rate = exchangeRates.find(r => r.from === fromCurrency && r.to === toCurrency)?.rate;
-    if (rate) return amount * rate;
-    
-    // Convert through USD if direct rate not available
-    const toUSD = exchangeRates.find(r => r.from === fromCurrency && r.to === 'USD')?.rate;
-    const fromUSD = exchangeRates.find(r => r.from === 'USD' && r.to === toCurrency)?.rate;
-    
-    if (toUSD && fromUSD) return amount * toUSD * fromUSD;
-    
-    return amount; // Fallback
-  };
+  // Função de conversão de moeda removida por não estar sendo usada
 
   return (
     <div className="space-y-6">

@@ -66,7 +66,6 @@ const ClientsManagement: React.FC = () => {
   const [selectedCountry, setSelectedCountry] = useState('all');
 
   const countries = ['Angola', 'Namíbia', 'África do Sul'];
-  const sectors = ['Saúde', 'Educação', 'Turismo', 'Comércio', 'Transporte', 'Tecnologia'];
 
   const getCountryFlag = (country: string) => {
     const flags = {

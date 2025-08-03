@@ -43,7 +43,6 @@ interface ProjectHealth {
 const Analytics: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('6months');
   const [selectedMetric, setSelectedMetric] = useState('revenue');
-  const [selectedCountry, setSelectedCountry] = useState('all');
 
   // Dados de analytics por período
   const analyticsData: AnalyticsData[] = [

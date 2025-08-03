@@ -60,7 +60,7 @@ const AuthCallback: React.FC = () => {
     };
 
     processOAuthCallback();
-  }, [hasProcessed]);
+  }, [hasProcessed]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 🔧 FUNÇÃO: Tentar recuperar sessão após erro de banco - COM RETRY
   const attemptSessionRecovery = async (retryCount = 0) => {

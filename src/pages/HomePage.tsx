@@ -6,7 +6,7 @@ const HomePage: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   // ✅ SEMPRE chamar o hook - sem condições
-  const { t, language } = useTranslation();
+  const { t } = useTranslation();
 
   // ✅ FUNÇÃO PARA TOGGLE DO MENU MOBILE
   const toggleMobileMenu = () => {
@@ -1333,27 +1333,27 @@ const HomePage: React.FC = () => {
             <h3>{t('company.name') || 'Africa\'s Hands'}</h3>
             <p>Conectando Angola, Namíbia e África do Sul através da cooperação regional e inovação tecnológica.</p>
             <div className="social-links">
-              <a href="#" aria-label="Facebook"><i className="fab fa-facebook"></i></a>
-              <a href="#" aria-label="Twitter"><i className="fab fa-twitter"></i></a>
-              <a href="#" aria-label="LinkedIn"><i className="fab fa-linkedin"></i></a>
-              <a href="#" aria-label="Instagram"><i className="fab fa-instagram"></i></a>
+              <a href="javascript:void(0)" aria-label="Facebook"><i className="fab fa-facebook"></i></a>
+              <a href="javascript:void(0)" aria-label="Twitter"><i className="fab fa-twitter"></i></a>
+              <a href="javascript:void(0)" aria-label="LinkedIn"><i className="fab fa-linkedin"></i></a>
+              <a href="javascript:void(0)" aria-label="Instagram"><i className="fab fa-instagram"></i></a>
             </div>
           </div>
           <div className="footer-section">
             <h4>Recursos</h4>
             <ul>
-              <li><a href="#">Rede de Saúde</a></li>
-              <li><a href="#">Intercâmbio Universitário</a></li>
-              <li><a href="#">Marketplace</a></li>
-              <li><a href="#">Hub de Inovação</a></li>
+              <li><a href="javascript:void(0)">Rede de Saúde</a></li>
+              <li><a href="javascript:void(0)">Intercâmbio Universitário</a></li>
+              <li><a href="javascript:void(0)">Marketplace</a></li>
+              <li><a href="javascript:void(0)">Hub de Inovação</a></li>
             </ul>
           </div>
           <div className="footer-section">
             <h4>Países</h4>
             <ul>
-              <li><a href="#">🇦🇴 Angola</a></li>
-              <li><a href="#">🇳🇦 Namíbia</a></li>
-              <li><a href="#">🇿🇦 África do Sul</a></li>
+              <li><a href="javascript:void(0)">🇦🇴 Angola</a></li>
+              <li><a href="javascript:void(0)">🇳🇦 Namíbia</a></li>
+              <li><a href="javascript:void(0)">🇿🇦 África do Sul</a></li>
             </ul>
           </div>
           <div className="footer-section">
