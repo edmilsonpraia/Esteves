@@ -245,8 +245,8 @@ const translations: Translations = {
     
     // User
     'user.contact': 'Contato',
-    'user.phoneAngola': '+244 924 123 456',
-    'user.phoneNamibia': '+264 81 234 567',
+    'user.phoneAngola': '+244 924 166 401',
+    'user.phoneNamibia': '+244 924 166 401',
     'user.welcome': 'Bem-vindo',
     'user.defaultName': 'Usuário',
     'user.communityMember': 'Membro da Comunidade',
@@ -599,8 +599,8 @@ const translations: Translations = {
     
     // User
     'user.contact': 'Contact',
-    'user.phoneAngola': '+244 924 123 456',
-    'user.phoneNamibia': '+264 81 234 567',
+    'user.phoneAngola': '+244 924 166 401',
+    'user.phoneNamibia': '+244 924 166 401',
     'user.welcome': 'Welcome',
     'user.defaultName': 'User',
     'user.communityMember': 'Community Member',

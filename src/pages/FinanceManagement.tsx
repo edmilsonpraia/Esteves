@@ -378,19 +378,19 @@ const FinanceManagement: React.FC = () => {
   // Função de conversão de moeda removida por não estar sendo usada
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Gestão Financeira Regional</h1>
-          <p className="text-gray-600">Controle financeiro integrado Angola 🇦🇴 Namíbia 🇳🇦 África do Sul 🇿🇦</p>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Gestão Financeira Regional</h1>
+          <p className="text-sm sm:text-base text-gray-600">Controle financeiro integrado Angola 🇦🇴 Namíbia 🇳🇦 África do Sul 🇿🇦</p>
         </div>
         
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <select
             value={selectedCountry}
             onChange={(e) => setSelectedCountry(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white"
+            className="w-full sm:w-auto px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white touch-manipulation"
           >
             <option value="all">🌍 Todos os Países</option>
             {countries.map(country => (
@@ -403,7 +403,7 @@ const FinanceManagement: React.FC = () => {
           <select
             value={selectedPeriod}
             onChange={(e) => setSelectedPeriod(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white"
+            className="w-full sm:w-auto px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white touch-manipulation"
           >
             <option value="current_month">Mês Atual</option>
             <option value="current_quarter">Trimestre Atual</option>
@@ -413,122 +413,122 @@ const FinanceManagement: React.FC = () => {
 
           <button 
             onClick={() => setShowTransactionModal(true)}
-            className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-700 transition-colors"
+            className="w-full sm:w-auto bg-red-600 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-red-700 transition-colors touch-manipulation min-h-[44px]"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Nova Transação
+            <span className="text-sm sm:text-base">Nova Transação</span>
           </button>
         </div>
       </div>
 
       {/* Financial Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-6">
+        <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Receita Total</p>
-              <p className="text-2xl font-bold text-green-600">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">Receita Total</p>
+              <p className="text-lg sm:text-2xl font-bold text-green-600 truncate">
                 {formatCurrency(summary.totalIncome)}
               </p>
             </div>
-            <div className="p-3 bg-green-100 rounded-full">
-              <span className="text-2xl">💰</span>
+            <div className="p-2 sm:p-3 bg-green-100 rounded-full flex-shrink-0">
+              <span className="text-lg sm:text-2xl">💰</span>
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
+          <div className="mt-3 sm:mt-4 flex items-center text-xs sm:text-sm">
             <span className="text-green-600">📈 +15.2%</span>
             <span className="text-gray-500 ml-1">vs mês anterior</span>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Despesas</p>
-              <p className="text-2xl font-bold text-red-600">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">Despesas</p>
+              <p className="text-lg sm:text-2xl font-bold text-red-600 truncate">
                 {formatCurrency(summary.totalExpenses)}
               </p>
             </div>
-            <div className="p-3 bg-red-100 rounded-full">
-              <span className="text-2xl">💸</span>
+            <div className="p-2 sm:p-3 bg-red-100 rounded-full flex-shrink-0">
+              <span className="text-lg sm:text-2xl">💸</span>
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
+          <div className="mt-3 sm:mt-4 flex items-center text-xs sm:text-sm">
             <span className="text-red-600">📉 -8.1%</span>
             <span className="text-gray-500 ml-1">vs mês anterior</span>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Lucro Líquido</p>
-              <p className={`text-2xl font-bold ${summary.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">Lucro Líquido</p>
+              <p className={`text-lg sm:text-2xl font-bold truncate ${summary.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {formatCurrency(summary.netProfit)}
               </p>
             </div>
-            <div className={`p-3 rounded-full ${summary.netProfit >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
-              <span className="text-2xl">{summary.netProfit >= 0 ? '📈' : '📉'}</span>
+            <div className={`p-2 sm:p-3 rounded-full flex-shrink-0 ${summary.netProfit >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
+              <span className="text-lg sm:text-2xl">{summary.netProfit >= 0 ? '📈' : '📉'}</span>
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
+          <div className="mt-3 sm:mt-4 flex items-center text-xs sm:text-sm">
             <span className={summary.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}>
               {summary.profitMargin.toFixed(1)}% margem
             </span>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Pendente</p>
-              <p className="text-2xl font-bold text-yellow-600">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">Pendente</p>
+              <p className="text-lg sm:text-2xl font-bold text-yellow-600 truncate">
                 {formatCurrency(summary.pendingAmount)}
               </p>
             </div>
-            <div className="p-3 bg-yellow-100 rounded-full">
-              <span className="text-2xl">⏳</span>
+            <div className="p-2 sm:p-3 bg-yellow-100 rounded-full flex-shrink-0">
+              <span className="text-lg sm:text-2xl">⏳</span>
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
+          <div className="mt-3 sm:mt-4 flex items-center text-xs sm:text-sm">
             <span className="text-gray-500">Aguardando aprovação</span>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Orçamento</p>
-              <p className="text-2xl font-bold text-purple-600">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">Orçamento</p>
+              <p className="text-lg sm:text-2xl font-bold text-purple-600 truncate">
                 {formatCurrency(summary.totalBudgetAllocated)}
               </p>
             </div>
-            <div className="p-3 bg-purple-100 rounded-full">
-              <span className="text-2xl">💼</span>
+            <div className="p-2 sm:p-3 bg-purple-100 rounded-full flex-shrink-0">
+              <span className="text-lg sm:text-2xl">💼</span>
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
+          <div className="mt-3 sm:mt-4 flex items-center text-xs sm:text-sm">
             <span className="text-purple-600">
               {((summary.totalBudgetSpent / summary.totalBudgetAllocated) * 100).toFixed(1)}% usado
             </span>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Taxa de Câmbio</p>
-              <p className="text-lg font-bold text-blue-600">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">Taxa de Câmbio</p>
+              <p className="text-sm sm:text-lg font-bold text-blue-600 truncate">
                 1 USD = {exchangeRates[0].rate} AOA
               </p>
             </div>
-            <div className="p-3 bg-blue-100 rounded-full">
-              <span className="text-2xl">💱</span>
+            <div className="p-2 sm:p-3 bg-blue-100 rounded-full flex-shrink-0">
+              <span className="text-lg sm:text-2xl">💱</span>
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
+          <div className="mt-3 sm:mt-4 flex items-center text-xs sm:text-sm">
             <span className="text-blue-600">🕒 Atualizado há 2h</span>
           </div>
         </div>
@@ -537,53 +537,54 @@ const FinanceManagement: React.FC = () => {
       {/* Tab Navigation */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">
         <div className="border-b border-gray-200">
-          <nav className="flex space-x-8 px-6 overflow-x-auto">
+          <nav className="flex space-x-2 sm:space-x-8 px-3 sm:px-6 overflow-x-auto scrollbar-hide">
             {[
-              { id: 'overview', name: 'Visão Geral', icon: '📊' },
-              { id: 'transactions', name: 'Transações', icon: '💳' },
-              { id: 'budgets', name: 'Orçamentos', icon: '💼' },
-              { id: 'invoices', name: 'Faturas', icon: '📄' },
-              { id: 'reports', name: 'Relatórios', icon: '📈' },
-              { id: 'exchange', name: 'Câmbio', icon: '💱' }
+              { id: 'overview', name: 'Visão Geral', icon: '📊', shortName: 'Geral' },
+              { id: 'transactions', name: 'Transações', icon: '💳', shortName: 'Trans.' },
+              { id: 'budgets', name: 'Orçamentos', icon: '💼', shortName: 'Orç.' },
+              { id: 'invoices', name: 'Faturas', icon: '📄', shortName: 'Faturas' },
+              { id: 'reports', name: 'Relatórios', icon: '📈', shortName: 'Rel.' },
+              { id: 'exchange', name: 'Câmbio', icon: '💱', shortName: 'Câmbio' }
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-2 border-b-2 font-medium text-sm whitespace-nowrap ${
+                className={`py-3 sm:py-4 px-2 sm:px-3 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap touch-manipulation min-w-0 ${
                   activeTab === tab.id
                     ? 'border-red-500 text-red-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <span className="mr-2">{tab.icon}</span>
-                {tab.name}
+                <span className="mr-1 sm:mr-2">{tab.icon}</span>
+                <span className="hidden sm:inline">{tab.name}</span>
+                <span className="sm:hidden">{tab.shortName}</span>
               </button>
             ))}
           </nav>
         </div>
 
-        <div className="p-6">
+        <div className="p-3 sm:p-6">
           {/* Overview Tab */}
           {activeTab === 'overview' && (
-            <div className="space-y-6">
+            <div className="space-y-3 sm:space-y-6">
               {/* Cash Flow Chart */}
-              <div className="bg-gray-50 rounded-lg p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Fluxo de Caixa Mensal</h3>
-                  <div className="flex gap-2">
+              <div className="bg-gray-50 rounded-lg p-3 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-3 sm:mb-4">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">Fluxo de Caixa Mensal</h3>
+                  <div className="flex gap-3 sm:gap-2">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span className="text-sm text-gray-600">Receitas</span>
+                      <span className="text-xs sm:text-sm text-gray-600">Receitas</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                      <span className="text-sm text-gray-600">Despesas</span>
+                      <span className="text-xs sm:text-sm text-gray-600">Despesas</span>
                     </div>
                   </div>
                 </div>
                 
                 {/* Simplified Chart */}
-                <div className="h-64 flex items-end justify-between gap-2">
+                <div className="h-48 sm:h-64 flex items-end justify-between gap-1 sm:gap-2">
                   {['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'].map((month, index) => {
                     const income = Math.random() * 80000 + 20000;
                     const expense = Math.random() * 60000 + 15000;
@@ -593,12 +594,12 @@ const FinanceManagement: React.FC = () => {
                       <div key={month} className="flex-1 flex flex-col items-center gap-1">
                         <div className="w-full flex gap-1">
                           <div
-                            className="bg-green-500 rounded-t"
+                            className="bg-green-500 rounded-t flex-1"
                             style={{ height: `${(income / 100000) * maxHeight}px` }}
                             title={`Receita: ${formatCurrency(income)}`}
                           ></div>
                           <div
-                            className="bg-red-500 rounded-t"
+                            className="bg-red-500 rounded-t flex-1"
                             style={{ height: `${(expense / 100000) * maxHeight}px` }}
                             title={`Despesa: ${formatCurrency(expense)}`}
                           ></div>
@@ -612,8 +613,8 @@ const FinanceManagement: React.FC = () => {
 
               {/* Country Performance */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance por País</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Performance por País</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   {countries.map(country => {
                     const countryTransactions = transactions.filter(t => t.country === country);
                     const countryIncome = countryTransactions
@@ -625,24 +626,24 @@ const FinanceManagement: React.FC = () => {
                     const countryProfit = countryIncome - countryExpenses;
 
                     return (
-                      <div key={country} className="bg-white border border-gray-200 rounded-lg p-6">
-                        <div className="flex items-center gap-3 mb-4">
-                          <span className="text-3xl">{getCountryFlag(country)}</span>
-                          <h4 className="font-semibold text-gray-900">{country}</h4>
+                      <div key={country} className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
+                        <div className="flex items-center gap-3 mb-3 sm:mb-4">
+                          <span className="text-2xl sm:text-3xl">{getCountryFlag(country)}</span>
+                          <h4 className="font-semibold text-gray-900 text-sm sm:text-base">{country}</h4>
                         </div>
                         
-                        <div className="space-y-3">
+                        <div className="space-y-2 sm:space-y-3">
                           <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">Receita</span>
-                            <span className="font-medium text-green-600">{formatCurrency(countryIncome)}</span>
+                            <span className="text-xs sm:text-sm text-gray-600">Receita</span>
+                            <span className="font-medium text-green-600 text-xs sm:text-sm">{formatCurrency(countryIncome)}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">Despesas</span>
-                            <span className="font-medium text-red-600">{formatCurrency(countryExpenses)}</span>
+                            <span className="text-xs sm:text-sm text-gray-600">Despesas</span>
+                            <span className="font-medium text-red-600 text-xs sm:text-sm">{formatCurrency(countryExpenses)}</span>
                           </div>
                           <div className="flex justify-between border-t pt-2">
-                            <span className="text-sm font-medium text-gray-900">Lucro</span>
-                            <span className={`font-bold ${countryProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            <span className="text-xs sm:text-sm font-medium text-gray-900">Lucro</span>
+                            <span className={`font-bold text-xs sm:text-sm ${countryProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                               {formatCurrency(countryProfit)}
                             </span>
                           </div>
@@ -655,28 +656,30 @@ const FinanceManagement: React.FC = () => {
 
               {/* Recent Activity */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Atividade Recente</h3>
-                <div className="space-y-3">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Atividade Recente</h3>
+                <div className="space-y-2 sm:space-y-3">
                   {transactions.slice(0, 5).map(transaction => (
-                    <div key={transaction.id} className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getTransactionTypeColor(transaction.type)}`}>
-                          <span>{getTransactionTypeIcon(transaction.type)}</span>
+                    <div key={transaction.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white border border-gray-200 rounded-lg">
+                      <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${getTransactionTypeColor(transaction.type)}`}>
+                          <span className="text-sm sm:text-base">{getTransactionTypeIcon(transaction.type)}</span>
                         </div>
-                        <div>
-                          <h4 className="font-medium text-gray-900">{transaction.description}</h4>
-                          <div className="flex items-center gap-2 text-sm text-gray-500">
-                            <span>{getCountryFlag(transaction.country)} {transaction.country}</span>
-                            <span>•</span>
-                            <span>{transaction.project}</span>
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-medium text-gray-900 text-sm sm:text-base truncate">{transaction.description}</h4>
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500">
+                            <span className="flex items-center gap-1">
+                              {getCountryFlag(transaction.country)} {transaction.country}
+                            </span>
+                            <span className="hidden sm:inline">•</span>
+                            <span className="truncate">{transaction.project}</span>
                           </div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className={`font-bold ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                      <div className="flex justify-between sm:block sm:text-right flex-shrink-0">
+                        <div className={`font-bold text-sm sm:text-base ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
                           {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount, transaction.currency)}
                         </div>
-                        <div className="text-sm text-gray-500">{new Date(transaction.date).toLocaleDateString('pt-BR')}</div>
+                        <div className="text-xs sm:text-sm text-gray-500">{new Date(transaction.date).toLocaleDateString('pt-BR')}</div>
                       </div>
                     </div>
                   ))}
@@ -687,16 +690,16 @@ const FinanceManagement: React.FC = () => {
 
           {/* Transactions Tab */}
           {activeTab === 'transactions' && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">Todas as Transações</h3>
-                <div className="flex gap-2">
+            <div className="space-y-3 sm:space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900">Todas as Transações</h3>
+                <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
-                    placeholder="Buscar transações..."
-                    className="px-4 py-2 border border-gray-300 rounded-lg text-sm"
+                    placeholder="Buscar..."
+                    className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-lg text-sm touch-manipulation"
                   />
-                  <select className="px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                  <select className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-lg text-sm touch-manipulation">
                     <option value="">Todos os tipos</option>
                     <option value="income">Receita</option>
                     <option value="expense">Despesa</option>
@@ -705,7 +708,59 @@ const FinanceManagement: React.FC = () => {
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
+              {/* Mobile Cards View */}
+              <div className="block lg:hidden space-y-3">
+                {transactions.map(transaction => (
+                  <div key={transaction.id} className="bg-white border border-gray-200 rounded-lg p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${getTransactionTypeColor(transaction.type)}`}>
+                          <span className="text-sm">{getTransactionTypeIcon(transaction.type)}</span>
+                        </div>
+                        <div>
+                          <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full ${getTransactionTypeColor(transaction.type)}`}>
+                            {transaction.type === 'income' ? 'Receita' : 
+                             transaction.type === 'expense' ? 'Despesa' : 'Transferência'}
+                          </span>
+                        </div>
+                      </div>
+                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(transaction.status)}`}>
+                        {getStatusLabel(transaction.status)}
+                      </span>
+                    </div>
+                    
+                    <div className="space-y-2 mb-4">
+                      <h4 className="font-medium text-gray-900 text-sm">{transaction.description}</h4>
+                      <p className="text-xs text-gray-500">{transaction.project}</p>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className={`font-bold text-lg ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                          {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount, transaction.currency)}
+                        </span>
+                        <div className="text-right">
+                          <div className="text-xs text-gray-500">
+                            {new Date(transaction.date).toLocaleDateString('pt-BR')}
+                          </div>
+                          <div className="text-xs text-gray-500 flex items-center gap-1">
+                            {getCountryFlag(transaction.country)} {transaction.country}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-2 pt-3 border-t border-gray-200">
+                      <button className="flex-1 text-blue-600 hover:text-blue-700 text-sm py-2 px-3 bg-blue-50 rounded-lg touch-manipulation">Ver</button>
+                      <button className="flex-1 text-green-600 hover:text-green-700 text-sm py-2 px-3 bg-green-50 rounded-lg touch-manipulation">Editar</button>
+                      {transaction.status === 'pending' && (
+                        <button className="flex-1 text-red-600 hover:text-red-700 text-sm py-2 px-3 bg-red-50 rounded-lg touch-manipulation">Aprovar</button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden lg:block overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50">
                     <tr>
@@ -771,31 +826,33 @@ const FinanceManagement: React.FC = () => {
 
           {/* Budgets Tab */}
           {activeTab === 'budgets' && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">Orçamentos por Categoria</h3>
-                <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm">
+            <div className="space-y-3 sm:space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900">Orçamentos por Categoria</h3>
+                <button className="w-full sm:w-auto bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm touch-manipulation min-h-[44px]">
                   Criar Orçamento
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
                 {budgets.map(budget => {
                   const usagePercentage = (budget.spent / budget.allocated) * 100;
                   const remaining = budget.allocated - budget.spent;
                   
                   return (
-                    <div key={budget.id} className="bg-white border border-gray-200 rounded-xl p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div>
-                          <h4 className="font-semibold text-gray-900 text-lg">{budget.name}</h4>
-                          <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
-                            <span>{getCountryFlag(budget.country)} {budget.country}</span>
-                            <span>•</span>
+                    <div key={budget.id} className="bg-white border border-gray-200 rounded-xl p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-3 sm:mb-4">
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-semibold text-gray-900 text-base sm:text-lg truncate">{budget.name}</h4>
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 mt-1">
+                            <span className="flex items-center gap-1">
+                              {getCountryFlag(budget.country)} {budget.country}
+                            </span>
+                            <span className="hidden sm:inline">•</span>
                             <span>{budget.period}</span>
                           </div>
                         </div>
-                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                        <span className={`px-3 py-1 text-xs font-medium rounded-full flex-shrink-0 ${
                           usagePercentage > 90 ? 'bg-red-100 text-red-800' :
                           usagePercentage > 75 ? 'bg-yellow-100 text-yellow-800' :
                           'bg-green-100 text-green-800'
@@ -804,26 +861,26 @@ const FinanceManagement: React.FC = () => {
                         </span>
                       </div>
 
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-3 sm:space-y-4">
+                        <div className="grid grid-cols-2 gap-3 sm:gap-4">
                           <div>
-                            <p className="text-sm text-gray-500">Alocado</p>
-                            <p className="text-lg font-bold text-blue-600">{formatCurrency(budget.allocated, budget.currency)}</p>
+                            <p className="text-xs sm:text-sm text-gray-500">Alocado</p>
+                            <p className="text-base sm:text-lg font-bold text-blue-600 truncate">{formatCurrency(budget.allocated, budget.currency)}</p>
                           </div>
                           <div>
-                            <p className="text-sm text-gray-500">Gasto</p>
-                            <p className="text-lg font-bold text-red-600">{formatCurrency(budget.spent, budget.currency)}</p>
+                            <p className="text-xs sm:text-sm text-gray-500">Gasto</p>
+                            <p className="text-base sm:text-lg font-bold text-red-600 truncate">{formatCurrency(budget.spent, budget.currency)}</p>
                           </div>
                         </div>
 
                         <div>
-                          <div className="flex justify-between text-sm mb-2">
+                          <div className="flex justify-between text-xs sm:text-sm mb-2">
                             <span className="text-gray-600">Progresso</span>
                             <span className="font-medium">{usagePercentage.toFixed(1)}%</span>
                           </div>
-                          <div className="w-full bg-gray-200 rounded-full h-3">
+                          <div className="w-full bg-gray-200 rounded-full h-2 sm:h-3">
                             <div
-                              className={`h-3 rounded-full transition-all duration-300 ${
+                              className={`h-2 sm:h-3 rounded-full transition-all duration-300 ${
                                 usagePercentage > 90 ? 'bg-red-500' :
                                 usagePercentage > 75 ? 'bg-yellow-500' :
                                 'bg-green-500'
@@ -833,24 +890,24 @@ const FinanceManagement: React.FC = () => {
                           </div>
                         </div>
 
-                        <div className="pt-4 border-t border-gray-200">
-                          <div className="flex justify-between items-center">
+                        <div className="pt-3 sm:pt-4 border-t border-gray-200">
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-4">
                             <div>
-                              <p className="text-sm text-gray-500">Restante</p>
-                              <p className="font-bold text-gray-900">{formatCurrency(remaining, budget.currency)}</p>
+                              <p className="text-xs sm:text-sm text-gray-500">Restante</p>
+                              <p className="font-bold text-gray-900 text-sm sm:text-base truncate">{formatCurrency(remaining, budget.currency)}</p>
                             </div>
-                            <div className="text-right">
-                              <p className="text-sm text-gray-500">Responsável</p>
-                              <p className="text-sm font-medium text-gray-900">{budget.responsible}</p>
+                            <div className="sm:text-right">
+                              <p className="text-xs sm:text-sm text-gray-500">Responsável</p>
+                              <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">{budget.responsible}</p>
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex gap-2">
-                          <button className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors text-sm">
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <button className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors text-sm touch-manipulation min-h-[44px]">
                             Ver Detalhes
                           </button>
-                          <button className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors text-sm">
+                          <button className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors text-sm touch-manipulation min-h-[44px]">
                             Ajustar
                           </button>
                         </div>
@@ -864,61 +921,61 @@ const FinanceManagement: React.FC = () => {
 
           {/* Invoices Tab */}
           {activeTab === 'invoices' && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">Gestão de Faturas</h3>
+            <div className="space-y-3 sm:space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900">Gestão de Faturas</h3>
                 <button 
                   onClick={() => setShowInvoiceModal(true)}
-                  className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm"
+                  className="w-full sm:w-auto bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm touch-manipulation min-h-[44px]"
                 >
                   Nova Fatura
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
                 {invoices.map(invoice => (
-                  <div key={invoice.id} className="bg-white border border-gray-200 rounded-xl p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h4 className="font-semibold text-gray-900">{invoice.number}</h4>
-                        <p className="text-sm text-gray-600">{invoice.client}</p>
+                  <div key={invoice.id} className="bg-white border border-gray-200 rounded-xl p-4 sm:p-6">
+                    <div className="flex items-start justify-between mb-3 sm:mb-4">
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-semibold text-gray-900 text-sm sm:text-base truncate">{invoice.number}</h4>
+                        <p className="text-xs sm:text-sm text-gray-600 truncate">{invoice.client}</p>
                       </div>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(invoice.status)}`}>
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full flex-shrink-0 ${getStatusColor(invoice.status)}`}>
                         {getStatusLabel(invoice.status)}
                       </span>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-2 sm:space-y-3">
                       <div>
-                        <p className="text-sm text-gray-500">Projeto</p>
-                        <p className="font-medium text-gray-900">{invoice.project}</p>
+                        <p className="text-xs sm:text-sm text-gray-500">Projeto</p>
+                        <p className="font-medium text-gray-900 text-sm sm:text-base truncate">{invoice.project}</p>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-2 gap-3 sm:gap-4">
                         <div>
-                          <p className="text-sm text-gray-500">Valor</p>
-                          <p className="font-bold text-green-600 text-lg">
+                          <p className="text-xs sm:text-sm text-gray-500">Valor</p>
+                          <p className="font-bold text-green-600 text-base sm:text-lg truncate">
                             {formatCurrency(invoice.amount, invoice.currency)}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-500">País</p>
-                          <p className="font-medium text-gray-900">
-                            {getCountryFlag(invoice.country)} {invoice.country}
+                          <p className="text-xs sm:text-sm text-gray-500">País</p>
+                          <p className="font-medium text-gray-900 text-xs sm:text-sm flex items-center gap-1">
+                            {getCountryFlag(invoice.country)} <span className="truncate">{invoice.country}</span>
                           </p>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-2 gap-3 sm:gap-4">
                         <div>
-                          <p className="text-sm text-gray-500">Emissão</p>
-                          <p className="text-sm text-gray-900">
+                          <p className="text-xs sm:text-sm text-gray-500">Emissão</p>
+                          <p className="text-xs sm:text-sm text-gray-900">
                             {new Date(invoice.issueDate).toLocaleDateString('pt-BR')}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-500">Vencimento</p>
-                          <p className={`text-sm ${
+                          <p className="text-xs sm:text-sm text-gray-500">Vencimento</p>
+                          <p className={`text-xs sm:text-sm ${
                             new Date(invoice.dueDate) < new Date() && invoice.status !== 'paid' 
                               ? 'text-red-600 font-medium' 
                               : 'text-gray-900'
@@ -928,16 +985,16 @@ const FinanceManagement: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="pt-4 border-t border-gray-200">
-                        <div className="flex gap-2">
-                          <button className="flex-1 bg-gray-100 text-gray-700 py-2 px-3 rounded-lg hover:bg-gray-200 transition-colors text-sm">
+                      <div className="pt-3 sm:pt-4 border-t border-gray-200">
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <button className="flex-1 bg-gray-100 text-gray-700 py-2 px-3 rounded-lg hover:bg-gray-200 transition-colors text-sm touch-manipulation min-h-[44px]">
                             Ver PDF
                           </button>
-                          <button className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                          <button className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition-colors text-sm touch-manipulation min-h-[44px]">
                             Enviar
                           </button>
                           {invoice.status === 'sent' && (
-                            <button className="flex-1 bg-green-600 text-white py-2 px-3 rounded-lg hover:bg-green-700 transition-colors text-sm">
+                            <button className="flex-1 bg-green-600 text-white py-2 px-3 rounded-lg hover:bg-green-700 transition-colors text-sm touch-manipulation min-h-[44px]">
                               Marcar Pago
                             </button>
                           )}
@@ -1105,25 +1162,25 @@ const FinanceManagement: React.FC = () => {
 
       {/* Transaction Modal */}
       {showTransactionModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+          <div className="bg-white rounded-t-xl sm:rounded-xl max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+            <div className="p-4 sm:p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Nova Transação</h2>
+                <h2 className="text-lg sm:text-2xl font-bold text-gray-900">Nova Transação</h2>
                 <button
                   onClick={() => setShowTransactionModal(false)}
-                  className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-colors touch-manipulation"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
             </div>
 
-            <div className="p-6">
-              <form className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 sm:p-6">
+              <form className="space-y-4 sm:space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Tipo *</label>
                     <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
@@ -1144,10 +1201,10 @@ const FinanceManagement: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Moeda *</label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent touch-manipulation">
                       {currencies.map(currency => (
                         <option key={currency} value={currency}>{currency}</option>
                       ))}
@@ -1156,7 +1213,7 @@ const FinanceManagement: React.FC = () => {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">País *</label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent touch-manipulation">
                       {countries.map(country => (
                         <option key={country} value={country}>
                           {getCountryFlag(country)} {country}
@@ -1170,15 +1227,15 @@ const FinanceManagement: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Descrição *</label>
                   <input
                     type="text"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent touch-manipulation"
                     placeholder="Descrição da transação"
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Categoria *</label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent touch-manipulation">
                       {categories.map(category => (
                         <option key={category} value={category}>{category}</option>
                       ))}
@@ -1187,7 +1244,7 @@ const FinanceManagement: React.FC = () => {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Projeto</label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent touch-manipulation">
                       <option value="">Selecione um projeto</option>
                       <option value="telemedicina">Rede de Telemedicina Regional</option>
                       <option value="marketplace">Marketplace de Artesanato</option>
@@ -1201,22 +1258,22 @@ const FinanceManagement: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Observações</label>
                   <textarea
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent touch-manipulation resize-none"
                     placeholder="Informações adicionais sobre a transação..."
                   />
                 </div>
 
-                <div className="flex gap-3 pt-4">
+                <div className="flex flex-col sm:flex-row gap-3 pt-4">
                   <button
                     type="button"
                     onClick={() => setShowTransactionModal(false)}
-                    className="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                    className="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium touch-manipulation min-h-[48px]"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-medium"
+                    className="flex-1 bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-medium touch-manipulation min-h-[48px]"
                   >
                     Criar Transação
                   </button>

@@ -279,101 +279,103 @@ const Analytics: React.FC = () => {
   const kpis = calculateKPIs();
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Analytics & KPIs Regionais</h1>
-          <p className="text-gray-600">Métricas detalhadas e insights da performance regional Africa's Hands</p>
-        </div>
-        
-        <div className="flex gap-3">
-          <select
-            value={selectedPeriod}
-            onChange={(e) => setSelectedPeriod(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white"
-          >
-            {periods.map((period) => (
-              <option key={period.value} value={period.value}>
-                {period.label}
-              </option>
-            ))}
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header - Mobile Responsive */}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">Analytics & KPIs Regionais</h1>
+            <p className="text-gray-600 text-sm sm:text-base mt-1">Métricas detalhadas e insights da performance regional Africa's Hands</p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <select
+              value={selectedPeriod}
+              onChange={(e) => setSelectedPeriod(e.target.value)}
+              className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white w-full sm:w-auto"
+            >
+              {periods.map((period) => (
+                <option key={period.value} value={period.value}>
+                  {period.label}
+                </option>
+              ))}
           </select>
           
-          <button className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-700 transition-colors">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            Exportar Relatório
-          </button>
+            <button className="bg-red-600 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-red-700 transition-colors text-sm w-full sm:w-auto">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span className="whitespace-nowrap">Exportar Relatório</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* KPIs Principais */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+      {/* KPIs Principais - Mobile Responsive */}
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+        <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Receita Total</p>
-              <p className="text-2xl font-bold text-green-600">
-                ${kpis.totalRevenue.toLocaleString()}
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Receita Total</p>
+              <p className="text-lg sm:text-2xl font-bold text-green-600 mt-1">
+                ${(kpis.totalRevenue / 1000).toFixed(0)}k
               </p>
             </div>
-            <div className="p-3 bg-green-100 rounded-full">
-              <span className="text-2xl">💰</span>
+            <div className="p-2 sm:p-3 bg-green-100 rounded-full ml-2 flex-shrink-0">
+              <span className="text-lg sm:text-2xl">💰</span>
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
+          <div className="mt-3 sm:mt-4 flex items-center text-xs sm:text-sm">
             <span className="text-green-600">📈 +12.5%</span>
-            <span className="text-gray-500 ml-1">vs período anterior</span>
+            <span className="text-gray-500 ml-1 hidden sm:inline">vs período anterior</span>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">ROI Médio</p>
-              <p className="text-2xl font-bold text-blue-600">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">ROI Médio</p>
+              <p className="text-lg sm:text-2xl font-bold text-blue-600 mt-1">
                 {((kpis.totalRevenue - (kpis.totalRevenue * 0.7)) / (kpis.totalRevenue * 0.7) * 100).toFixed(1)}%
               </p>
             </div>
-            <div className="p-3 bg-blue-100 rounded-full">
-              <span className="text-2xl">📊</span>
+            <div className="p-2 sm:p-3 bg-blue-100 rounded-full ml-2 flex-shrink-0">
+              <span className="text-lg sm:text-2xl">📊</span>
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
-            <span className="text-blue-600">Excelente performance</span>
+          <div className="mt-3 sm:mt-4 flex items-center text-xs sm:text-sm">
+            <span className="text-blue-600 truncate">Excelente performance</span>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Eficiência da Equipe</p>
-              <p className="text-2xl font-bold text-purple-600">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Eficiência da Equipe</p>
+              <p className="text-lg sm:text-2xl font-bold text-purple-600 mt-1">
                 ${kpis.teamEfficiency.toLocaleString()}
               </p>
             </div>
-            <div className="p-3 bg-purple-100 rounded-full">
-              <span className="text-2xl">👥</span>
+            <div className="p-2 sm:p-3 bg-purple-100 rounded-full ml-2 flex-shrink-0">
+              <span className="text-lg sm:text-2xl">👥</span>
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
-            <span className="text-gray-500">Receita por membro</span>
+          <div className="mt-3 sm:mt-4 flex items-center text-xs sm:text-sm">
+            <span className="text-gray-500 truncate">Receita por membro</span>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Progresso Médio</p>
-              <p className="text-2xl font-bold text-indigo-600">{kpis.avgProgress}%</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Progresso Médio</p>
+              <p className="text-lg sm:text-2xl font-bold text-indigo-600 mt-1">{kpis.avgProgress}%</p>
             </div>
-            <div className="p-3 bg-indigo-100 rounded-full">
-              <span className="text-2xl">⚡</span>
+            <div className="p-2 sm:p-3 bg-indigo-100 rounded-full ml-2 flex-shrink-0">
+              <span className="text-lg sm:text-2xl">⚡</span>
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
+          <div className="mt-3 sm:mt-4 flex items-center text-xs sm:text-sm">
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
                 className="bg-indigo-600 h-2 rounded-full" 
@@ -384,31 +386,32 @@ const Analytics: React.FC = () => {
         </div>
       </div>
 
-      {/* Gráfico de Tendências */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">Tendências de Performance</h2>
+      {/* Gráfico de Tendências - Mobile Responsive */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Tendências de Performance</h2>
           
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {metrics.map((metric) => (
               <button
                 key={metric.value}
                 onClick={() => setSelectedMetric(metric.value)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                   selectedMetric === metric.value
                     ? 'bg-red-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 <span className="mr-1">{metric.icon}</span>
-                {metric.label}
+                <span className="hidden sm:inline">{metric.label}</span>
+                <span className="sm:hidden">{metric.label.substring(0, 3)}</span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Gráfico Simulado */}
-        <div className="h-64 bg-gray-50 rounded-lg p-6 flex items-end justify-between gap-2">
+        {/* Gráfico Simulado - Mobile Responsive */}
+        <div className="h-48 sm:h-64 bg-gray-50 rounded-lg p-3 sm:p-6 flex items-end justify-between gap-1 sm:gap-2">
           {analyticsData.map((data, index) => {
             const getValue = () => {
               switch (selectedMetric) {
@@ -425,12 +428,12 @@ const Analytics: React.FC = () => {
             const percentage = (height / maxHeight) * 100;
             
             return (
-              <div key={index} className="flex flex-col items-center gap-2">
+              <div key={index} className="flex flex-col items-center gap-1 sm:gap-2">
                 <div 
-                  className="bg-gradient-to-t from-red-600 to-red-400 rounded-t transition-all duration-500 hover:scale-105 w-8"
+                  className="bg-gradient-to-t from-red-600 to-red-400 rounded-t transition-all duration-500 hover:scale-105 w-6 sm:w-8"
                   style={{ height: `${Math.min(percentage, 100)}%` }}
                 ></div>
-                <span className="text-xs text-gray-600 transform -rotate-45">
+                <span className="text-xs text-gray-600 transform -rotate-45 truncate">
                   {new Date(data.period).toLocaleDateString('pt-BR', { month: 'short' })}
                 </span>
               </div>
@@ -438,64 +441,64 @@ const Analytics: React.FC = () => {
           })}
         </div>
 
-        <div className="mt-4 flex justify-center gap-6 text-sm text-gray-600">
+        <div className="mt-3 sm:mt-4 flex flex-wrap justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-gray-600">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-red-600 rounded-full"></div>
-            <span>Crescimento Sustentável</span>
+            <span className="truncate">Crescimento Sustentável</span>
           </div>
           <div className="flex items-center gap-2">
             <span>📈</span>
-            <span>Tendência Positiva</span>
+            <span className="truncate">Tendência Positiva</span>
           </div>
         </div>
       </div>
 
       {/* Métricas por País */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">Performance por País</h2>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">Performance por País</h2>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-6">
           {countryMetrics.map((country) => (
-            <div key={country.country} className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl">{country.flag}</span>
-                  <h3 className="text-lg font-semibold text-gray-900">{country.country}</h3>
+            <div key={country.country} className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 sm:p-6 border border-gray-200">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                  <span className="text-2xl sm:text-3xl flex-shrink-0">{country.flag}</span>
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{country.country}</h3>
                 </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-gray-900">{country.projects}</div>
+                <div className="text-right flex-shrink-0">
+                  <div className="text-xl sm:text-2xl font-bold text-gray-900">{country.projects}</div>
                   <div className="text-xs text-gray-600">Projetos</div>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="space-y-3 sm:space-y-4">
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm">
                   <div>
-                    <p className="text-gray-600">Receita</p>
-                    <p className="font-semibold text-green-600">${country.revenue.toLocaleString()}</p>
+                    <p className="text-gray-600 truncate">Receita</p>
+                    <p className="font-semibold text-green-600 text-sm sm:text-base">${country.revenue.toLocaleString()}</p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Clientes</p>
-                    <p className="font-semibold text-blue-600">{country.clients}</p>
+                    <p className="text-gray-600 truncate">Clientes</p>
+                    <p className="font-semibold text-blue-600 text-sm sm:text-base">{country.clients}</p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Equipe</p>
-                    <p className="font-semibold text-purple-600">{country.teamSize}</p>
+                    <p className="text-gray-600 truncate">Equipe</p>
+                    <p className="font-semibold text-purple-600 text-sm sm:text-base">{country.teamSize}</p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Setor Top</p>
-                    <p className="font-semibold text-indigo-600">{country.topSector}</p>
+                    <p className="text-gray-600 truncate">Setor Top</p>
+                    <p className="font-semibold text-indigo-600 text-sm sm:text-base truncate">{country.topSector}</p>
                   </div>
                 </div>
 
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-gray-600">Progresso Médio</span>
-                    <span className="text-sm font-semibold">{country.avgProgress}%</span>
+                    <span className="text-xs sm:text-sm text-gray-600">Progresso Médio</span>
+                    <span className="text-xs sm:text-sm font-semibold">{country.avgProgress}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div className="w-full bg-gray-200 rounded-full h-2 sm:h-3">
                     <div 
-                      className="bg-gradient-to-r from-red-500 to-red-600 h-3 rounded-full transition-all duration-500"
+                      className="bg-gradient-to-r from-red-500 to-red-600 h-2 sm:h-3 rounded-full transition-all duration-500"
                       style={{ width: `${country.avgProgress}%` }}
                     ></div>
                   </div>
@@ -503,8 +506,8 @@ const Analytics: React.FC = () => {
 
                 <div className="pt-2 border-t border-gray-200">
                   <div className="flex justify-between text-xs text-gray-600">
-                    <span>Receita/Projeto</span>
-                    <span className="font-medium">${(country.revenue / country.projects).toLocaleString()}</span>
+                    <span className="truncate">Receita/Projeto</span>
+                    <span className="font-medium ml-2">${(country.revenue / country.projects).toLocaleString()}</span>
                   </div>
                 </div>
               </div>
@@ -513,11 +516,66 @@ const Analytics: React.FC = () => {
         </div>
       </div>
 
-      {/* Performance por Setor */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">Performance por Setor</h2>
+      {/* Performance por Setor - Mobile Responsive */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">Performance por Setor</h2>
         
-        <div className="overflow-x-auto">
+        {/* Mobile Cards Layout */}
+        <div className="block lg:hidden space-y-3">
+          {sectorPerformance.map((sector) => (
+            <div key={sector.sector} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <span className="text-xl flex-shrink-0">{sector.icon}</span>
+                  <h3 className="font-medium text-gray-900 text-sm truncate">{sector.sector}</h3>
+                </div>
+                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full flex-shrink-0 ${
+                  sector.status === 'growing' ? 'bg-green-100 text-green-800' :
+                  sector.status === 'stable' ? 'bg-blue-100 text-blue-800' :
+                  'bg-red-100 text-red-800'
+                }`}>
+                  {sector.status === 'growing' ? 'Crescendo' :
+                   sector.status === 'stable' ? 'Estável' : 'Declínio'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <p className="text-gray-600">Projetos</p>
+                  <p className="font-semibold text-gray-900">{sector.projects}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Receita</p>
+                  <p className="font-semibold text-green-600">${sector.revenue.toLocaleString()}</p>
+                </div>
+              </div>
+
+              <div className="mt-3">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-xs text-gray-600">Progresso</span>
+                  <div className="flex items-center gap-1">
+                    <span>{getGrowthIcon(sector.growth)}</span>
+                    <span className={`text-xs font-medium ${getGrowthColor(sector.growth)}`}>
+                      {sector.growth > 0 ? '+' : ''}{sector.growth.toFixed(1)}%
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-red-600 h-2 rounded-full"
+                      style={{ width: `${sector.avgProgress}%` }}
+                    ></div>
+                  </div>
+                  <span className="text-xs text-gray-900 w-8 text-right">{sector.avgProgress}%</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Table Layout */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
