@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation, LanguageToggle } from '../context/TranslationContext';
+import { supabase } from '../lib/supabase';
 
 interface LoginForm {
   email: string;
@@ -103,22 +104,16 @@ const LoginAfricasHands: React.FC = () => {
     try {
       if (isLogin) {
         // Login
+        console.log('🔐 [LoginForm] Tentando login para:', formData.email);
         await login(formData.email, formData.password);
         setSuccessMessage(t('login.messages.loginSuccess'));
         
-        // ✅ REMOÇÃO DO REDIRECIONAMENTO PROBLEMÁTICO
-        // O redirecionamento agora é gerenciado pelo App.tsx
-        // NÃO fazer window.location.href = '/admin' ou '/user'
-        
-        // Aguardar um momento para mostrar a mensagem de sucesso
-        setTimeout(() => {
-          // O App.tsx detectará automaticamente o estado de autenticação
-          // e redirecionará para o dashboard apropriado
-          console.log('Login bem-sucedido, aguardando redirecionamento automático...');
-        }, 1000);
+        console.log('✅ [LoginForm] Login bem-sucedido, aguardando redirecionamento automático...');
         
       } else {
         // Registro
+        console.log('📝 [LoginForm] Tentando registro para:', formData.email);
+        
         await register(formData.email, formData.password, {
           name: formData.name!,
           country: formData.country,
@@ -127,32 +122,37 @@ const LoginAfricasHands: React.FC = () => {
           role: formData.email.includes('admin') ? 'admin' : 'user'
         });
         
-        setSuccessMessage(t('login.messages.registerSuccess'));
+        // ✅ CORREÇÃO: Mensagem adequada para o fluxo atual
+        setSuccessMessage('Conta criada com sucesso! Você já pode fazer login.');
         setIsLogin(true); // Mudar para tela de login
         
-        // Limpar formulário
+        // Limpar formulário após registro bem-sucedido
         setFormData({
-          email: '',
+          email: formData.email, // Manter email para facilitar login
           password: '',
-          country: '',
+          country: formData.country,
           rememberMe: false,
           name: '',
           sector: '',
           organization: ''
         });
+        
+        console.log('✅ [LoginForm] Registro bem-sucedido, mudando para tela de login');
       }
     } catch (error: any) {
-      console.error('Erro na autenticação:', error);
+      console.error('❌ [LoginForm] Erro na autenticação:', error);
       
       // Tratar diferentes tipos de erro
       if (error.message?.includes('Invalid login credentials')) {
         setErrorMessage(t('login.errors.invalidCredentials'));
       } else if (error.message?.includes('Email not confirmed')) {
-        setErrorMessage(t('login.errors.emailNotConfirmed'));
+        setErrorMessage('Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada.');
       } else if (error.message?.includes('User already registered')) {
         setErrorMessage(t('login.errors.userAlreadyExists'));
       } else if (error.message?.includes('Password should be at least 6 characters')) {
         setErrorMessage(t('login.errors.passwordTooShort'));
+      } else if (error.message?.includes('Database error saving new user')) {
+        setErrorMessage('Erro no banco de dados. Tente novamente em alguns segundos.');
       } else {
         setErrorMessage(error.message || t('login.errors.authenticationError'));
       }
@@ -168,12 +168,12 @@ const LoginAfricasHands: React.FC = () => {
       setErrorMessage('');
       setSuccessMessage('');
       
-      console.log('🔐 Iniciando login com Google...');
+      console.log('🔐 [LoginForm] Iniciando login com Google...');
       await loginWithGoogle();
       
       // Não precisa de mais nada aqui - o AuthContext cuida do resto
     } catch (error: any) {
-      console.error('❌ Erro no login Google:', error);
+      console.error('❌ [LoginForm] Erro no login Google:', error);
       setErrorMessage(error.message || 'Erro no login com Google');
       setIsLoading(false);
     }
@@ -186,46 +186,48 @@ const LoginAfricasHands: React.FC = () => {
       setErrorMessage('');
       setSuccessMessage('');
       
-      console.log('🔐 Iniciando login com Facebook...');
+      console.log('🔐 [LoginForm] Iniciando login com Facebook...');
       await loginWithFacebook();
       
       // Não precisa de mais nada aqui - o AuthContext cuida do resto
     } catch (error: any) {
-      console.error('❌ Erro no login Facebook:', error);
+      console.error('❌ [LoginForm] Erro no login Facebook:', error);
       setErrorMessage(error.message || 'Erro no login com Facebook');
       setIsLoading(false);
     }
   };
 
-  const handleForgotPassword = () => {
+  const handleForgotPassword = async () => {
     if (!formData.email) {
       setErrorMessage(t('login.errors.enterEmailFirst'));
       return;
     }
     
-    // Implementar reset de senha com Supabase
-    alert(`${t('login.messages.recoveryEmailSent')}: ${formData.email}`);
+    try {
+      setIsLoading(true);
+      setErrorMessage('');
+      
+      console.log('🔑 [LoginForm] Enviando email de recuperação para:', formData.email);
+      
+      // ✅ IMPLEMENTAÇÃO REAL do reset de senha
+      const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
+        redirectTo: `${window.location.origin}/reset-password`
+      });
+      
+      if (error) throw error;
+      
+      setSuccessMessage(`Email de recuperação enviado para ${formData.email}. Verifique sua caixa de entrada.`);
+      console.log('✅ [LoginForm] Email de recuperação enviado com sucesso');
+      
+    } catch (error: any) {
+      console.error('❌ [LoginForm] Erro ao enviar email de recuperação:', error);
+      setErrorMessage('Erro ao enviar email de recuperação. Tente novamente.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const fillDemoCredentials = (type: 'admin' | 'user') => {
-    if (type === 'admin') {
-      setFormData(prev => ({
-        ...prev,
-        email: 'admin@gmail.com',
-        password: '123456',
-        country: 'AO'
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        email: 'user@gmail.com',
-        password: '123456',
-        country: 'AO'
-      }));
-    }
-    setErrorMessage('');
-    setSuccessMessage('');
-  };
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
@@ -387,6 +389,8 @@ const LoginAfricasHands: React.FC = () => {
               </div>
             </div>
           )}
+
+
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -550,7 +554,8 @@ const LoginAfricasHands: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleForgotPassword}
-                  className="text-sm text-red-600 hover:text-red-700 font-medium"
+                  disabled={isLoading}
+                  className="text-sm text-red-600 hover:text-red-700 font-medium disabled:opacity-50"
                 >
                   {t('login.forgotPassword.link')}
                 </button>
@@ -645,7 +650,6 @@ const LoginAfricasHands: React.FC = () => {
               )}
             </button>
           </div>
-
 
           {/* Footer */}
           <div className="mt-8 text-center text-sm text-gray-500">

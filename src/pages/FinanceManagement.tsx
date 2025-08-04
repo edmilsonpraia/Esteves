@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation, LanguageToggle } from '../context/TranslationContext';
 
 interface Transaction {
   id: number;
@@ -61,6 +62,7 @@ interface ExchangeRate {
 }
 
 const FinanceManagement: React.FC = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedCountry, setSelectedCountry] = useState('all');
   const [selectedPeriod, setSelectedPeriod] = useState('current_month');
@@ -324,15 +326,15 @@ const FinanceManagement: React.FC = () => {
 
   const getStatusLabel = (status: string) => {
     const labels = {
-      'pending': 'Pendente',
-      'approved': 'Aprovado',
-      'completed': 'Concluído',
-      'rejected': 'Rejeitado',
-      'paid': 'Pago',
-      'sent': 'Enviado',
-      'overdue': 'Vencido',
-      'draft': 'Rascunho',
-      'cancelled': 'Cancelado'
+      'pending': t('admin.pending'),
+      'approved': t('applications.status.approved'),
+      'completed': t('stats.completed'),
+      'rejected': t('applications.status.rejected'),
+      'paid': t('finance.paid'),
+      'sent': t('finance.sent'),
+      'overdue': t('finance.overdue'),
+      'draft': t('finance.draft'),
+      'cancelled': t('finance.cancelled')
     };
     return labels[status as keyof typeof labels] || status;
   };
@@ -381,9 +383,14 @@ const FinanceManagement: React.FC = () => {
     <div className="space-y-3 sm:space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-3 sm:gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Gestão Financeira Regional</h1>
-          <p className="text-sm sm:text-base text-gray-600">Controle financeiro integrado Angola 🇦🇴 Namíbia 🇳🇦 África do Sul 🇿🇦</p>
+        <div className="flex-1">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">{t('finance.title')}</h1>
+              <p className="text-sm sm:text-base text-gray-600">{t('finance.subtitle')}</p>
+            </div>
+            <LanguageToggle />
+          </div>
         </div>
         
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
@@ -392,7 +399,7 @@ const FinanceManagement: React.FC = () => {
             onChange={(e) => setSelectedCountry(e.target.value)}
             className="w-full sm:w-auto px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white touch-manipulation"
           >
-            <option value="all">🌍 Todos os Países</option>
+            <option value="all">🌍 {t('projects.allCountries')}</option>
             {countries.map(country => (
               <option key={country} value={country}>
                 {getCountryFlag(country)} {country}
@@ -405,10 +412,10 @@ const FinanceManagement: React.FC = () => {
             onChange={(e) => setSelectedPeriod(e.target.value)}
             className="w-full sm:w-auto px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white touch-manipulation"
           >
-            <option value="current_month">Mês Atual</option>
-            <option value="current_quarter">Trimestre Atual</option>
-            <option value="current_year">Ano Atual</option>
-            <option value="last_30_days">Últimos 30 dias</option>
+            <option value="current_month">{t('finance.currentMonth')}</option>
+            <option value="current_quarter">{t('finance.currentQuarter')}</option>
+            <option value="current_year">{t('finance.currentYear')}</option>
+            <option value="last_30_days">{t('analytics.lastDays')}</option>
           </select>
 
           <button 
@@ -418,7 +425,7 @@ const FinanceManagement: React.FC = () => {
             <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            <span className="text-sm sm:text-base">Nova Transação</span>
+            <span className="text-sm sm:text-base">{t('finance.addTransaction')}</span>
           </button>
         </div>
       </div>
@@ -428,7 +435,7 @@ const FinanceManagement: React.FC = () => {
         <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm font-medium text-gray-600">Receita Total</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-600">{t('finance.totalRevenue')}</p>
               <p className="text-lg sm:text-2xl font-bold text-green-600 truncate">
                 {formatCurrency(summary.totalIncome)}
               </p>
@@ -439,14 +446,14 @@ const FinanceManagement: React.FC = () => {
           </div>
           <div className="mt-3 sm:mt-4 flex items-center text-xs sm:text-sm">
             <span className="text-green-600">📈 +15.2%</span>
-            <span className="text-gray-500 ml-1">vs mês anterior</span>
+            <span className="text-gray-500 ml-1">{t('finance.vsPreviousMonth')}</span>
           </div>
         </div>
 
         <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm font-medium text-gray-600">Despesas</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-600">{t('finance.totalExpenses')}</p>
               <p className="text-lg sm:text-2xl font-bold text-red-600 truncate">
                 {formatCurrency(summary.totalExpenses)}
               </p>
@@ -457,14 +464,14 @@ const FinanceManagement: React.FC = () => {
           </div>
           <div className="mt-3 sm:mt-4 flex items-center text-xs sm:text-sm">
             <span className="text-red-600">📉 -8.1%</span>
-            <span className="text-gray-500 ml-1">vs mês anterior</span>
+            <span className="text-gray-500 ml-1">{t('finance.vsPreviousMonth')}</span>
           </div>
         </div>
 
         <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm font-medium text-gray-600">Lucro Líquido</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-600">{t('finance.netProfit')}</p>
               <p className={`text-lg sm:text-2xl font-bold truncate ${summary.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {formatCurrency(summary.netProfit)}
               </p>
@@ -475,7 +482,7 @@ const FinanceManagement: React.FC = () => {
           </div>
           <div className="mt-3 sm:mt-4 flex items-center text-xs sm:text-sm">
             <span className={summary.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}>
-              {summary.profitMargin.toFixed(1)}% margem
+              {summary.profitMargin.toFixed(1)}% {t('finance.profitMargin')}
             </span>
           </div>
         </div>
@@ -483,7 +490,7 @@ const FinanceManagement: React.FC = () => {
         <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm font-medium text-gray-600">Pendente</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-600">{t('finance.pendingInvoices')}</p>
               <p className="text-lg sm:text-2xl font-bold text-yellow-600 truncate">
                 {formatCurrency(summary.pendingAmount)}
               </p>
@@ -493,14 +500,14 @@ const FinanceManagement: React.FC = () => {
             </div>
           </div>
           <div className="mt-3 sm:mt-4 flex items-center text-xs sm:text-sm">
-            <span className="text-gray-500">Aguardando aprovação</span>
+            <span className="text-gray-500">{t('finance.awaitingApproval')}</span>
           </div>
         </div>
 
         <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm font-medium text-gray-600">Orçamento</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-600">{t('finance.budget')}</p>
               <p className="text-lg sm:text-2xl font-bold text-purple-600 truncate">
                 {formatCurrency(summary.totalBudgetAllocated)}
               </p>
@@ -539,12 +546,12 @@ const FinanceManagement: React.FC = () => {
         <div className="border-b border-gray-200">
           <nav className="flex space-x-2 sm:space-x-8 px-3 sm:px-6 overflow-x-auto scrollbar-hide">
             {[
-              { id: 'overview', name: 'Visão Geral', icon: '📊', shortName: 'Geral' },
-              { id: 'transactions', name: 'Transações', icon: '💳', shortName: 'Trans.' },
-              { id: 'budgets', name: 'Orçamentos', icon: '💼', shortName: 'Orç.' },
-              { id: 'invoices', name: 'Faturas', icon: '📄', shortName: 'Faturas' },
-              { id: 'reports', name: 'Relatórios', icon: '📈', shortName: 'Rel.' },
-              { id: 'exchange', name: 'Câmbio', icon: '💱', shortName: 'Câmbio' }
+              { id: 'overview', name: t('finance.general'), icon: '📊', shortName: t('finance.general') },
+              { id: 'transactions', name: t('finance.transactions'), icon: '💳', shortName: t('finance.trans') },
+              { id: 'budgets', name: t('finance.budget'), icon: '💼', shortName: t('finance.orc') },
+              { id: 'invoices', name: t('finance.invoices'), icon: '📄', shortName: t('finance.fat') },
+              { id: 'reports', name: t('finance.reports'), icon: '📈', shortName: t('finance.rel') },
+              { id: 'exchange', name: t('finance.exchange'), icon: '💱', shortName: t('finance.exchange') }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -570,15 +577,15 @@ const FinanceManagement: React.FC = () => {
               {/* Cash Flow Chart */}
               <div className="bg-gray-50 rounded-lg p-3 sm:p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-3 sm:mb-4">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">Fluxo de Caixa Mensal</h3>
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">{t('finance.monthlyCashFlow')}</h3>
                   <div className="flex gap-3 sm:gap-2">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span className="text-xs sm:text-sm text-gray-600">Receitas</span>
+                      <span className="text-xs sm:text-sm text-gray-600">{t('finance.income')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                      <span className="text-xs sm:text-sm text-gray-600">Despesas</span>
+                      <span className="text-xs sm:text-sm text-gray-600">{t('finance.expense')}</span>
                     </div>
                   </div>
                 </div>
@@ -764,13 +771,13 @@ const FinanceManagement: React.FC = () => {
                 <table className="w-full">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descrição</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Valor</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">País</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('finance.date')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('finance.description')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('finance.type')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('finance.amount')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('admin.status')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('admin.country')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('finance.actions')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -787,9 +794,9 @@ const FinanceManagement: React.FC = () => {
                         </td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full ${getTransactionTypeColor(transaction.type)}`}>
-                            {getTransactionTypeIcon(transaction.type)}
-                            {transaction.type === 'income' ? 'Receita' : 
-                             transaction.type === 'expense' ? 'Despesa' : 'Transferência'}
+                          {getTransactionTypeIcon(transaction.type)}
+                          {transaction.type === 'income' ? t('finance.income') : 
+                          transaction.type === 'expense' ? t('finance.expense') : t('finance.transfer')}
                           </span>
                         </td>
                         <td className="px-6 py-4">
@@ -809,10 +816,10 @@ const FinanceManagement: React.FC = () => {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex gap-2">
-                            <button className="text-blue-600 hover:text-blue-700 text-sm">Ver</button>
-                            <button className="text-green-600 hover:text-green-700 text-sm">Editar</button>
+                            <button className="text-blue-600 hover:text-blue-700 text-sm">{t('clients.view')}</button>
+                            <button className="text-green-600 hover:text-green-700 text-sm">{t('finance.edit')}</button>
                             {transaction.status === 'pending' && (
-                              <button className="text-red-600 hover:text-red-700 text-sm">Aprovar</button>
+                            <button className="text-red-600 hover:text-red-700 text-sm">{t('finance.approve')}</button>
                             )}
                           </div>
                         </td>
@@ -828,9 +835,9 @@ const FinanceManagement: React.FC = () => {
           {activeTab === 'budgets' && (
             <div className="space-y-3 sm:space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900">Orçamentos por Categoria</h3>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900">{t('finance.budgetsByCategory')}</h3>
                 <button className="w-full sm:w-auto bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm touch-manipulation min-h-[44px]">
-                  Criar Orçamento
+                  {t('finance.createBudget')}
                 </button>
               </div>
 
@@ -857,25 +864,25 @@ const FinanceManagement: React.FC = () => {
                           usagePercentage > 75 ? 'bg-yellow-100 text-yellow-800' :
                           'bg-green-100 text-green-800'
                         }`}>
-                          {usagePercentage.toFixed(1)}% usado
+                          {usagePercentage.toFixed(1)}% {t('finance.used')}
                         </span>
                       </div>
 
                       <div className="space-y-3 sm:space-y-4">
                         <div className="grid grid-cols-2 gap-3 sm:gap-4">
                           <div>
-                            <p className="text-xs sm:text-sm text-gray-500">Alocado</p>
+                            <p className="text-xs sm:text-sm text-gray-500">{t('finance.allocated')}</p>
                             <p className="text-base sm:text-lg font-bold text-blue-600 truncate">{formatCurrency(budget.allocated, budget.currency)}</p>
                           </div>
                           <div>
-                            <p className="text-xs sm:text-sm text-gray-500">Gasto</p>
+                            <p className="text-xs sm:text-sm text-gray-500">{t('finance.spent')}</p>
                             <p className="text-base sm:text-lg font-bold text-red-600 truncate">{formatCurrency(budget.spent, budget.currency)}</p>
                           </div>
                         </div>
 
                         <div>
                           <div className="flex justify-between text-xs sm:text-sm mb-2">
-                            <span className="text-gray-600">Progresso</span>
+                            <span className="text-gray-600">{t('finance.progress')}</span>
                             <span className="font-medium">{usagePercentage.toFixed(1)}%</span>
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-2 sm:h-3">
@@ -893,11 +900,11 @@ const FinanceManagement: React.FC = () => {
                         <div className="pt-3 sm:pt-4 border-t border-gray-200">
                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-4">
                             <div>
-                              <p className="text-xs sm:text-sm text-gray-500">Restante</p>
+                              <p className="text-xs sm:text-sm text-gray-500">{t('finance.remaining')}</p>
                               <p className="font-bold text-gray-900 text-sm sm:text-base truncate">{formatCurrency(remaining, budget.currency)}</p>
                             </div>
                             <div className="sm:text-right">
-                              <p className="text-xs sm:text-sm text-gray-500">Responsável</p>
+                              <p className="text-xs sm:text-sm text-gray-500">{t('finance.responsible')}</p>
                               <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">{budget.responsible}</p>
                             </div>
                           </div>
@@ -905,10 +912,10 @@ const FinanceManagement: React.FC = () => {
 
                         <div className="flex flex-col sm:flex-row gap-2">
                           <button className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors text-sm touch-manipulation min-h-[44px]">
-                            Ver Detalhes
+                            {t('finance.viewDetails')}
                           </button>
                           <button className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors text-sm touch-manipulation min-h-[44px]">
-                            Ajustar
+                            {t('finance.adjust')}
                           </button>
                         </div>
                       </div>
@@ -923,12 +930,12 @@ const FinanceManagement: React.FC = () => {
           {activeTab === 'invoices' && (
             <div className="space-y-3 sm:space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900">Gestão de Faturas</h3>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900">{t('finance.invoiceManagement')}</h3>
                 <button 
                   onClick={() => setShowInvoiceModal(true)}
                   className="w-full sm:w-auto bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm touch-manipulation min-h-[44px]"
                 >
-                  Nova Fatura
+                  {t('finance.newInvoice')}
                 </button>
               </div>
 
@@ -947,19 +954,19 @@ const FinanceManagement: React.FC = () => {
 
                     <div className="space-y-2 sm:space-y-3">
                       <div>
-                        <p className="text-xs sm:text-sm text-gray-500">Projeto</p>
+                        <p className="text-xs sm:text-sm text-gray-500">{t('finance.project')}</p>
                         <p className="font-medium text-gray-900 text-sm sm:text-base truncate">{invoice.project}</p>
                       </div>
 
                       <div className="grid grid-cols-2 gap-3 sm:gap-4">
                         <div>
-                          <p className="text-xs sm:text-sm text-gray-500">Valor</p>
+                          <p className="text-xs sm:text-sm text-gray-500">{t('finance.amount')}</p>
                           <p className="font-bold text-green-600 text-base sm:text-lg truncate">
                             {formatCurrency(invoice.amount, invoice.currency)}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs sm:text-sm text-gray-500">País</p>
+                          <p className="text-xs sm:text-sm text-gray-500">{t('admin.country')}</p>
                           <p className="font-medium text-gray-900 text-xs sm:text-sm flex items-center gap-1">
                             {getCountryFlag(invoice.country)} <span className="truncate">{invoice.country}</span>
                           </p>
@@ -968,13 +975,13 @@ const FinanceManagement: React.FC = () => {
 
                       <div className="grid grid-cols-2 gap-3 sm:gap-4">
                         <div>
-                          <p className="text-xs sm:text-sm text-gray-500">Emissão</p>
+                          <p className="text-xs sm:text-sm text-gray-500">{t('finance.issueDate')}</p>
                           <p className="text-xs sm:text-sm text-gray-900">
                             {new Date(invoice.issueDate).toLocaleDateString('pt-BR')}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs sm:text-sm text-gray-500">Vencimento</p>
+                          <p className="text-xs sm:text-sm text-gray-500">{t('finance.dueDate')}</p>
                           <p className={`text-xs sm:text-sm ${
                             new Date(invoice.dueDate) < new Date() && invoice.status !== 'paid' 
                               ? 'text-red-600 font-medium' 
@@ -988,14 +995,14 @@ const FinanceManagement: React.FC = () => {
                       <div className="pt-3 sm:pt-4 border-t border-gray-200">
                         <div className="flex flex-col sm:flex-row gap-2">
                           <button className="flex-1 bg-gray-100 text-gray-700 py-2 px-3 rounded-lg hover:bg-gray-200 transition-colors text-sm touch-manipulation min-h-[44px]">
-                            Ver PDF
+                            {t('finance.viewPDF')}
                           </button>
                           <button className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition-colors text-sm touch-manipulation min-h-[44px]">
-                            Enviar
+                            {t('finance.send')}
                           </button>
                           {invoice.status === 'sent' && (
                             <button className="flex-1 bg-green-600 text-white py-2 px-3 rounded-lg hover:bg-green-700 transition-colors text-sm touch-manipulation min-h-[44px]">
-                              Marcar Pago
+                              {t('finance.markPaid')}
                             </button>
                           )}
                         </div>
@@ -1166,7 +1173,7 @@ const FinanceManagement: React.FC = () => {
           <div className="bg-white rounded-t-xl sm:rounded-xl max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
             <div className="p-4 sm:p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg sm:text-2xl font-bold text-gray-900">Nova Transação</h2>
+                <h2 className="text-lg sm:text-2xl font-bold text-gray-900">{t('finance.addTransaction')}</h2>
                 <button
                   onClick={() => setShowTransactionModal(false)}
                   className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-colors touch-manipulation"

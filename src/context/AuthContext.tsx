@@ -45,8 +45,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   // 🔧 TIMEOUT PARA EVITAR LOADING INFINITO
-  const LOADING_TIMEOUT = 3000; // 3 segundos máximo
-  const OPERATION_TIMEOUT = 2000; // 2 segundos para operações
+  const LOADING_TIMEOUT = 8000; // ✅ AUMENTADO de 3000 para 8000
+  const OPERATION_TIMEOUT = 5000; // ✅ AUMENTADO de 2000 para 5000
 
   // 🎯 FUNÇÃO: Determinar role baseado no email
   const determineRoleFromEmail = (email: string): 'admin' | 'user' => {
@@ -522,18 +522,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) throw error;
 
-      if (data.user) {
-        console.log('✅ [Register] Usuário registrado, criando perfil...');
-        
-        const profileData = {
-          ...userData,
-          role: userData.role || determineRoleFromEmail(email)
-        };
-        
-        createUserProfile(data.user, profileData)
-          .then(() => console.log('✅ [Register] Perfil criado após registro'))
-          .catch(err => console.warn('⚠️ [Register] Erro ao criar perfil após registro (não crítico):', err));
-      }
+      // ✅ CORREÇÃO: NÃO criar perfil imediatamente após signup
+      // O perfil será criado automaticamente pelo onAuthStateChange quando o usuário fizer login
+      console.log('✅ [Register] Usuário registrado com sucesso!');
+      console.log('📧 [Register] Verificar email para confirmação se necessário');
       
       setIsLoading(false);
     } catch (error: any) {
