@@ -109,20 +109,49 @@ const translations: Translations = {
     'login.slogan': 'AO • NA • ZA Regional',
     'login.countriesDescription': 'Conectando Angola, Namíbia e África do Sul',
     
-    // Form
+    // Login Form - TRADUÇÕES COMPLETAS PARA O LOGIN
+    'login.form.fullName': 'Nome Completo',
+    'login.form.fullNamePlaceholder': 'Digite seu nome completo',
     'login.form.email': 'Email',
-    'login.form.emailPlaceholder': 'seu@email.com',
+    'login.form.emailPlaceholder': 'Digite seu email',
+    'login.form.emailTip': 'Use emails com "admin" para acesso administrativo',
     'login.form.password': 'Senha',
-    'login.form.passwordPlaceholder': 'Sua senha',
+    'login.form.passwordPlaceholder': 'Digite sua senha',
+    'login.form.passwordRequirement': 'Mínimo de 6 caracteres',
     'login.form.rememberMe': 'Lembrar-me',
-    'login.form.adminTip': 'Use admin@africashands.com para acesso administrativo',
     'login.form.selectCountry': 'Selecione seu país',
+    'login.form.sector': 'Setor de Atuação',
+    'login.form.selectSector': 'Selecione seu setor',
+    'login.form.organization': 'Organização',
+    'login.form.organizationPlaceholder': 'Nome da sua organização (opcional)',
     
-    // Buttons
+    // Login Buttons - TRADUÇÕES COMPLETAS
     'login.buttons.signingIn': 'Entrando...',
     'login.buttons.creatingAccount': 'Criando conta...',
     'login.buttons.enterPlatform': 'Entrar na Plataforma',
     'login.buttons.createMyAccount': 'Criar Minha Conta',
+    
+    // Login Messages - TRADUÇÕES COMPLETAS
+    'login.messages.loginSuccess': 'Login realizado com sucesso!',
+    'login.messages.registerSuccess': 'Conta criada com sucesso! Verificar email para ativação.',
+    'login.messages.recoveryEmailSent': 'Email de recuperação enviado para',
+    
+    // Login Errors - TRADUÇÕES COMPLETAS
+    'login.errors.fillAllFields': 'Preencha todos os campos obrigatórios',
+    'login.errors.invalidEmail': 'Email inválido',
+    'login.errors.passwordTooShort': 'A senha deve ter pelo menos 6 caracteres',
+    'login.errors.nameCountryRequired': 'Nome e país são obrigatórios para registro',
+    'login.errors.selectCountry': 'Selecione um país',
+    'login.errors.enterEmailFirst': 'Digite seu email primeiro',
+    'login.errors.invalidCredentials': 'Email ou senha incorretos',
+    'login.errors.emailNotConfirmed': 'Por favor, confirme seu email antes de fazer login',
+    'login.errors.userAlreadyExists': 'Este email já está registrado',
+    'login.errors.authenticationError': 'Erro na autenticação. Tente novamente.',
+    
+    // Login Sectors - TRADUÇÕES COMPLETAS PARA OS SETORES
+    'login.sectors.executive': 'Gestão Executiva',
+    'login.sectors.government': 'Governo',
+    'login.sectors.ngos': 'ONGs',
     
     // Countries
     'country.angola': 'Angola',
@@ -141,30 +170,32 @@ const translations: Translations = {
     'login.stats.countries': 'Países',
     'login.stats.sectors': 'Setores',
     
-    // Social Login
+    // Social Login - TRADUÇÕES COMPLETAS
     'login.socialLogin.orContinueWith': 'ou continue com',
     'login.socialLogin.continueWithGoogle': 'Continuar com Google',
     'login.socialLogin.continueWithFacebook': 'Continuar com Facebook',
     'login.socialLogin.googleSoon': 'Login com Google em breve!',
+    
+    // Forgot Password - TRADUÇÕES COMPLETAS
+    'login.forgotPassword.link': 'Esqueci a senha',
+    'login.forgotPassword.title': 'Recuperar Senha',
+    'login.forgotPassword.description': 'Digite seu email para receber instruções de recuperação',
+    'login.forgotPassword.send': 'Enviar',
+    'login.forgotPassword.sending': 'Enviando...',
+    'login.forgotPassword.success': 'Email de recuperação enviado com sucesso!',
+    'login.forgotPassword.error': 'Erro ao enviar email de recuperação',
     
     // Demo Accounts
     'login.demoAccounts.title': 'Contas de Demonstração',
     'login.demoAccounts.admin': 'Administrador',
     'login.demoAccounts.user': 'Usuário',
     
-    // Footer
+    // Footer - TRADUÇÕES COMPLETAS
     'login.footer.agreement': 'Ao continuar, você concorda com nossos',
     'login.footer.termsOfUse': 'Termos de Uso',
     'login.footer.and': 'e',
     'login.footer.privacyPolicy': 'Política de Privacidade',
     'login.footer.developedBy': 'Desenvolvido por',
-    
-    // Errors
-    'login.errors.fillAllFields': 'Preencha todos os campos',
-    'login.errors.selectCountry': 'Selecione um país',
-    
-    // Forgot Password
-    'login.forgotPassword.link': 'Esqueci a senha',
     
     // Dashboard
     'dashboard.title': 'Painel Administrativo Regional',
@@ -668,20 +699,49 @@ const translations: Translations = {
     'login.slogan': 'AO • NA • ZA Regional',
     'login.countriesDescription': 'Connecting Angola, Namibia and South Africa',
     
-    // Form
+    // Login Form - TRADUÇÕES COMPLETAS PARA O LOGIN EM INGLÊS
+    'login.form.fullName': 'Full Name',
+    'login.form.fullNamePlaceholder': 'Enter your full name',
     'login.form.email': 'Email',
-    'login.form.emailPlaceholder': 'your@email.com',
+    'login.form.emailPlaceholder': 'Enter your email',
+    'login.form.emailTip': 'Use emails with "admin" for administrative access',
     'login.form.password': 'Password',
-    'login.form.passwordPlaceholder': 'Your password',
+    'login.form.passwordPlaceholder': 'Enter your password',
+    'login.form.passwordRequirement': 'Minimum 6 characters',
     'login.form.rememberMe': 'Remember me',
-    'login.form.adminTip': 'Use admin@africashands.com for administrative access',
     'login.form.selectCountry': 'Select your country',
+    'login.form.sector': 'Sector',
+    'login.form.selectSector': 'Select your sector',
+    'login.form.organization': 'Organization',
+    'login.form.organizationPlaceholder': 'Your organization name (optional)',
     
-    // Buttons
+    // Login Buttons - TRADUÇÕES COMPLETAS EM INGLÊS
     'login.buttons.signingIn': 'Signing in...',
     'login.buttons.creatingAccount': 'Creating account...',
     'login.buttons.enterPlatform': 'Enter Platform',
     'login.buttons.createMyAccount': 'Create My Account',
+    
+    // Login Messages - TRADUÇÕES COMPLETAS EM INGLÊS
+    'login.messages.loginSuccess': 'Login successful!',
+    'login.messages.registerSuccess': 'Account created successfully! Check email for activation.',
+    'login.messages.recoveryEmailSent': 'Recovery email sent to',
+    
+    // Login Errors - TRADUÇÕES COMPLETAS EM INGLÊS
+    'login.errors.fillAllFields': 'Fill all required fields',
+    'login.errors.invalidEmail': 'Invalid email',
+    'login.errors.passwordTooShort': 'Password must be at least 6 characters',
+    'login.errors.nameCountryRequired': 'Name and country are required for registration',
+    'login.errors.selectCountry': 'Select a country',
+    'login.errors.enterEmailFirst': 'Enter your email first',
+    'login.errors.invalidCredentials': 'Invalid email or password',
+    'login.errors.emailNotConfirmed': 'Please confirm your email before logging in',
+    'login.errors.userAlreadyExists': 'This email is already registered',
+    'login.errors.authenticationError': 'Authentication error. Try again.',
+    
+    // Login Sectors - TRADUÇÕES COMPLETAS PARA OS SETORES EM INGLÊS
+    'login.sectors.executive': 'Executive Management',
+    'login.sectors.government': 'Government',
+    'login.sectors.ngos': 'NGOs',
     
     // Countries
     'country.angola': 'Angola',
@@ -700,30 +760,32 @@ const translations: Translations = {
     'login.stats.countries': 'Countries',
     'login.stats.sectors': 'Sectors',
     
-    // Social Login
+    // Social Login - TRADUÇÕES COMPLETAS EM INGLÊS
     'login.socialLogin.orContinueWith': 'or continue with',
     'login.socialLogin.continueWithGoogle': 'Continue with Google',
     'login.socialLogin.continueWithFacebook': 'Continue with Facebook',
     'login.socialLogin.googleSoon': 'Google login coming soon!',
+    
+    // Forgot Password - TRADUÇÕES COMPLETAS EM INGLÊS
+    'login.forgotPassword.link': 'Forgot password',
+    'login.forgotPassword.title': 'Reset Password',
+    'login.forgotPassword.description': 'Enter your email to receive recovery instructions',
+    'login.forgotPassword.send': 'Send',
+    'login.forgotPassword.sending': 'Sending...',
+    'login.forgotPassword.success': 'Recovery email sent successfully!',
+    'login.forgotPassword.error': 'Error sending recovery email',
     
     // Demo Accounts
     'login.demoAccounts.title': 'Demo Accounts',
     'login.demoAccounts.admin': 'Administrator',
     'login.demoAccounts.user': 'User',
     
-    // Footer
+    // Footer - TRADUÇÕES COMPLETAS EM INGLÊS
     'login.footer.agreement': 'By continuing, you agree to our',
     'login.footer.termsOfUse': 'Terms of Use',
     'login.footer.and': 'and',
     'login.footer.privacyPolicy': 'Privacy Policy',
     'login.footer.developedBy': 'Developed by',
-    
-    // Errors
-    'login.errors.fillAllFields': 'Fill all fields',
-    'login.errors.selectCountry': 'Select a country',
-    
-    // Forgot Password
-    'login.forgotPassword.link': 'Forgot password',
     
     // Dashboard
     'dashboard.title': 'Regional Administrative Panel',
@@ -989,6 +1051,35 @@ const translations: Translations = {
     'finance.progress': 'Progress',
     'finance.spent': 'Spent',
     'finance.remaining': 'Remaining',
+    'finance.exchange': 'Exchange',
+    'finance.transfer': 'Transfer',
+    'finance.project': 'Project',
+    'finance.issueDate': 'Issue',
+    'finance.dueDate': 'Due',
+    'finance.viewPDF': 'View PDF',
+    'finance.send': 'Send',
+    'finance.markPaid': 'Mark Paid',
+    'finance.approve': 'Approve',
+    'finance.invoiceManagement': 'Invoice Management',
+    'finance.newInvoice': 'New Invoice',
+    'finance.budgetsByCategory': 'Budgets by Category',
+    'finance.used': 'used',
+    'finance.allocated': 'Allocated',
+    'finance.responsible': 'Responsible',
+    'finance.viewDetails': 'View Details',
+    'finance.adjust': 'Adjust',
+    'finance.monthlyCashFlow': 'Monthly Cash Flow',
+    'finance.vsPreviousMonth': 'vs previous month',
+    'finance.profitMargin': 'margin',
+    'finance.awaitingApproval': 'Awaiting approval',
+    'finance.currentMonth': 'Current Month',
+    'finance.currentQuarter': 'Current Quarter',
+    'finance.currentYear': 'Current Year',
+    'finance.paid': 'Paid',
+    'finance.sent': 'Sent',
+    'finance.overdue': 'Overdue',
+    'finance.draft': 'Draft',
+    'finance.cancelled': 'Cancelled',
 
     // Admin Pages - Clients
     'clients.title': 'Client Management',
