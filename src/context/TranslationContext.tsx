@@ -1,26 +1,19 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-type Language = 'pt' | 'en';
-
-interface TranslationContextType {
-  language: Language;
-  setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+interface Translations {
+  [key: string]: {
+    [key: string]: string;
+  };
 }
 
-const TranslationContext = createContext<TranslationContextType | null>(null);
+interface TranslationContextType {
+  t: (key: string) => string;
+  language: string;
+  setLanguage: (lang: string) => void;
+}
 
-// Define translation keys as a type for better type safety
-type TranslationKeys = {
-  [key: string]: string;
-};
+const TranslationContext = createContext<TranslationContextType | undefined>(undefined);
 
-type Translations = {
-  pt: TranslationKeys;
-  en: TranslationKeys;
-};
-
-// Complete translations object
 const translations: Translations = {
   pt: {
     // Company
@@ -109,7 +102,7 @@ const translations: Translations = {
     'login.slogan': 'AO • NA • ZA Regional',
     'login.countriesDescription': 'Conectando Angola, Namíbia e África do Sul',
     
-    // Login Form - TRADUÇÕES COMPLETAS PARA O LOGIN
+    // Login Form
     'login.form.fullName': 'Nome Completo',
     'login.form.fullNamePlaceholder': 'Digite seu nome completo',
     'login.form.email': 'Email',
@@ -125,18 +118,18 @@ const translations: Translations = {
     'login.form.organization': 'Organização',
     'login.form.organizationPlaceholder': 'Nome da sua organização (opcional)',
     
-    // Login Buttons - TRADUÇÕES COMPLETAS
+    // Login Buttons
     'login.buttons.signingIn': 'Entrando...',
     'login.buttons.creatingAccount': 'Criando conta...',
     'login.buttons.enterPlatform': 'Entrar na Plataforma',
     'login.buttons.createMyAccount': 'Criar Minha Conta',
     
-    // Login Messages - TRADUÇÕES COMPLETAS
+    // Login Messages
     'login.messages.loginSuccess': 'Login realizado com sucesso!',
     'login.messages.registerSuccess': 'Conta criada com sucesso! Verificar email para ativação.',
     'login.messages.recoveryEmailSent': 'Email de recuperação enviado para',
     
-    // Login Errors - TRADUÇÕES COMPLETAS
+    // Login Errors
     'login.errors.fillAllFields': 'Preencha todos os campos obrigatórios',
     'login.errors.invalidEmail': 'Email inválido',
     'login.errors.passwordTooShort': 'A senha deve ter pelo menos 6 caracteres',
@@ -148,7 +141,7 @@ const translations: Translations = {
     'login.errors.userAlreadyExists': 'Este email já está registrado',
     'login.errors.authenticationError': 'Erro na autenticação. Tente novamente.',
     
-    // Login Sectors - TRADUÇÕES COMPLETAS PARA OS SETORES
+    // Login Sectors
     'login.sectors.executive': 'Gestão Executiva',
     'login.sectors.government': 'Governo',
     'login.sectors.ngos': 'ONGs',
@@ -169,14 +162,19 @@ const translations: Translations = {
     'login.stats.population': 'População',
     'login.stats.countries': 'Países',
     'login.stats.sectors': 'Setores',
+    'stats.activeOpportunities': 'Oportunidades Ativas',
+    'stats.pendingApplications': 'Candidaturas Pendentes',
+    'stats.pendingRequests': 'Solicitações Pendentes',
+    'stats.activeUsers': 'Usuários Ativos',
+    'stats.connections': 'Conexões',
     
-    // Social Login - TRADUÇÕES COMPLETAS
+    // Social Login
     'login.socialLogin.orContinueWith': 'ou continue com',
     'login.socialLogin.continueWithGoogle': 'Continuar com Google',
     'login.socialLogin.continueWithFacebook': 'Continuar com Facebook',
     'login.socialLogin.googleSoon': 'Login com Google em breve!',
     
-    // Forgot Password - TRADUÇÕES COMPLETAS
+    // Forgot Password
     'login.forgotPassword.link': 'Esqueci a senha',
     'login.forgotPassword.title': 'Recuperar Senha',
     'login.forgotPassword.description': 'Digite seu email para receber instruções de recuperação',
@@ -190,7 +188,7 @@ const translations: Translations = {
     'login.demoAccounts.admin': 'Administrador',
     'login.demoAccounts.user': 'Usuário',
     
-    // Footer - TRADUÇÕES COMPLETAS
+    // Footer
     'login.footer.agreement': 'Ao continuar, você concorda com nossos',
     'login.footer.termsOfUse': 'Termos de Uso',
     'login.footer.and': 'e',
@@ -326,6 +324,9 @@ const translations: Translations = {
     'tabs.applications': 'Candidaturas',
     'tabs.network': 'Rede',
     'tabs.resources': 'Recursos',
+    'tabs.overview': 'Visão Geral',
+    'tabs.requests': 'Solicitações',
+    'tabs.users': 'Usuários',
 
     // Opportunities
     'opportunities.title': 'Oportunidades Regionais',
@@ -337,6 +338,16 @@ const translations: Translations = {
     'opportunities.applied': 'Candidatado',
     'opportunities.save': 'Salvo',
     'opportunities.applySuccess': 'Candidatura enviada com sucesso!',
+    'opportunities.opportunityCount': 'Oportunidade',
+    'opportunities.opportunitiesCount': 'Oportunidades',
+    'opportunities.systemCount': 'no sistema',
+    'opportunities.edit': 'Editar',
+    'opportunities.pause': 'Pausar',
+    'opportunities.activate': 'Ativar',
+    'opportunities.delete': 'Excluir',
+    'opportunities.noOpportunities': 'Nenhuma Oportunidade Encontrada',
+    'opportunities.noOpportunitiesDesc': 'Crie sua primeira oportunidade para começar a conectar profissionais',
+    'opportunities.createFirst': 'Criar Primeira Oportunidade',
 
     // Applications
     'applications.title': 'Minhas Candidaturas',
@@ -345,6 +356,20 @@ const translations: Translations = {
     'applications.status.pending': 'Pendente',
     'applications.status.approved': 'Aprovado',
     'applications.status.rejected': 'Rejeitado',
+    'applications.allApplications': 'Todas as Candidaturas',
+    'applications.pending': 'Pendentes',
+    'applications.approved': 'Aprovadas',
+    'applications.rejected': 'Rejeitadas',
+    'applications.candidate': 'Candidato',
+    'applications.email': 'Email',
+    'applications.date': 'Data',
+    'applications.organization': 'Organização',
+    'applications.location': 'Localização',
+    'applications.deadline': 'Prazo',
+    'applications.message': 'Mensagem',
+    'applications.approve': 'Aprovar',
+    'applications.reject': 'Rejeitar',
+    'applications.viewDetails': 'Ver Detalhes',
 
     // Network
     'network.title': 'Minha Rede',
@@ -389,11 +414,24 @@ const translations: Translations = {
     'services.hotels': 'Hotéis',
     'services.consulting': 'Consultoria',
     'services.guides': 'Guias Locais',
+    'requests.title': 'Solicitações de Serviço',
+    'requests.allRequests': 'Todas as Solicitações',
+    'requests.noRequests': 'Nenhuma Solicitação Encontrada',
+    'requests.noRequestsDesc': 'Nenhuma solicitação de serviço foi registrada ainda',
+    'requests.name': 'Nome',
+    'requests.phone': 'Telefone',
+    'requests.country': 'País',
+    'requests.details': 'Detalhes',
+    'requests.process': 'Processar',
+    'requests.markComplete': 'Marcar como Concluído',
+    'requests.whatsapp': 'Contactar via WhatsApp',
+    'requests.emailAction': 'Enviar Email',
 
     // Common
     'common.error': 'Ocorreu um erro',
     'common.close': 'Fechar',
     'common.processing': 'Processando...',
+    'common.warning': 'Aviso',
 
     // Project Types
     'project.type.project': 'Projeto',
@@ -461,35 +499,35 @@ const translations: Translations = {
     'finance.progress': 'Progresso',
     'finance.spent': 'Gasto',
     'finance.remaining': 'Restante',
-     'finance.exchange': 'Câmbio',
-     'finance.transfer': 'Transferência',
-     'finance.project': 'Projeto',
-     'finance.issueDate': 'Emissão',
-     'finance.dueDate': 'Vencimento',
-     'finance.viewPDF': 'Ver PDF',
-     'finance.send': 'Enviar',
-     'finance.markPaid': 'Marcar Pago',
-     'finance.approve': 'Aprovar',
-     'finance.invoiceManagement': 'Gestão de Faturas',
-     'finance.newInvoice': 'Nova Fatura',
-     'finance.budgetsByCategory': 'Orçamentos por Categoria',
-     'finance.used': 'usado',
-     'finance.allocated': 'Alocado',
-     'finance.responsible': 'Responsável',
-     'finance.viewDetails': 'Ver Detalhes',
-     'finance.adjust': 'Ajustar',
-     'finance.monthlyCashFlow': 'Fluxo de Caixa Mensal',
-     'finance.vsPreviousMonth': 'vs mês anterior',
-     'finance.profitMargin': 'margem',
-     'finance.awaitingApproval': 'Aguardando aprovação',
-     'finance.currentMonth': 'Mês Atual',
-     'finance.currentQuarter': 'Trimestre Atual',
-     'finance.currentYear': 'Ano Atual',
-     'finance.paid': 'Pago',
-     'finance.sent': 'Enviado',
-     'finance.overdue': 'Vencido',
-     'finance.draft': 'Rascunho',
-     'finance.cancelled': 'Cancelado',
+    'finance.exchange': 'Câmbio',
+    'finance.transfer': 'Transferência',
+    'finance.project': 'Projeto',
+    'finance.issueDate': 'Emissão',
+    'finance.dueDate': 'Vencimento',
+    'finance.viewPDF': 'Ver PDF',
+    'finance.send': 'Enviar',
+    'finance.markPaid': 'Marcar Pago',
+    'finance.approve': 'Aprovar',
+    'finance.invoiceManagement': 'Gestão de Faturas',
+    'finance.newInvoice': 'Nova Fatura',
+    'finance.budgetsByCategory': 'Orçamentos por Categoria',
+    'finance.used': 'usado',
+    'finance.allocated': 'Alocado',
+    'finance.responsible': 'Responsável',
+    'finance.viewDetails': 'Ver Detalhes',
+    'finance.adjust': 'Ajustar',
+    'finance.monthlyCashFlow': 'Fluxo de Caixa Mensal',
+    'finance.vsPreviousMonth': 'vs mês anterior',
+    'finance.profitMargin': 'margem',
+    'finance.awaitingApproval': 'Aguardando aprovação',
+    'finance.currentMonth': 'Mês Atual',
+    'finance.currentQuarter': 'Trimestre Atual',
+    'finance.currentYear': 'Ano Atual',
+    'finance.paid': 'Pago',
+    'finance.sent': 'Enviado',
+    'finance.overdue': 'Vencido',
+    'finance.draft': 'Rascunho',
+    'finance.cancelled': 'Cancelado',
 
     // Admin Pages - Clients
     'clients.title': 'Gestão de Clientes',
@@ -610,7 +648,69 @@ const translations: Translations = {
     'admin.total': 'Total',
     'admin.active': 'Ativo',
     'admin.inactive': 'Inativo',
-    'admin.pending': 'Pendente'
+    'admin.pending': 'Pendente',
+    'admin.title': 'Painel Administrativo',
+    'admin.subtitle': 'Gerencie oportunidades, candidaturas e solicitações regionais',
+    'admin.administrator': 'Administrador:',
+    'admin.newOpportunity': 'Nova Oportunidade',
+    'admin.loadingTitle': 'Carregando Painel Administrativo',
+    'admin.loadingSubtitle': 'Por favor, aguarde enquanto os dados são carregados',
+
+    // Overview
+    'overview.recentActivity': 'Atividade Recente',
+    'overview.newApplication': 'Nova Candidatura Recebida',
+    'overview.serviceRequest': 'Nova Solicitação de Serviço',
+    'overview.requestProcessed': 'Solicitação Processada',
+    'overview.hoursAgo': 'Há algumas horas',
+    'overview.fiveHoursAgo': 'Há 5 horas',
+    'overview.oneDayAgo': 'Há 1 dia',
+    'overview.activityByCountry': 'Atividade por País',
+    'overview.applicationsCount': 'Candidaturas',
+    'overview.requestsCount': 'Solicitações',
+
+    // Status
+    'status.active': 'Ativo',
+    'status.inactive': 'Inativo',
+    'status.expired': 'Expirado',
+
+    // Edit
+    'edit.title': 'Editar Oportunidade',
+    'edit.opportunityTitle': 'Título da Oportunidade',
+    'edit.description': 'Descrição',
+    'edit.country': 'País',
+    'edit.selectCountry': 'Selecione um país',
+    'edit.sector': 'Setor',
+    'edit.selectSector': 'Selecione um setor',
+    'edit.organization': 'Organização',
+    'edit.location': 'Localização',
+    'edit.deadline': 'Prazo',
+    'edit.budget': 'Orçamento',
+    'edit.requirements': 'Requisitos',
+    'edit.requirement': 'Requisito',
+    'edit.addRequirement': 'Adicionar Requisito',
+    'edit.type': 'Tipo',
+    'edit.status': 'Status',
+    'edit.featured': 'Destacado',
+
+    // Delete
+    'delete.title': 'Confirmar Exclusão',
+    'delete.message': 'Tem certeza de que deseja excluir esta oportunidade? Esta ação não pode ser desfeita.',
+    'delete.confirm': 'Confirmar Exclusão',
+
+    // Details
+    'details.title': 'Detalhes',
+    'details.placeholder': 'Detalhes da candidatura ou solicitação serão exibidos aqui',
+    'details.close': 'Fechar',
+
+    // Messages
+    'messages.opportunityUpdated': 'Oportunidade atualizada com sucesso!',
+    'messages.opportunityDeleted': 'Oportunidade excluída com sucesso!',
+    'messages.statusChanged': 'Status alterado com sucesso!',
+    'messages.applicationApproved': 'Candidatura aprovada com sucesso!',
+    'messages.applicationRejected': 'Candidatura rejeitada com sucesso!',
+    'messages.requestProcessed': 'Solicitação processada com sucesso!',
+    'messages.fillRequiredFields': 'Por favor, preencha todos os campos obrigatórios',
+    'messages.selectCountryAndSector': 'Por favor, selecione um país e um setor'
   },
   en: {
     // Company
@@ -699,7 +799,7 @@ const translations: Translations = {
     'login.slogan': 'AO • NA • ZA Regional',
     'login.countriesDescription': 'Connecting Angola, Namibia and South Africa',
     
-    // Login Form - TRADUÇÕES COMPLETAS PARA O LOGIN EM INGLÊS
+    // Login Form
     'login.form.fullName': 'Full Name',
     'login.form.fullNamePlaceholder': 'Enter your full name',
     'login.form.email': 'Email',
@@ -715,18 +815,18 @@ const translations: Translations = {
     'login.form.organization': 'Organization',
     'login.form.organizationPlaceholder': 'Your organization name (optional)',
     
-    // Login Buttons - TRADUÇÕES COMPLETAS EM INGLÊS
+    // Login Buttons
     'login.buttons.signingIn': 'Signing in...',
     'login.buttons.creatingAccount': 'Creating account...',
     'login.buttons.enterPlatform': 'Enter Platform',
     'login.buttons.createMyAccount': 'Create My Account',
     
-    // Login Messages - TRADUÇÕES COMPLETAS EM INGLÊS
+    // Login Messages
     'login.messages.loginSuccess': 'Login successful!',
     'login.messages.registerSuccess': 'Account created successfully! Check email for activation.',
     'login.messages.recoveryEmailSent': 'Recovery email sent to',
     
-    // Login Errors - TRADUÇÕES COMPLETAS EM INGLÊS
+    // Login Errors
     'login.errors.fillAllFields': 'Fill all required fields',
     'login.errors.invalidEmail': 'Invalid email',
     'login.errors.passwordTooShort': 'Password must be at least 6 characters',
@@ -738,7 +838,7 @@ const translations: Translations = {
     'login.errors.userAlreadyExists': 'This email is already registered',
     'login.errors.authenticationError': 'Authentication error. Try again.',
     
-    // Login Sectors - TRADUÇÕES COMPLETAS PARA OS SETORES EM INGLÊS
+    // Login Sectors
     'login.sectors.executive': 'Executive Management',
     'login.sectors.government': 'Government',
     'login.sectors.ngos': 'NGOs',
@@ -759,14 +859,19 @@ const translations: Translations = {
     'login.stats.population': 'Population',
     'login.stats.countries': 'Countries',
     'login.stats.sectors': 'Sectors',
+    'stats.activeOpportunities': 'Active Opportunities',
+    'stats.pendingApplications': 'Pending Applications',
+    'stats.pendingRequests': 'Pending Requests',
+    'stats.activeUsers': 'Active Users',
+    'stats.connections': 'Connections',
     
-    // Social Login - TRADUÇÕES COMPLETAS EM INGLÊS
+    // Social Login
     'login.socialLogin.orContinueWith': 'or continue with',
     'login.socialLogin.continueWithGoogle': 'Continue with Google',
     'login.socialLogin.continueWithFacebook': 'Continue with Facebook',
     'login.socialLogin.googleSoon': 'Google login coming soon!',
     
-    // Forgot Password - TRADUÇÕES COMPLETAS EM INGLÊS
+    // Forgot Password
     'login.forgotPassword.link': 'Forgot password',
     'login.forgotPassword.title': 'Reset Password',
     'login.forgotPassword.description': 'Enter your email to receive recovery instructions',
@@ -780,7 +885,7 @@ const translations: Translations = {
     'login.demoAccounts.admin': 'Administrator',
     'login.demoAccounts.user': 'User',
     
-    // Footer - TRADUÇÕES COMPLETAS EM INGLÊS
+    // Footer
     'login.footer.agreement': 'By continuing, you agree to our',
     'login.footer.termsOfUse': 'Terms of Use',
     'login.footer.and': 'and',
@@ -916,6 +1021,9 @@ const translations: Translations = {
     'tabs.applications': 'Applications',
     'tabs.network': 'Network',
     'tabs.resources': 'Resources',
+    'tabs.overview': 'Overview',
+    'tabs.requests': 'Requests',
+    'tabs.users': 'Users',
 
     // Opportunities
     'opportunities.title': 'Regional Opportunities',
@@ -927,7 +1035,17 @@ const translations: Translations = {
     'opportunities.applied': 'Applied',
     'opportunities.save': 'Saved',
     'opportunities.applySuccess': 'Application submitted successfully!',
-    
+    'opportunities.opportunityCount': 'Opportunity',
+    'opportunities.opportunitiesCount': 'Opportunities',
+    'opportunities.systemCount': 'in the system',
+    'opportunities.edit': 'Edit',
+    'opportunities.pause': 'Pause',
+    'opportunities.activate': 'Activate',
+    'opportunities.delete': 'Delete',
+    'opportunities.noOpportunities': 'No Opportunities Found',
+    'opportunities.noOpportunitiesDesc': 'Create your first opportunity to start connecting professionals',
+    'opportunities.createFirst': 'Create First Opportunity',
+
     // Applications
     'applications.title': 'My Applications',
     'applications.noApplications': 'You haven\'t applied to any opportunities yet',
@@ -935,7 +1053,21 @@ const translations: Translations = {
     'applications.status.pending': 'Pending',
     'applications.status.approved': 'Approved',
     'applications.status.rejected': 'Rejected',
-    
+    'applications.allApplications': 'All Applications',
+    'applications.pending': 'Pending',
+    'applications.approved': 'Approved',
+    'applications.rejected': 'Rejected',
+    'applications.candidate': 'Candidate',
+    'applications.email': 'Email',
+    'applications.date': 'Date',
+    'applications.organization': 'Organization',
+    'applications.location': 'Location',
+    'applications.deadline': 'Deadline',
+    'applications.message': 'Message',
+    'applications.approve': 'Approve',
+    'applications.reject': 'Reject',
+    'applications.viewDetails': 'View Details',
+
     // Network
     'network.title': 'My Network',
     'network.myConnections': 'My Connections',
@@ -979,18 +1111,31 @@ const translations: Translations = {
     'services.hotels': 'Hotels',
     'services.consulting': 'Consulting',
     'services.guides': 'Local Guides',
-    
+    'requests.title': 'Service Requests',
+    'requests.allRequests': 'All Requests',
+    'requests.noRequests': 'No Requests Found',
+    'requests.noRequestsDesc': 'No service requests have been registered yet',
+    'requests.name': 'Name',
+    'requests.phone': 'Phone',
+    'requests.country': 'Country',
+    'requests.details': 'Details',
+    'requests.process': 'Process',
+    'requests.markComplete': 'Mark as Complete',
+    'requests.whatsapp': 'Contact via WhatsApp',
+    'requests.emailAction': 'Send Email',
+
     // Common
     'common.error': 'An error occurred',
     'common.close': 'Close',
     'common.processing': 'Processing...',
-    
+    'common.warning': 'Warning',
+
     // Project Types
     'project.type.project': 'Project',
     'project.type.partnership': 'Partnership',
     'project.type.funding': 'Funding',
     'project.type.education': 'Education',
-    
+
     // CTA
     'cta.expandNetwork': 'Expand your regional network',
     'cta.expandNetworkDesc': 'Connect with professionals in Angola, Namibia and South Africa',
@@ -1200,36 +1345,87 @@ const translations: Translations = {
     'admin.total': 'Total',
     'admin.active': 'Active',
     'admin.inactive': 'Inactive',
-    'admin.pending': 'Pending'
+    'admin.pending': 'Pending',
+    'admin.title': 'Admin Dashboard',
+    'admin.subtitle': 'Manage regional opportunities, applications, and requests',
+    'admin.administrator': 'Administrator:',
+    'admin.newOpportunity': 'New Opportunity',
+    'admin.loadingTitle': 'Loading Admin Dashboard',
+    'admin.loadingSubtitle': 'Please wait while data is loading',
+
+    // Overview
+    'overview.recentActivity': 'Recent Activity',
+    'overview.newApplication': 'New Application Received',
+    'overview.serviceRequest': 'New Service Request',
+    'overview.requestProcessed': 'Request Processed',
+    'overview.hoursAgo': 'A few hours ago',
+    'overview.fiveHoursAgo': '5 hours ago',
+    'overview.oneDayAgo': '1 day ago',
+    'overview.activityByCountry': 'Activity by Country',
+    'overview.applicationsCount': 'Applications',
+    'overview.requestsCount': 'Requests',
+
+    // Status
+    'status.active': 'Active',
+    'status.inactive': 'Inactive',
+    'status.expired': 'Expired',
+
+    // Edit
+    'edit.title': 'Edit Opportunity',
+    'edit.opportunityTitle': 'Opportunity Title',
+    'edit.description': 'Description',
+    'edit.country': 'Country',
+    'edit.selectCountry': 'Select a country',
+    'edit.sector': 'Sector',
+    'edit.selectSector': 'Select a sector',
+    'edit.organization': 'Organization',
+    'edit.location': 'Location',
+    'edit.deadline': 'Deadline',
+    'edit.budget': 'Budget',
+    'edit.requirements': 'Requirements',
+    'edit.requirement': 'Requirement',
+    'edit.addRequirement': 'Add Requirement',
+    'edit.type': 'Type',
+    'edit.status': 'Status',
+    'edit.featured': 'Featured',
+
+    // Delete
+    'delete.title': 'Confirm Deletion',
+    'delete.message': 'Are you sure you want to delete this opportunity? This action cannot be undone.',
+    'delete.confirm': 'Confirm Deletion',
+
+    // Details
+    'details.title': 'Details',
+    'details.placeholder': 'Application or request details will be displayed here',
+    'details.close': 'Close',
+
+    // Messages
+    'messages.opportunityUpdated': 'Opportunity updated successfully!',
+    'messages.opportunityDeleted': 'Opportunity deleted successfully!',
+    'messages.statusChanged': 'Status changed successfully!',
+    'messages.applicationApproved': 'Application approved successfully!',
+    'messages.applicationRejected': 'Application rejected successfully!',
+    'messages.requestProcessed': 'Request processed successfully!',
+    'messages.fillRequiredFields': 'Please fill all required fields',
+    'messages.selectCountryAndSector': 'Please select a country and a sector'
   }
 };
 
-export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>('pt');
+export const TranslationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [language, setLanguage] = useState<string>('en');
 
   const t = (key: string): string => {
-    // Check if key exists in current language
-    if (translations[language][key]) {
-      return translations[language][key];
-    }
-    
-    // Fallback to Portuguese if available
-    if (language !== 'pt' && translations.pt[key]) {
-      return translations.pt[key];
-    }
-    
-    // Return the key itself if no translation found
-    return key;
+    return translations[language][key] || key;
   };
 
   return (
-    <TranslationContext.Provider value={{ language, setLanguage, t }}>
+    <TranslationContext.Provider value={{ t, language, setLanguage }}>
       {children}
     </TranslationContext.Provider>
   );
 };
 
-export const useTranslation = () => {
+export const useTranslation = (): TranslationContextType => {
   const context = useContext(TranslationContext);
   if (!context) {
     throw new Error('useTranslation must be used within a TranslationProvider');
@@ -1240,31 +1436,16 @@ export const useTranslation = () => {
 export const LanguageToggle: React.FC = () => {
   const { language, setLanguage } = useTranslation();
 
+  const toggleLanguage = () => {
+    setLanguage(language === 'en' ? 'pt' : 'en');
+  };
+
   return (
-    <div className="flex items-center gap-1 bg-white bg-opacity-20 rounded-lg p-1 border border-white border-opacity-30 shadow-sm">
-      <button
-        onClick={() => setLanguage('pt')}
-        className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
-          language === 'pt' 
-            ? 'bg-white text-red-600 shadow-md' 
-            : 'text-white hover:bg-white hover:bg-opacity-30 hover:text-red-50'
-        }`}
-      >
-        PT
-      </button>
-      <div className="h-5 w-px bg-white bg-opacity-40"></div>
-      <button
-        onClick={() => setLanguage('en')}
-        className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
-          language === 'en' 
-            ? 'bg-white text-red-600 shadow-md' 
-            : 'text-white hover:bg-white hover:bg-opacity-30 hover:text-red-50'
-        }`}
-      >
-        EN
-      </button>
-    </div>
+    <button
+      onClick={toggleLanguage}
+      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+    >
+      {language === 'en' ? 'Switch to Portuguese' : 'Mudar para Inglês'}
+    </button>
   );
 };
-
-export default TranslationContext;
