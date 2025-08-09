@@ -1099,7 +1099,7 @@ const HomePage: React.FC = () => {
               <span className="highlight">{t('country.southAfrica') || 'África do Sul'}</span>
             </h1>
             <p className="hero-description">
-              {t('hero.description') || 'Plataforma digital inovadora que promove cooperação regional, inovação tecnológica e desenvolvimento sustentável na África Austral.'}
+              Conectamos inovação e desenvolvimento na África Austral através de serviços essenciais: educação, saúde, transporte, comércio e turismo. Descubra oportunidades regionais!
             </p>
 
             {/* Hero Highlight Section */}
@@ -1108,46 +1108,6 @@ const HomePage: React.FC = () => {
                 <span>🚫</span>
                 {t('hero.avoidEmbarrassment') || 'Evite constrangimentos!'}
               </h3>
-              <p>
-                <strong>🌍 {t('hero.lookingForServices') || 'Procuras serviços de:'}</strong>
-              </p>
-              
-              <div className="services-grid">
-                <div className="service-item">
-                  <span className="check-icon">✅</span>
-                  <span className="service-icon">🎓</span>
-                  <span>{t('sector.education') || 'Educação'}</span>
-                </div>
-                <div className="service-item">
-                  <span className="check-icon">✅</span>
-                  <span className="service-icon">🏥</span>
-                  <span>{t('sector.health') || 'Saúde'}</span>
-                </div>
-                <div className="service-item">
-                  <span className="check-icon">✅</span>
-                  <span className="service-icon">🚗</span>
-                  <span>{t('sector.transport') || 'Transporte'}</span>
-                </div>
-                <div className="service-item">
-                  <span className="check-icon">✅</span>
-                  <span className="service-icon">🛒</span>
-                  <span>{t('sector.commerce') || 'Comércio'}</span>
-                </div>
-                <div className="service-item">
-                  <span className="check-icon">✅</span>
-                  <span className="service-icon">🏨</span>
-                  <span>{t('sector.tourism') || 'Turismo'}</span>
-                </div>
-                <div className="service-item">
-                  <span className="check-icon">✅</span>
-                  <span className="service-icon">🌟</span>
-                  <span>{t('hero.regionalOpportunities') || 'Oportunidades regionais'}</span>
-                </div>
-              </div>
-
-              <div style={{ textAlign: 'center', margin: '1.5rem 0', color: '#e74c3c', fontWeight: '600' }}>
-                👉 <strong>{t('hero.everythingInOnePlace') || 'Tudo organizado num único lugar!'}</strong>
-              </div>
 
               <div className="regional-emphasis">
                 <div className="regional-flags">
@@ -1218,7 +1178,7 @@ const HomePage: React.FC = () => {
             <div className="hero-buttons">
               <a href="https://www.africashands.org/" className="btn-primary">
                 <i className="fas fa-rocket"></i>
-                {t('hero.startNow') || 'Começar Agora'}
+                {t('hero.startNow') || 'Comece Agora'}
               </a>
               <a href="#sobre" className="btn-secondary">
                 <i className="fas fa-play"></i>
@@ -1308,13 +1268,13 @@ const HomePage: React.FC = () => {
           <h2>{t('cta.title') || 'Faça Parte da Transformação Regional'}</h2>
           <p>Junte-se à plataforma que está conectando a África Austral e criando oportunidades de cooperação sem precedentes.</p>
           <div className="cta-buttons">
-            <button 
-              onClick={handleLoginNavigation}
+            <a 
+              href="https://www.africashands.org/"
               className="btn-primary"
             >
               <i className="fas fa-user-plus"></i>
               Registrar-se Agora
-            </button>
+            </a>
             <a 
               href="#contato"
               className="btn-secondary"
