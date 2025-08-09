@@ -1176,10 +1176,10 @@ const HomePage: React.FC = () => {
             </div>
 
             <div className="hero-buttons">
-              <a href="https://www.africashands.org/" className="btn-primary">
+              <button onClick={handleLoginNavigation} className="btn-primary">
                 <i className="fas fa-rocket"></i>
                 {t('hero.startNow') || 'Comece Agora'}
-              </a>
+              </button>
               <a href="#sobre" className="btn-secondary">
                 <i className="fas fa-play"></i>
                 {t('hero.learnMore') || 'Saiba Mais'}
@@ -1268,13 +1268,13 @@ const HomePage: React.FC = () => {
           <h2>{t('cta.title') || 'Faça Parte da Transformação Regional'}</h2>
           <p>Junte-se à plataforma que está conectando a África Austral e criando oportunidades de cooperação sem precedentes.</p>
           <div className="cta-buttons">
-            <a 
-              href="https://www.africashands.org/"
+            <button 
+              onClick={handleLoginNavigation}
               className="btn-primary"
             >
               <i className="fas fa-user-plus"></i>
               Registrar-se Agora
-            </a>
+            </button>
             <a 
               href="#contato"
               className="btn-secondary"
