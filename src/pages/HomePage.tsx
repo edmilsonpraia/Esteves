@@ -36,6 +36,9 @@ const HomePage: React.FC = () => {
       <a href="#recursos" onClick={onLinkClick} className={isMobile ? 'mobile-link' : 'desktop-link'}>
         {t('header.resources') || 'Recursos'}
       </a>
+      <a href="#testemunhos" onClick={onLinkClick} className={isMobile ? 'mobile-link' : 'desktop-link'}>
+        {t('header.testimonials') || 'Testemunhos'}
+      </a>
       <a href="#impacto" onClick={onLinkClick} className={isMobile ? 'mobile-link' : 'desktop-link'}>
         {t('header.impact') || 'Impacto'}
       </a>
@@ -267,6 +270,7 @@ const HomePage: React.FC = () => {
 
         .nav-menu a[href="#sobre"]::before { content: '📋'; }
         .nav-menu a[href="#recursos"]::before { content: '🛠️'; }
+        .nav-menu a[href="#testemunhos"]::before { content: '💬'; }
         .nav-menu a[href="#impacto"]::before { content: '📊'; }
         .nav-menu a[href="#contato"]::before { content: '📞'; }
 
@@ -720,6 +724,85 @@ const HomePage: React.FC = () => {
           font-size: 0.9rem;
         }
 
+        /* Testimonials Section */
+        .testimonials {
+          padding: 4rem 0;
+          background: #f8f9fa;
+        }
+
+        .testimonials-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+          padding: 0 1rem;
+        }
+
+        .testimonial-card {
+          background: white;
+          padding: 2rem 1.5rem;
+          border-radius: 15px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+          text-align: center;
+          border: 1px solid #f0f0f0;
+          position: relative;
+        }
+
+        .testimonial-card::before {
+          content: '"';
+          position: absolute;
+          top: -10px;
+          left: 20px;
+          font-size: 4rem;
+          color: #e74c3c;
+          opacity: 0.3;
+          font-family: serif;
+        }
+
+        .testimonial-quote {
+          font-size: 1rem;
+          color: #555;
+          line-height: 1.6;
+          margin-bottom: 1.5rem;
+          font-style: italic;
+        }
+
+        .testimonial-author {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 1rem;
+        }
+
+        .author-avatar {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #e74c3c, #c0392b);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.2rem;
+          flex-shrink: 0;
+        }
+
+        .author-info h4 {
+          font-size: 1rem;
+          font-weight: 600;
+          color: #2c3e50;
+          margin: 0 0 0.2rem 0;
+        }
+
+        .author-info p {
+          font-size: 0.8rem;
+          color: #666;
+          margin: 0;
+        }
+
+        .author-country {
+          font-size: 1.2rem;
+          margin-left: 0.5rem;
+        }
+
         /* Impact Section */
         .impact {
           padding: 4rem 0;
@@ -965,6 +1048,10 @@ const HomePage: React.FC = () => {
             grid-template-columns: repeat(2, 1fr);
           }
           
+          .testimonials-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+          
           .impact-stats {
             grid-template-columns: repeat(3, 1fr);
           }
@@ -1028,6 +1115,10 @@ const HomePage: React.FC = () => {
           
           .features-grid {
             grid-template-columns: repeat(4, 1fr);
+          }
+          
+          .testimonials-grid {
+            grid-template-columns: repeat(3, 1fr);
           }
           
           .footer-content {
@@ -1231,6 +1322,111 @@ const HomePage: React.FC = () => {
             </div>
             <h3>Hub de Inovação</h3>
             <p>Colaboração em projetos inovadores e desenvolvimento tecnológico conjunto.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section id="testemunhos" className="testimonials section">
+        <div className="section-header">
+          <h2>{t('testimonials.title') || 'Testemunhos Regionais'}</h2>
+          <p>Vozes da nossa comunidade em Angola, Namíbia e África do Sul</p>
+        </div>
+        <div className="testimonials-grid">
+          {/* Testemunho de Angola */}
+          <div className="testimonial-card">
+            <p className="testimonial-quote">
+              "Graças ao Africa's Hands, consegui encontrar rapidamente uma universidade parceira em Luanda para o meu intercâmbio. O processo foi simples e o suporte foi excepcional. Recomendo para qualquer estudante que queira explorar oportunidades na região."
+            </p>
+            <div className="testimonial-author">
+              <div className="author-avatar">
+                🇦🇴
+              </div>
+              <div className="author-info">
+                <h4>Maria Fernandes</h4>
+                <p>Estudante de Medicina • Luanda</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Testemunho da Namíbia */}
+          <div className="testimonial-card">
+            <p className="testimonial-quote">
+              "Como empresário na Namíbia, encontrar fornecedores confiáveis na região sempre foi um desafio. Com esta plataforma, expandimos nossos negócios para Angola e África do Sul, criando parcerias sólidas e duradouras."
+            </p>
+            <div className="testimonial-author">
+              <div className="author-avatar">
+                🇳🇦
+              </div>
+              <div className="author-info">
+                <h4>Johannes Nghifindaka</h4>
+                <p>Empresário • Windhoek</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Testemunho da África do Sul */}
+          <div className="testimonial-card">
+            <p className="testimonial-quote">
+              "A conectividade em saúde oferecida pela plataforma permitiu-nos acesso a especialistas médicos em Angola e Namíbia. Isso revolucionou nosso atendimento e trouxe novas perspectivas para nossos pacientes."
+            </p>
+            <div className="testimonial-author">
+              <div className="author-avatar">
+                🇿🇦
+              </div>
+              <div className="author-info">
+                <h4>Dr. Thabo Mthembu</h4>
+                <p>Médico Especialista • Cidade do Cabo</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Testemunho Adicional - Angola */}
+          <div className="testimonial-card">
+            <p className="testimonial-quote">
+              "Trabalho no setor turístico e esta plataforma me ajudou a conectar com guias locais e hotéis em toda a região. Agora posso oferecer pacotes completos aos meus clientes, desde Angola até África do Sul."
+            </p>
+            <div className="testimonial-author">
+              <div className="author-avatar">
+                🇦🇴
+              </div>
+              <div className="author-info">
+                <h4>Carlos Mendes</h4>
+                <p>Operador Turístico • Benguela</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Testemunho Adicional - Namíbia */}
+          <div className="testimonial-card">
+            <p className="testimonial-quote">
+              "Como transportadora, precisávamos de uma solução logística regional. O Africa's Hands facilitou nossas operações entre os três países, otimizando rotas e reduzindo custos significativamente."
+            </p>
+            <div className="testimonial-author">
+              <div className="author-avatar">
+                🇳🇦
+              </div>
+              <div className="author-info">
+                <h4>Anna Shikongo</h4>
+                <p>Diretora de Logística • Swakopmund</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Testemunho Adicional - África do Sul */}
+          <div className="testimonial-card">
+            <p className="testimonial-quote">
+              "A plataforma facilitou nossa pesquisa acadêmica colaborativa. Conseguimos reunir especialistas de universidades dos três países para projetos inovadores que beneficiam toda a região austral."
+            </p>
+            <div className="testimonial-author">
+              <div className="author-avatar">
+                🇿🇦
+              </div>
+              <div className="author-info">
+                <h4>Prof. Sarah van der Merwe</h4>
+                <p>Pesquisadora • Universidade de Stellenbosch</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
