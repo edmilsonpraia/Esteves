@@ -57,6 +57,12 @@ const UserDashboard: React.FC = () => {
   const [selectedCountry, setSelectedCountry] = useState('all');
   const [selectedSector, setSelectedSector] = useState('all');
   const [showServicesModal, setShowServicesModal] = useState(false);
+  const [showEducationModal, setShowEducationModal] = useState(false);
+  const [showHealthModal, setShowHealthModal] = useState(false);
+  const [showCommerceModal, setShowCommerceModal] = useState(false);
+  const [showTourismModal, setShowTourismModal] = useState(false);
+  const [showTransportModal, setShowTransportModal] = useState(false);
+  const [showGuidesModal, setShowGuidesModal] = useState(false);
   // const [selectedService, setSelectedService] = useState(''); // Removido - não usado
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [selectedServiceForRequest, setSelectedServiceForRequest] = useState('');
@@ -346,6 +352,30 @@ const UserDashboard: React.FC = () => {
     setShowServicesModal(true);
   };
 
+  const openEducationModal = () => {
+    setShowEducationModal(true);
+  };
+
+  const openHealthModal = () => {
+    setShowHealthModal(true);
+  };
+
+  const openCommerceModal = () => {
+    setShowCommerceModal(true);
+  };
+
+  const openTourismModal = () => {
+    setShowTourismModal(true);
+  };
+
+  const openTransportModal = () => {
+    setShowTransportModal(true);
+  };
+
+  const openGuidesModal = () => {
+    setShowGuidesModal(true);
+  };
+
   const openConnectionsModal = () => {
     setShowConnectionsModal(true);
   };
@@ -353,7 +383,14 @@ const UserDashboard: React.FC = () => {
   const openRequestForm = (serviceType: string) => {
     setSelectedServiceForRequest(serviceType);
     setShowRequestForm(true);
+    // Fechar todos os modais
     setShowServicesModal(false);
+    setShowEducationModal(false);
+    setShowHealthModal(false);
+    setShowCommerceModal(false);
+    setShowTourismModal(false);
+    setShowTransportModal(false);
+    setShowGuidesModal(false);
   };
 
   const closeRequestForm = () => {
@@ -381,42 +418,42 @@ const UserDashboard: React.FC = () => {
       count: applications.filter(app => app.opportunity?.sector === t('sector.education')).length, 
       label: t('sector.education'), 
       color: 'text-blue-600',
-      onClick: () => openServicesModal()
+      onClick: () => openEducationModal()
     },
     { 
       icon: '🏥', 
       count: applications.filter(app => app.opportunity?.sector === t('sector.health')).length, 
       label: t('sector.health'), 
       color: 'text-green-600',
-      onClick: () => openServicesModal()
+      onClick: () => openHealthModal()
     },
     { 
       icon: '🛒', 
       count: applications.filter(app => app.opportunity?.sector === t('sector.commerce')).length, 
       label: t('sector.commerce'), 
       color: 'text-purple-600',
-      onClick: () => openServicesModal()
+      onClick: () => openCommerceModal()
     },
     { 
       icon: '🏨', 
       count: applications.filter(app => app.opportunity?.sector === t('sector.tourism')).length, 
       label: t('sector.tourism'), 
       color: 'text-orange-600',
-      onClick: () => openServicesModal()
+      onClick: () => openTourismModal()
     },
     { 
       icon: '📍', 
       count: 8, 
       label: t('services.guides'), 
       color: 'text-teal-600',
-      onClick: () => openServicesModal()
+      onClick: () => openGuidesModal()
     },
     { 
       icon: '✈️', 
       count: applications.filter(app => app.opportunity?.sector === t('sector.transport')).length, 
       label: t('sector.transport'), 
       color: 'text-indigo-600',
-      onClick: () => openServicesModal()
+      onClick: () => openTransportModal()
     },
     { 
       icon: '🤝', 
@@ -465,7 +502,7 @@ const UserDashboard: React.FC = () => {
             <p className="text-sm text-red-100 opacity-90">{userProfile?.organization || t('user.communityMember')}</p>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-xs bg-white bg-opacity-20 px-2 py-1 rounded-full">
-                {getCountryFlag(userProfile?.country || '')} {userProfile?.country || 'SADC'}
+                {getCountryFlag(userProfile?.country || '')} {userProfile?.country || 'Região'}
               </span>
               {userProfile?.sector && (
                 <span className="text-xs bg-white bg-opacity-20 px-2 py-1 rounded-full">
@@ -885,6 +922,522 @@ const UserDashboard: React.FC = () => {
         )}
       </div>
 
+      {/* Modal de Educação */}
+      {showEducationModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">🎓</span>
+                  <h2 className="text-lg font-bold">Educação</h2>
+                </div>
+                <button
+                  onClick={() => setShowEducationModal(false)}
+                  className="text-white hover:text-blue-200 p-1"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-blue-100 text-sm mt-1">Serviços educacionais regionais</p>
+            </div>
+            <div className="p-4">
+              <div className="grid grid-cols-2 gap-3">
+                <button 
+                  className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Universidades')}
+                >
+                  🏫 Universidades
+                </button>
+                <button 
+                  className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Ensino Médio')}
+                >
+                  📚 Ensino Médio
+                </button>
+                <button 
+                  className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Cursos Técnicos')}
+                >
+                  🔧 Cursos Técnicos
+                </button>
+                <button 
+                  className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Intercâmbio')}
+                >
+                  🌍 Intercâmbio
+                </button>
+                <button 
+                  className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Certificações')}
+                >
+                  📜 Certificações
+                </button>
+                <button 
+                  className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Bolsas de Estudo')}
+                >
+                  💰 Bolsas de Estudo
+                </button>
+              </div>
+              
+              {/* Botão de Contato Urgente */}
+              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-xs text-green-700 mb-2 text-center">⚡ Precisa de ajuda urgente?</p>
+                <a 
+                  href="https://wa.me/+244924166401?text=Olá! Preciso de ajuda urgente com serviços de Educação."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:bg-green-600 transition-colors"
+                >
+                  <span>📱</span>
+                  <span>Contactar Urgente</span>
+                </a>
+              </div>
+
+              <button
+                onClick={() => setShowEducationModal(false)}
+                className="w-full mt-4 border border-blue-600 text-blue-600 py-3 rounded-lg font-medium text-sm"
+              >
+                {t('common.close')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Saúde */}
+      {showHealthModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-4 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">🏥</span>
+                  <h2 className="text-lg font-bold">Saúde</h2>
+                </div>
+                <button
+                  onClick={() => setShowHealthModal(false)}
+                  className="text-white hover:text-green-200 p-1"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-green-100 text-sm mt-1">Serviços de saúde regionais</p>
+            </div>
+            <div className="p-4">
+              <div className="grid grid-cols-2 gap-3">
+                <button 
+                  className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Hospitais Regionais')}
+                >
+                  🏥 Hospitais
+                </button>
+                <button 
+                  className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Clínicas Especializadas')}
+                >
+                  🩺 Clínicas
+                </button>
+                <button 
+                  className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Telemedicina')}
+                >
+                  💻 Telemedicina
+                </button>
+                <button 
+                  className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Seguro Saúde')}
+                >
+                  🛡️ Seguro Saúde
+                </button>
+                <button 
+                  className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Farmácias')}
+                >
+                  💊 Farmácias
+                </button>
+                <button 
+                  className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Emergências')}
+                >
+                  🚨 Emergências
+                </button>
+              </div>
+              
+              {/* Botão de Contato Urgente */}
+              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-xs text-green-700 mb-2 text-center">⚡ Precisa de ajuda urgente?</p>
+                <a 
+                  href="https://wa.me/+244924166401?text=Olá! Preciso de ajuda urgente com serviços de Saúde."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:bg-green-600 transition-colors"
+                >
+                  <span>📱</span>
+                  <span>Contactar Urgente</span>
+                </a>
+              </div>
+
+              <button
+                onClick={() => setShowHealthModal(false)}
+                className="w-full mt-4 border border-green-600 text-green-600 py-3 rounded-lg font-medium text-sm"
+              >
+                {t('common.close')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Comércio */}
+      {showCommerceModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-4 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">🛒</span>
+                  <h2 className="text-lg font-bold">Comércio</h2>
+                </div>
+                <button
+                  onClick={() => setShowCommerceModal(false)}
+                  className="text-white hover:text-purple-200 p-1"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-purple-100 text-sm mt-1">Serviços comerciais regionais</p>
+            </div>
+            <div className="p-4">
+              <div className="grid grid-cols-2 gap-3">
+                <button 
+                  className="bg-purple-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Import/Export')}
+                >
+                  📦 Import/Export
+                </button>
+                <button 
+                  className="bg-purple-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Licenças Comerciais')}
+                >
+                  📋 Licenças
+                </button>
+                <button 
+                  className="bg-purple-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Parcerias Empresariais')}
+                >
+                  🤝 Parcerias
+                </button>
+                <button 
+                  className="bg-purple-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Fornecedores')}
+                >
+                  🏭 Fornecedores
+                </button>
+                <button 
+                  className="bg-purple-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Feiras e Exposições')}
+                >
+                  🎪 Feiras
+                </button>
+                <button 
+                  className="bg-purple-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Consultoria de Negócios')}
+                >
+                  💼 Consultoria
+                </button>
+              </div>
+              
+              {/* Botão de Contato Urgente */}
+              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-xs text-green-700 mb-2 text-center">⚡ Precisa de ajuda urgente?</p>
+                <a 
+                  href="https://wa.me/+244924166401?text=Olá! Preciso de ajuda urgente com serviços de Comércio."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:bg-green-600 transition-colors"
+                >
+                  <span>📱</span>
+                  <span>Contactar Urgente</span>
+                </a>
+              </div>
+
+              <button
+                onClick={() => setShowCommerceModal(false)}
+                className="w-full mt-4 border border-purple-600 text-purple-600 py-3 rounded-lg font-medium text-sm"
+              >
+                {t('common.close')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Turismo */}
+      {showTourismModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-gradient-to-r from-orange-600 to-orange-700 text-white p-4 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">🏨</span>
+                  <h2 className="text-lg font-bold">Turismo</h2>
+                </div>
+                <button
+                  onClick={() => setShowTourismModal(false)}
+                  className="text-white hover:text-orange-200 p-1"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-orange-100 text-sm mt-1">Serviços turísticos regionais</p>
+            </div>
+            <div className="p-4">
+              <div className="grid grid-cols-2 gap-3">
+                <button 
+                  className="bg-orange-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Hotéis e Pousadas')}
+                >
+                  🏨 Hotéis
+                </button>
+                <button 
+                  className="bg-orange-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Pacotes Turísticos')}
+                >
+                  🎒 Pacotes
+                </button>
+                <button 
+                  className="bg-orange-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Vistos e Documentação')}
+                >
+                  📄 Vistos
+                </button>
+                <button 
+                  className="bg-orange-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Guias Turísticos')}
+                >
+                  👨‍🏫 Guias
+                </button>
+                <button 
+                  className="bg-orange-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Atividades')}
+                >
+                  🎯 Atividades
+                </button>
+                <button 
+                  className="bg-orange-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Seguro Viagem')}
+                >
+                  🛡️ Seguro Viagem
+                </button>
+              </div>
+              
+              {/* Botão de Contato Urgente */}
+              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-xs text-green-700 mb-2 text-center">⚡ Precisa de ajuda urgente?</p>
+                <a 
+                  href="https://wa.me/+244924166401?text=Olá! Preciso de ajuda urgente com serviços de Turismo."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:bg-green-600 transition-colors"
+                >
+                  <span>📱</span>
+                  <span>Contactar Urgente</span>
+                </a>
+              </div>
+
+              <button
+                onClick={() => setShowTourismModal(false)}
+                className="w-full mt-4 border border-orange-600 text-orange-600 py-3 rounded-lg font-medium text-sm"
+              >
+                {t('common.close')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Transporte */}
+      {showTransportModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white p-4 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">✈️</span>
+                  <h2 className="text-lg font-bold">Transporte</h2>
+                </div>
+                <button
+                  onClick={() => setShowTransportModal(false)}
+                  className="text-white hover:text-indigo-200 p-1"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-indigo-100 text-sm mt-1">Serviços de transporte regionais</p>
+            </div>
+            <div className="p-4">
+              <div className="grid grid-cols-2 gap-3">
+                <button 
+                  className="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Voos Regionais')}
+                >
+                  ✈️ Voos
+                </button>
+                <button 
+                  className="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Transfers/Táxis')}
+                >
+                  🚗 Transfers
+                </button>
+                <button 
+                  className="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Aluguel de Veículos')}
+                >
+                  🚙 Aluguel
+                </button>
+                <button 
+                  className="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Transporte Público')}
+                >
+                  🚌 Público
+                </button>
+                <button 
+                  className="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Logística de Cargas')}
+                >
+                  📦 Logística
+                </button>
+                <button 
+                  className="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Documentação Veicular')}
+                >
+                  📋 Documentação
+                </button>
+              </div>
+              
+              {/* Botão de Contato Urgente */}
+              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-xs text-green-700 mb-2 text-center">⚡ Precisa de ajuda urgente?</p>
+                <a 
+                  href="https://wa.me/+244924166401?text=Olá! Preciso de ajuda urgente com serviços de Transporte."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:bg-green-600 transition-colors"
+                >
+                  <span>📱</span>
+                  <span>Contactar Urgente</span>
+                </a>
+              </div>
+
+              <button
+                onClick={() => setShowTransportModal(false)}
+                className="w-full mt-4 border border-indigo-600 text-indigo-600 py-3 rounded-lg font-medium text-sm"
+              >
+                {t('common.close')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Guias Locais */}
+      {showGuidesModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-gradient-to-r from-teal-600 to-teal-700 text-white p-4 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">📍</span>
+                  <h2 className="text-lg font-bold">Guias Locais</h2>
+                </div>
+                <button
+                  onClick={() => setShowGuidesModal(false)}
+                  className="text-white hover:text-teal-200 p-1"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-teal-100 text-sm mt-1">Serviços de guias locais especializados</p>
+            </div>
+            <div className="p-4">
+              <div className="grid grid-cols-2 gap-3">
+                <button 
+                  className="bg-teal-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Conhecimento Cultural')}
+                >
+                  🎭 Cultural
+                </button>
+                <button 
+                  className="bg-teal-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Tradução')}
+                >
+                  🗣️ Tradução
+                </button>
+                <button 
+                  className="bg-teal-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Acompanhamento Oficial')}
+                >
+                  👔 Oficial
+                </button>
+                <button 
+                  className="bg-teal-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Networking Local')}
+                >
+                  🤝 Networking
+                </button>
+                <button 
+                  className="bg-teal-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Assessoria Jurídica')}
+                >
+                  ⚖️ Jurídica
+                </button>
+                <button 
+                  className="bg-teal-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => openRequestForm('Suporte Emergencial')}
+                >
+                  🚨 Emergencial
+                </button>
+              </div>
+              
+              {/* Botão de Contato Urgente */}
+              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-xs text-green-700 mb-2 text-center">⚡ Precisa de ajuda urgente?</p>
+                <a 
+                  href="https://wa.me/+244924166401?text=Olá! Preciso de ajuda urgente com Guias Locais."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:bg-green-600 transition-colors"
+                >
+                  <span>📱</span>
+                  <span>Contactar Urgente</span>
+                </a>
+              </div>
+
+              <button
+                onClick={() => setShowGuidesModal(false)}
+                className="w-full mt-4 border border-teal-600 text-teal-600 py-3 rounded-lg font-medium text-sm"
+              >
+                {t('common.close')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal de Serviços - Versão Compacta */}
       {showServicesModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -918,7 +1471,7 @@ const UserDashboard: React.FC = () => {
               <div className="space-y-3 mb-6">
                 {[
                   { service: t('services.universities'), icon: '🏫', desc: 'UCT, Wits, UNAM, UAN' },
-                  { service: t('services.hospitals'), icon: '🏥', desc: 'Rede hospitalar SADC' },
+                  { service: t('services.hospitals'), icon: '🏥', desc: 'Rede hospitalar regional' },
                   { service: t('services.transport'), icon: '🚗', desc: 'Táxis e transfers regionais' },
                   { service: t('services.hotels'), icon: '🏨', desc: 'Hospedagem em toda região' },
                   { service: t('services.consulting'), icon: '💼', desc: 'Negócios e investimentos' },
@@ -1047,7 +1600,7 @@ const UserDashboard: React.FC = () => {
                   <div className="text-center py-8">
                     <div className="text-4xl mb-2">🤝</div>
                     <p className="text-gray-600 mb-4">{t('network.noConnections')}</p>
-                    <p className="text-sm text-gray-500">Comece a conectar-se com profissionais da região SADC</p>
+                    <p className="text-sm text-gray-500">Comece a conectar-se com profissionais da região</p>
                   </div>
                 ) : (
                   <div className="space-y-3 max-h-60 overflow-y-auto">
