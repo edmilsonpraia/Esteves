@@ -37,7 +37,7 @@ const HomePage: React.FC = () => {
         {t('header.resources') || 'Recursos'}
       </a>
       <a href="#testemunhos" onClick={onLinkClick} className={isMobile ? 'mobile-link' : 'desktop-link'}>
-        {t('header.testimonials') || 'Testemunhos'}
+        {t('header.testimonials') || 'Depoimentos'}
       </a>
       <a href="#impacto" onClick={onLinkClick} className={isMobile ? 'mobile-link' : 'desktop-link'}>
         {t('header.impact') || 'Impacto'}
@@ -1185,8 +1185,10 @@ const HomePage: React.FC = () => {
         <div className="hero-content">
           <div className="hero-main-content">
             <h1 className="hero-title">
-              {t('hero.connecting') || 'Conectando'} <span className="highlight">{t('country.angola') || 'Angola'}</span>, 
-              <span className="highlight">{t('country.namibia') || 'Namíbia'}</span> {t('hero.and') || 'e'} 
+              {t('hero.connecting') || 'Conectando'}{' '}
+              <span className="highlight">{t('country.angola') || 'Angola'}</span>,{' '}
+              <span className="highlight">{t('country.namibia') || 'Namíbia'}</span>{' '}
+              {t('hero.and') || 'e'}{' '}
               <span className="highlight">{t('country.southAfrica') || 'África do Sul'}</span>
             </h1>
             <p className="hero-description">
