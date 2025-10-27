@@ -80,7 +80,7 @@ const UserDashboard: React.FC = () => {
     message: ''
   });
 
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { user } = useAuth();
   
   const {
@@ -930,7 +930,7 @@ const UserDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">🎓</span>
-                  <h2 className="text-lg font-bold">Educação</h2>
+                  <h2 className="text-lg font-bold">{t('education.title')}</h2>
                 </div>
                 <button
                   onClick={() => setShowEducationModal(false)}
@@ -941,59 +941,59 @@ const UserDashboard: React.FC = () => {
                   </svg>
                 </button>
               </div>
-              <p className="text-blue-100 text-sm mt-1">Serviços educacionais regionais</p>
+              <p className="text-blue-100 text-sm mt-1">{t('education.subtitle')}</p>
             </div>
             <div className="p-4">
               <div className="grid grid-cols-2 gap-3">
-                <button 
+                <button
                   className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Universidades')}
+                  onClick={() => openRequestForm(t('education.universities'))}
                 >
-                  🏫 Universidades
+                  🏫 {t('education.universities')}
                 </button>
-                <button 
+                <button
                   className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Ensino Médio')}
+                  onClick={() => openRequestForm(t('education.highSchool'))}
                 >
-                  📚 Ensino Médio
+                  📚 {t('education.highSchool')}
                 </button>
-                <button 
+                <button
                   className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Cursos Técnicos')}
+                  onClick={() => openRequestForm(t('education.technicalCourses'))}
                 >
-                  🔧 Cursos Técnicos
+                  🔧 {t('education.technicalCourses')}
                 </button>
-                <button 
+                <button
                   className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Intercâmbio')}
+                  onClick={() => openRequestForm(t('education.exchange'))}
                 >
-                  🌍 Intercâmbio
+                  🌍 {t('education.exchange')}
                 </button>
-                <button 
+                <button
                   className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Certificações')}
+                  onClick={() => openRequestForm(t('education.certifications'))}
                 >
-                  📜 Certificações
+                  📜 {t('education.certifications')}
                 </button>
-                <button 
+                <button
                   className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Bolsas de Estudo')}
+                  onClick={() => openRequestForm(t('education.scholarships'))}
                 >
-                  💰 Bolsas de Estudo
+                  💰 {t('education.scholarships')}
                 </button>
               </div>
-              
+
               {/* Botão de Contato Urgente */}
               <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-xs text-green-700 mb-2 text-center">⚡ Precisa de ajuda urgente?</p>
-                <a 
-                  href="https://wa.me/+244924166401?text=Olá! Preciso de ajuda urgente com serviços de Educação."
+                <p className="text-xs text-green-700 mb-2 text-center">{t('education.urgentHelpQuestion')}</p>
+                <a
+                  href={`https://wa.me/+244924166401?text=${language === 'en' ? 'Hello! I need urgent help with Education services.' : 'Olá! Preciso de ajuda urgente com serviços de Educação.'}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:bg-green-600 transition-colors"
                 >
                   <span>📱</span>
-                  <span>Contactar Urgente</span>
+                  <span>{t('education.contactUrgent')}</span>
                 </a>
               </div>
 
@@ -1016,7 +1016,7 @@ const UserDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">🏥</span>
-                  <h2 className="text-lg font-bold">Saúde</h2>
+                  <h2 className="text-lg font-bold">{t('health.title')}</h2>
                 </div>
                 <button
                   onClick={() => setShowHealthModal(false)}
@@ -1027,59 +1027,59 @@ const UserDashboard: React.FC = () => {
                   </svg>
                 </button>
               </div>
-              <p className="text-green-100 text-sm mt-1">Serviços de saúde regionais</p>
+              <p className="text-green-100 text-sm mt-1">{t('health.subtitle')}</p>
             </div>
             <div className="p-4">
               <div className="grid grid-cols-2 gap-3">
-                <button 
+                <button
                   className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Hospitais Regionais')}
+                  onClick={() => openRequestForm(t('health.regionalHospitals'))}
                 >
-                  🏥 Hospitais
+                  🏥 {t('health.hospitals')}
                 </button>
-                <button 
+                <button
                   className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Clínicas Especializadas')}
+                  onClick={() => openRequestForm(t('health.specializedClinics'))}
                 >
-                  🩺 Clínicas
+                  🩺 {t('health.clinics')}
                 </button>
-                <button 
+                <button
                   className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Telemedicina')}
+                  onClick={() => openRequestForm(t('health.telemedicine'))}
                 >
-                  💻 Telemedicina
+                  💻 {t('health.telemedicine')}
                 </button>
-                <button 
+                <button
                   className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Seguro Saúde')}
+                  onClick={() => openRequestForm(t('health.healthInsurance'))}
                 >
-                  🛡️ Seguro Saúde
+                  🛡️ {t('health.healthInsurance')}
                 </button>
-                <button 
+                <button
                   className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Farmácias')}
+                  onClick={() => openRequestForm(t('health.pharmacies'))}
                 >
-                  💊 Farmácias
+                  💊 {t('health.pharmacies')}
                 </button>
-                <button 
+                <button
                   className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Emergências')}
+                  onClick={() => openRequestForm(t('health.emergencies'))}
                 >
-                  🚨 Emergências
+                  🚨 {t('health.emergencies')}
                 </button>
               </div>
-              
+
               {/* Botão de Contato Urgente */}
               <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-xs text-green-700 mb-2 text-center">⚡ Precisa de ajuda urgente?</p>
-                <a 
-                  href="https://wa.me/+244924166401?text=Olá! Preciso de ajuda urgente com serviços de Saúde."
+                <p className="text-xs text-green-700 mb-2 text-center">{t('education.urgentHelpQuestion')}</p>
+                <a
+                  href={`https://wa.me/+244924166401?text=${language === 'en' ? 'Hello! I need urgent help with Health services.' : 'Olá! Preciso de ajuda urgente com serviços de Saúde.'}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:bg-green-600 transition-colors"
                 >
                   <span>📱</span>
-                  <span>Contactar Urgente</span>
+                  <span>{t('education.contactUrgent')}</span>
                 </a>
               </div>
 
@@ -1102,7 +1102,7 @@ const UserDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">🛒</span>
-                  <h2 className="text-lg font-bold">Comércio</h2>
+                  <h2 className="text-lg font-bold">{t('commerce.title')}</h2>
                 </div>
                 <button
                   onClick={() => setShowCommerceModal(false)}
@@ -1113,59 +1113,59 @@ const UserDashboard: React.FC = () => {
                   </svg>
                 </button>
               </div>
-              <p className="text-purple-100 text-sm mt-1">Serviços comerciais regionais</p>
+              <p className="text-purple-100 text-sm mt-1">{t('commerce.subtitle')}</p>
             </div>
             <div className="p-4">
               <div className="grid grid-cols-2 gap-3">
-                <button 
+                <button
                   className="bg-purple-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Import/Export')}
+                  onClick={() => openRequestForm(t('commerce.importExport'))}
                 >
-                  📦 Import/Export
+                  📦 {t('commerce.importExport')}
                 </button>
-                <button 
+                <button
                   className="bg-purple-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Licenças Comerciais')}
+                  onClick={() => openRequestForm(t('commerce.commercialLicenses'))}
                 >
-                  📋 Licenças
+                  📋 {language === 'en' ? 'Licenses' : 'Licenças'}
                 </button>
-                <button 
+                <button
                   className="bg-purple-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Parcerias Empresariais')}
+                  onClick={() => openRequestForm(t('commerce.businessPartnerships'))}
                 >
-                  🤝 Parcerias
+                  🤝 {language === 'en' ? 'Partnerships' : 'Parcerias'}
                 </button>
-                <button 
+                <button
                   className="bg-purple-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Fornecedores')}
+                  onClick={() => openRequestForm(t('commerce.suppliers'))}
                 >
-                  🏭 Fornecedores
+                  🏭 {t('commerce.suppliers')}
                 </button>
-                <button 
+                <button
                   className="bg-purple-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Feiras e Exposições')}
+                  onClick={() => openRequestForm(t('commerce.fairsExhibitions'))}
                 >
-                  🎪 Feiras
+                  🎪 {language === 'en' ? 'Fairs' : 'Feiras'}
                 </button>
-                <button 
+                <button
                   className="bg-purple-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Consultoria de Negócios')}
+                  onClick={() => openRequestForm(t('commerce.businessConsulting'))}
                 >
-                  💼 Consultoria
+                  💼 {language === 'en' ? 'Consulting' : 'Consultoria'}
                 </button>
               </div>
-              
+
               {/* Botão de Contato Urgente */}
               <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-xs text-green-700 mb-2 text-center">⚡ Precisa de ajuda urgente?</p>
-                <a 
-                  href="https://wa.me/+244924166401?text=Olá! Preciso de ajuda urgente com serviços de Comércio."
+                <p className="text-xs text-green-700 mb-2 text-center">{t('education.urgentHelpQuestion')}</p>
+                <a
+                  href={`https://wa.me/+244924166401?text=${language === 'en' ? 'Hello! I need urgent help with Commerce services.' : 'Olá! Preciso de ajuda urgente com serviços de Comércio.'}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:bg-green-600 transition-colors"
                 >
                   <span>📱</span>
-                  <span>Contactar Urgente</span>
+                  <span>{t('education.contactUrgent')}</span>
                 </a>
               </div>
 
@@ -1188,7 +1188,7 @@ const UserDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">🏨</span>
-                  <h2 className="text-lg font-bold">Turismo</h2>
+                  <h2 className="text-lg font-bold">{t('tourism.title')}</h2>
                 </div>
                 <button
                   onClick={() => setShowTourismModal(false)}
@@ -1199,59 +1199,59 @@ const UserDashboard: React.FC = () => {
                   </svg>
                 </button>
               </div>
-              <p className="text-orange-100 text-sm mt-1">Serviços turísticos regionais</p>
+              <p className="text-orange-100 text-sm mt-1">{t('tourism.subtitle')}</p>
             </div>
             <div className="p-4">
               <div className="grid grid-cols-2 gap-3">
-                <button 
+                <button
                   className="bg-orange-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Hotéis e Pousadas')}
+                  onClick={() => openRequestForm(t('tourism.hotelsInns'))}
                 >
-                  🏨 Hotéis
+                  🏨 {language === 'en' ? 'Hotels' : 'Hotéis'}
                 </button>
-                <button 
+                <button
                   className="bg-orange-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Pacotes Turísticos')}
+                  onClick={() => openRequestForm(t('tourism.tourPackages'))}
                 >
-                  🎒 Pacotes
+                  🎒 {language === 'en' ? 'Packages' : 'Pacotes'}
                 </button>
-                <button 
+                <button
                   className="bg-orange-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Vistos e Documentação')}
+                  onClick={() => openRequestForm(t('tourism.visasDocumentation'))}
                 >
-                  📄 Vistos
+                  📄 {language === 'en' ? 'Visas' : 'Vistos'}
                 </button>
-                <button 
+                <button
                   className="bg-orange-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Guias Turísticos')}
+                  onClick={() => openRequestForm(t('tourism.tourGuides'))}
                 >
-                  👨‍🏫 Guias
+                  👨‍🏫 {language === 'en' ? 'Guides' : 'Guias'}
                 </button>
-                <button 
+                <button
                   className="bg-orange-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Atividades')}
+                  onClick={() => openRequestForm(t('tourism.activities'))}
                 >
-                  🎯 Atividades
+                  🎯 {t('tourism.activities')}
                 </button>
-                <button 
+                <button
                   className="bg-orange-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Seguro Viagem')}
+                  onClick={() => openRequestForm(t('tourism.travelInsurance'))}
                 >
-                  🛡️ Seguro Viagem
+                  🛡️ {t('tourism.travelInsurance')}
                 </button>
               </div>
-              
+
               {/* Botão de Contato Urgente */}
               <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-xs text-green-700 mb-2 text-center">⚡ Precisa de ajuda urgente?</p>
-                <a 
-                  href="https://wa.me/+244924166401?text=Olá! Preciso de ajuda urgente com serviços de Turismo."
+                <p className="text-xs text-green-700 mb-2 text-center">{t('education.urgentHelpQuestion')}</p>
+                <a
+                  href={`https://wa.me/+244924166401?text=${language === 'en' ? 'Hello! I need urgent help with Tourism services.' : 'Olá! Preciso de ajuda urgente com serviços de Turismo.'}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:bg-green-600 transition-colors"
                 >
                   <span>📱</span>
-                  <span>Contactar Urgente</span>
+                  <span>{t('education.contactUrgent')}</span>
                 </a>
               </div>
 
@@ -1274,7 +1274,7 @@ const UserDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">✈️</span>
-                  <h2 className="text-lg font-bold">Transporte</h2>
+                  <h2 className="text-lg font-bold">{t('transport.title')}</h2>
                 </div>
                 <button
                   onClick={() => setShowTransportModal(false)}
@@ -1285,59 +1285,59 @@ const UserDashboard: React.FC = () => {
                   </svg>
                 </button>
               </div>
-              <p className="text-indigo-100 text-sm mt-1">Serviços de transporte regionais</p>
+              <p className="text-indigo-100 text-sm mt-1">{t('transport.subtitle')}</p>
             </div>
             <div className="p-4">
               <div className="grid grid-cols-2 gap-3">
-                <button 
+                <button
                   className="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Voos Regionais')}
+                  onClick={() => openRequestForm(t('transport.regionalFlights'))}
                 >
-                  ✈️ Voos
+                  ✈️ {language === 'en' ? 'Flights' : 'Voos'}
                 </button>
-                <button 
+                <button
                   className="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Transfers/Táxis')}
+                  onClick={() => openRequestForm(t('transport.transfersTaxis'))}
                 >
-                  🚗 Transfers
+                  🚗 {language === 'en' ? 'Transfers' : 'Transfers'}
                 </button>
-                <button 
+                <button
                   className="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Aluguel de Veículos')}
+                  onClick={() => openRequestForm(t('transport.carRental'))}
                 >
-                  🚙 Aluguel
+                  🚙 {language === 'en' ? 'Rental' : 'Aluguel'}
                 </button>
-                <button 
+                <button
                   className="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Transporte Público')}
+                  onClick={() => openRequestForm(t('transport.publicTransport'))}
                 >
-                  🚌 Público
+                  🚌 {language === 'en' ? 'Public' : 'Público'}
                 </button>
-                <button 
+                <button
                   className="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Logística de Cargas')}
+                  onClick={() => openRequestForm(t('transport.cargoLogistics'))}
                 >
-                  📦 Logística
+                  📦 {language === 'en' ? 'Logistics' : 'Logística'}
                 </button>
-                <button 
+                <button
                   className="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Documentação Veicular')}
+                  onClick={() => openRequestForm(t('transport.vehicleDocumentation'))}
                 >
-                  📋 Documentação
+                  📋 {language === 'en' ? 'Documentation' : 'Documentação'}
                 </button>
               </div>
-              
+
               {/* Botão de Contato Urgente */}
               <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-xs text-green-700 mb-2 text-center">⚡ Precisa de ajuda urgente?</p>
-                <a 
-                  href="https://wa.me/+244924166401?text=Olá! Preciso de ajuda urgente com serviços de Transporte."
+                <p className="text-xs text-green-700 mb-2 text-center">{t('education.urgentHelpQuestion')}</p>
+                <a
+                  href={`https://wa.me/+244924166401?text=${language === 'en' ? 'Hello! I need urgent help with Transport services.' : 'Olá! Preciso de ajuda urgente com serviços de Transporte.'}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:bg-green-600 transition-colors"
                 >
                   <span>📱</span>
-                  <span>Contactar Urgente</span>
+                  <span>{t('education.contactUrgent')}</span>
                 </a>
               </div>
 
@@ -1360,7 +1360,7 @@ const UserDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">📍</span>
-                  <h2 className="text-lg font-bold">Guias Locais</h2>
+                  <h2 className="text-lg font-bold">{t('guides.title')}</h2>
                 </div>
                 <button
                   onClick={() => setShowGuidesModal(false)}
@@ -1371,59 +1371,59 @@ const UserDashboard: React.FC = () => {
                   </svg>
                 </button>
               </div>
-              <p className="text-teal-100 text-sm mt-1">Serviços de guias locais especializados</p>
+              <p className="text-teal-100 text-sm mt-1">{t('guides.subtitle')}</p>
             </div>
             <div className="p-4">
               <div className="grid grid-cols-2 gap-3">
-                <button 
+                <button
                   className="bg-teal-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Conhecimento Cultural')}
+                  onClick={() => openRequestForm(t('guides.culturalKnowledge'))}
                 >
-                  🎭 Cultural
+                  🎭 {language === 'en' ? 'Cultural' : 'Cultural'}
                 </button>
-                <button 
+                <button
                   className="bg-teal-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Tradução')}
+                  onClick={() => openRequestForm(t('guides.translation'))}
                 >
-                  🗣️ Tradução
+                  🗣️ {t('guides.translation')}
                 </button>
-                <button 
+                <button
                   className="bg-teal-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Acompanhamento Oficial')}
+                  onClick={() => openRequestForm(t('guides.officialAccompaniment'))}
                 >
-                  👔 Oficial
+                  👔 {language === 'en' ? 'Official' : 'Oficial'}
                 </button>
-                <button 
+                <button
                   className="bg-teal-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Networking Local')}
+                  onClick={() => openRequestForm(t('guides.localNetworking'))}
                 >
                   🤝 Networking
                 </button>
-                <button 
+                <button
                   className="bg-teal-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Assessoria Jurídica')}
+                  onClick={() => openRequestForm(t('guides.legalAdvisory'))}
                 >
-                  ⚖️ Jurídica
+                  ⚖️ {language === 'en' ? 'Legal' : 'Jurídica'}
                 </button>
-                <button 
+                <button
                   className="bg-teal-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => openRequestForm('Suporte Emergencial')}
+                  onClick={() => openRequestForm(t('guides.emergencySupport'))}
                 >
-                  🚨 Emergencial
+                  🚨 {language === 'en' ? 'Emergency' : 'Emergencial'}
                 </button>
               </div>
-              
+
               {/* Botão de Contato Urgente */}
               <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-xs text-green-700 mb-2 text-center">⚡ Precisa de ajuda urgente?</p>
-                <a 
-                  href="https://wa.me/+244924166401?text=Olá! Preciso de ajuda urgente com Guias Locais."
+                <p className="text-xs text-green-700 mb-2 text-center">{t('education.urgentHelpQuestion')}</p>
+                <a
+                  href={`https://wa.me/+244924166401?text=${language === 'en' ? 'Hello! I need urgent help with Local Guides.' : 'Olá! Preciso de ajuda urgente com Guias Locais.'}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:bg-green-600 transition-colors"
                 >
                   <span>📱</span>
-                  <span>Contactar Urgente</span>
+                  <span>{t('education.contactUrgent')}</span>
                 </a>
               </div>
 

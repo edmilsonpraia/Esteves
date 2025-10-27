@@ -255,7 +255,7 @@ const AdminDashboard: React.FC = () => {
                     service_type: 'Hospitais Regionais',
                     name: 'Dr. António Fernandes',
                     email: 'antonio@email.com',
-                    phone: '++244 924 166 401',
+                    phone: '+244 924 166 401',
                     message: 'Preciso de informações sobre hospitais especializados em cardiologia em Luanda.',
                     status: 'pending',
                     created_at: '2024-06-18T09:15:00Z',

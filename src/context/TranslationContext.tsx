@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { useAuth } from './AuthContext';
+import { supabase } from '../lib/supabase';
 
 interface Translations {
   [key: string]: {
@@ -514,6 +516,17 @@ const translations: Translations = {
     'services.consulting': 'Consultoria',
     'services.guides': 'Guias Locais',
     'requests.title': 'Solicitações de Serviço',
+
+    // Education Modal Specific
+    'education.title': 'Educação',
+    'education.subtitle': 'Serviços educacionais regionais',
+    'education.universities': 'Universidades',
+    'education.highSchool': 'Ensino Médio',
+    'education.technicalCourses': 'Cursos Técnicos',
+    'education.exchange': 'Intercâmbio',
+    'education.certifications': 'Certificações',
+    'education.scholarships': 'Bolsas de Estudo',
+    'education.urgentHelpQuestion': '⚡ Precisa de ajuda urgente?',
     'requests.allRequests': 'Todas as Solicitações',
     'requests.noRequests': 'Nenhuma Solicitação Encontrada',
     'requests.noRequestsDesc': 'Nenhuma solicitação de serviço foi registrada ainda',
@@ -524,7 +537,76 @@ const translations: Translations = {
     'requests.process': 'Processar',
     'requests.markComplete': 'Marcar como Concluído',
     'requests.whatsapp': 'Contactar via WhatsApp',
+    'education.contactUrgent': 'Contactar Urgente',
     'requests.emailAction': 'Enviar Email',
+
+    // Health Modal
+    'health.title': 'Saúde',
+    'health.subtitle': 'Serviços de saúde regionais',
+    'health.hospitals': 'Hospitais',
+    'health.regionalHospitals': 'Hospitais Regionais',
+    'health.clinics': 'Clínicas',
+    'health.specializedClinics': 'Clínicas Especializadas',
+    'health.telemedicine': 'Telemedicina',
+    'health.healthInsurance': 'Seguro Saúde',
+    'health.pharmacies': 'Farmácias',
+    'health.emergencies': 'Emergências',
+
+    // Commerce Modal
+    'commerce.title': 'Comércio',
+    'commerce.subtitle': 'Serviços comerciais regionais',
+    'commerce.importExport': 'Import/Export',
+    'commerce.commercialLicenses': 'Licenças Comerciais',
+    'commerce.businessPartnerships': 'Parcerias Empresariais',
+    'commerce.suppliers': 'Fornecedores',
+    'commerce.fairsExhibitions': 'Feiras e Exposições',
+    'commerce.businessConsulting': 'Consultoria de Negócios',
+
+    // Tourism Modal
+    'tourism.title': 'Turismo',
+    'tourism.subtitle': 'Serviços turísticos regionais',
+    'tourism.hotelsInns': 'Hotéis e Pousadas',
+    'tourism.tourPackages': 'Pacotes Turísticos',
+    'tourism.visasDocumentation': 'Vistos e Documentação',
+    'tourism.tourGuides': 'Guias Turísticos',
+    'tourism.activities': 'Atividades',
+    'tourism.travelInsurance': 'Seguro Viagem',
+
+    // Transport Modal
+    'transport.title': 'Transporte',
+    'transport.subtitle': 'Serviços de transporte regionais',
+    'transport.regionalFlights': 'Voos Regionais',
+    'transport.transfersTaxis': 'Transfers/Táxis',
+    'transport.carRental': 'Aluguel de Veículos',
+    'transport.publicTransport': 'Transporte Público',
+    'transport.cargoLogistics': 'Logística de Cargas',
+    'transport.vehicleDocumentation': 'Documentação Veicular',
+
+    // Local Guides Modal
+    'guides.title': 'Guias Locais',
+    'guides.subtitle': 'Serviços de guias especializados',
+    'guides.culturalKnowledge': 'Conhecimento Cultural',
+    'guides.translation': 'Tradução',
+    'guides.officialAccompaniment': 'Acompanhamento Oficial',
+    'guides.localNetworking': 'Networking Local',
+    'guides.legalAdvisory': 'Assessoria Jurídica',
+    'guides.emergencySupport': 'Suporte Emergencial',
+
+    // Services Modal (General)
+    'servicesModal.title': 'Serviços Gerais',
+    'servicesModal.subtitle': 'Serviços integrados na região',
+    'servicesModal.officeHeadquarters': 'Escritório - Sede',
+    'servicesModal.address': 'Endereço',
+    'servicesModal.contactInfo': 'Informações de Contato',
+
+    // Connections/Network Modal
+    'connectionsModal.title': 'Rede',
+    'connectionsModal.subtitle': 'Sua rede profissional',
+    'connectionsModal.myConnections': 'Minhas Conexões',
+    'connectionsModal.connectionsByCountry': 'Conexões por País',
+    'connectionsModal.professional': 'Profissional',
+    'connectionsModal.addConnection': 'Adicionar Conexão',
+    'connectionsModal.searchConnections': 'Buscar Conexões',
 
     // Common
     'common.error': 'Ocorreu um erro',
@@ -1310,6 +1392,17 @@ const translations: Translations = {
     'services.consulting': 'Consulting',
     'services.guides': 'Local Guides',
     'requests.title': 'Service Requests',
+
+    // Education Modal Specific
+    'education.title': 'Education',
+    'education.subtitle': 'Regional educational services',
+    'education.universities': 'Universities',
+    'education.highSchool': 'High School',
+    'education.technicalCourses': 'Technical Courses',
+    'education.exchange': 'Exchange Programs',
+    'education.certifications': 'Certifications',
+    'education.scholarships': 'Scholarships',
+    'education.urgentHelpQuestion': '⚡ Need urgent help?',
     'requests.allRequests': 'All Requests',
     'requests.noRequests': 'No Requests Found',
     'requests.noRequestsDesc': 'No service requests have been registered yet',
@@ -1320,7 +1413,76 @@ const translations: Translations = {
     'requests.process': 'Process',
     'requests.markComplete': 'Mark as Complete',
     'requests.whatsapp': 'Contact via WhatsApp',
+    'education.contactUrgent': 'Contact Urgently',
     'requests.emailAction': 'Send Email',
+
+    // Health Modal
+    'health.title': 'Health',
+    'health.subtitle': 'Regional health services',
+    'health.hospitals': 'Hospitals',
+    'health.regionalHospitals': 'Regional Hospitals',
+    'health.clinics': 'Clinics',
+    'health.specializedClinics': 'Specialized Clinics',
+    'health.telemedicine': 'Telemedicine',
+    'health.healthInsurance': 'Health Insurance',
+    'health.pharmacies': 'Pharmacies',
+    'health.emergencies': 'Emergencies',
+
+    // Commerce Modal
+    'commerce.title': 'Commerce',
+    'commerce.subtitle': 'Regional commercial services',
+    'commerce.importExport': 'Import/Export',
+    'commerce.commercialLicenses': 'Commercial Licenses',
+    'commerce.businessPartnerships': 'Business Partnerships',
+    'commerce.suppliers': 'Suppliers',
+    'commerce.fairsExhibitions': 'Fairs and Exhibitions',
+    'commerce.businessConsulting': 'Business Consulting',
+
+    // Tourism Modal
+    'tourism.title': 'Tourism',
+    'tourism.subtitle': 'Regional tourism services',
+    'tourism.hotelsInns': 'Hotels and Inns',
+    'tourism.tourPackages': 'Tour Packages',
+    'tourism.visasDocumentation': 'Visas and Documentation',
+    'tourism.tourGuides': 'Tour Guides',
+    'tourism.activities': 'Activities',
+    'tourism.travelInsurance': 'Travel Insurance',
+
+    // Transport Modal
+    'transport.title': 'Transport',
+    'transport.subtitle': 'Regional transport services',
+    'transport.regionalFlights': 'Regional Flights',
+    'transport.transfersTaxis': 'Transfers/Taxis',
+    'transport.carRental': 'Car Rental',
+    'transport.publicTransport': 'Public Transport',
+    'transport.cargoLogistics': 'Cargo Logistics',
+    'transport.vehicleDocumentation': 'Vehicle Documentation',
+
+    // Local Guides Modal
+    'guides.title': 'Local Guides',
+    'guides.subtitle': 'Specialized guide services',
+    'guides.culturalKnowledge': 'Cultural Knowledge',
+    'guides.translation': 'Translation',
+    'guides.officialAccompaniment': 'Official Accompaniment',
+    'guides.localNetworking': 'Local Networking',
+    'guides.legalAdvisory': 'Legal Advisory',
+    'guides.emergencySupport': 'Emergency Support',
+
+    // Services Modal (General)
+    'servicesModal.title': 'General Services',
+    'servicesModal.subtitle': 'Integrated services in the region',
+    'servicesModal.officeHeadquarters': 'Office - Headquarters',
+    'servicesModal.address': 'Address',
+    'servicesModal.contactInfo': 'Contact Information',
+
+    // Connections/Network Modal
+    'connectionsModal.title': 'Network',
+    'connectionsModal.subtitle': 'Your professional network',
+    'connectionsModal.myConnections': 'My Connections',
+    'connectionsModal.connectionsByCountry': 'Connections by Country',
+    'connectionsModal.professional': 'Professional',
+    'connectionsModal.addConnection': 'Add Connection',
+    'connectionsModal.searchConnections': 'Search Connections',
 
     // Common
     'common.error': 'An error occurred',
@@ -1610,14 +1772,41 @@ const translations: Translations = {
 };
 
 export const TranslationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<string>('en');
+  const { user, isAuthenticated } = useAuth();
+  const [language, setLanguage] = useState<string>('pt');
+
+  // Efeito para sincronizar o idioma com o perfil do usuário
+  useEffect(() => {
+    // Se o usuário está autenticado e tem uma preferência de idioma, use-a.
+    if (isAuthenticated && user?.preferences?.language) {
+      setLanguage(user.preferences.language);
+    }
+  }, [user, isAuthenticated]);
+
+  // Função para alterar o idioma e atualizar o perfil do usuário
+  const handleSetLanguage = async (lang: string) => {
+    setLanguage(lang);
+    // Se o usuário estiver logado, atualiza a preferência no banco de dados
+    if (user) {
+      try {
+        await supabase
+          .from('profiles')
+          .update({ preferences: { ...user.preferences, language: lang } })
+          .eq('id', user.id);
+        console.log(`✅ Preferência de idioma atualizada para '${lang}' no banco de dados.`);
+      } catch (error) {
+        console.error('❌ Erro ao atualizar a preferência de idioma:', error);
+      }
+    }
+  };
 
   const t = (key: string): string => {
-    return translations[language][key] || key;
+    const langObject = translations[language as keyof typeof translations];
+    return langObject[key as keyof typeof langObject] || key;
   };
 
   return (
-    <TranslationContext.Provider value={{ t, language, setLanguage }}>
+    <TranslationContext.Provider value={{ t, language, setLanguage: handleSetLanguage }}>
       {children}
     </TranslationContext.Provider>
   );
