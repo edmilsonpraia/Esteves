@@ -137,6 +137,114 @@ export interface Database {
           updated_at?: string
         }
       }
+      regional_services: {
+        Row: {
+          id: string
+          title: string
+          description: string
+          category: 'saude' | 'educacao' | 'comercio' | 'turismo' | 'transporte' | 'tecnologia'
+          countries: string[]
+          features: string[]
+          price: string
+          duration: string
+          image: string
+          icon: string
+          featured: boolean
+          providers: string[]
+          requirements: string[]
+          benefits: string[]
+          status: 'active' | 'inactive' | 'archived'
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          title: string
+          description: string
+          category: 'saude' | 'educacao' | 'comercio' | 'turismo' | 'transporte' | 'tecnologia'
+          countries: string[]
+          features: string[]
+          price: string
+          duration: string
+          image: string
+          icon: string
+          featured?: boolean
+          providers: string[]
+          requirements: string[]
+          benefits: string[]
+          status?: 'active' | 'inactive' | 'archived'
+        }
+        Update: {
+          title?: string
+          description?: string
+          category?: 'saude' | 'educacao' | 'comercio' | 'turismo' | 'transporte' | 'tecnologia'
+          countries?: string[]
+          features?: string[]
+          price?: string
+          duration?: string
+          image?: string
+          icon?: string
+          featured?: boolean
+          providers?: string[]
+          requirements?: string[]
+          benefits?: string[]
+          status?: 'active' | 'inactive' | 'archived'
+          updated_at?: string
+        }
+      }
+      service_requests: {
+        Row: {
+          id: string
+          service_id: string
+          user_id?: string
+          user_name: string
+          user_email: string
+          user_phone?: string
+          user_country: string
+          organization?: string
+          sector?: string
+          message?: string
+          status: 'pending' | 'approved' | 'rejected' | 'in_progress' | 'completed' | 'cancelled'
+          priority: 'low' | 'medium' | 'high' | 'urgent'
+          scheduled_date?: string
+          completed_date?: string
+          notes?: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          service_id: string
+          user_id?: string
+          user_name: string
+          user_email: string
+          user_phone?: string
+          user_country: string
+          organization?: string
+          sector?: string
+          message?: string
+          status?: 'pending' | 'approved' | 'rejected' | 'in_progress' | 'completed' | 'cancelled'
+          priority?: 'low' | 'medium' | 'high' | 'urgent'
+          scheduled_date?: string
+          completed_date?: string
+          notes?: string
+        }
+        Update: {
+          service_id?: string
+          user_id?: string
+          user_name?: string
+          user_email?: string
+          user_phone?: string
+          user_country?: string
+          organization?: string
+          sector?: string
+          message?: string
+          status?: 'pending' | 'approved' | 'rejected' | 'in_progress' | 'completed' | 'cancelled'
+          priority?: 'low' | 'medium' | 'high' | 'urgent'
+          scheduled_date?: string
+          completed_date?: string
+          notes?: string
+          updated_at?: string
+        }
+      }
     }
   }
 }
@@ -145,6 +253,8 @@ export interface Database {
 export type Profile = Database['public']['Tables']['profiles']['Row']
 export type Project = Database['public']['Tables']['projects']['Row']
 export type Client = Database['public']['Tables']['clients']['Row']
+export type RegionalService = Database['public']['Tables']['regional_services']['Row']
+export type ServiceRequest = Database['public']['Tables']['service_requests']['Row']
 
 // Funções auxiliares para autenticação
 export const authHelpers = {

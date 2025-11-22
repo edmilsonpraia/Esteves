@@ -249,13 +249,20 @@ const AppContent: React.FC = () => {
     setCurrentMode('login');
   };
 
-  // ✅ FUNÇÃO PARA EXPOR NAVEGAÇÃO GLOBALMENTE (para HomePage usar)
+  // ✅ FUNÇÃO PARA EXPOR NAVEGAÇÃO GLOBALMENTE (para HomePage e outras páginas usarem)
   useEffect(() => {
     // Expor função de navegação globalmente para a HomePage
     (window as any).navigateToLogin = navigateToLogin;
-    
+
+    // ✅ NOVA: Expor função para navegar para qualquer página
+    (window as any).navigateToPage = (page: string) => {
+      console.log('🚀 Navegando para página:', page);
+      setCurrentPage(page);
+    };
+
     return () => {
       delete (window as any).navigateToLogin;
+      delete (window as any).navigateToPage;
     };
   }, []);
 

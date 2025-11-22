@@ -36,15 +36,28 @@ interface Application {
 
 interface ServiceRequest {
     id: string;
-    user_id: string;
-    service_type: string;
-    name: string;
-    email: string;
-    phone: string;
-    message: string;
-    status: 'pending' | 'processing' | 'completed' | 'cancelled';
+    service_id: string;
+    user_id?: string;
+    user_name: string;
+    user_email: string;
+    user_phone?: string;
+    user_country: string;
+    organization?: string;
+    sector?: string;
+    message?: string;
+    status: 'pending' | 'approved' | 'rejected' | 'in_progress' | 'completed' | 'cancelled';
+    priority: 'low' | 'medium' | 'high' | 'urgent';
+    scheduled_date?: string;
+    completed_date?: string;
+    notes?: string;
     created_at: string;
-    user_country?: string;
+    updated_at: string;
+    service?: {
+        id: string;
+        title: string;
+        category: string;
+        icon: string;
+    };
 }
 
 interface Connection {
@@ -251,39 +264,64 @@ const AdminDashboard: React.FC = () => {
             setServiceRequests([
                 {
                     id: '1',
+                    service_id: 'service-1',
                     user_id: 'user-1',
-                    service_type: 'Hospitais Regionais',
-                    name: 'Dr. António Fernandes',
-                    email: 'antonio@email.com',
-                    phone: '+244 924 166 401',
+                    user_name: 'Dr. António Fernandes',
+                    user_email: 'antonio@email.com',
+                    user_phone: '+244 924 166 401',
+                    user_country: t('country.angola'),
                     message: 'Preciso de informações sobre hospitais especializados em cardiologia em Luanda.',
                     status: 'pending',
+                    priority: 'medium',
                     created_at: '2024-06-18T09:15:00Z',
-                    user_country: t('country.angola')
+                    updated_at: '2024-06-18T09:15:00Z',
+                    service: {
+                        id: 'service-1',
+                        title: 'Rede de Telemedicina Regional',
+                        category: 'saude',
+                        icon: '🏥'
+                    }
                 },
                 {
                     id: '2',
+                    service_id: 'service-2',
                     user_id: 'user-2',
-                    service_type: 'Universidades Regionais',
-                    name: 'Ana Costa',
-                    email: 'ana.costa@email.com',
-                    phone: '+244 924 166 401',
+                    user_name: 'Ana Costa',
+                    user_email: 'ana.costa@email.com',
+                    user_phone: '+27 21 123 4567',
+                    user_country: t('country.southAfrica'),
                     message: 'Interessada em programas de mestrado em medicina na UCT.',
-                    status: 'processing',
+                    status: 'in_progress',
+                    priority: 'high',
                     created_at: '2024-06-17T16:45:00Z',
-                    user_country: t('country.southAfrica')
+                    updated_at: '2024-06-17T16:45:00Z',
+                    service: {
+                        id: 'service-2',
+                        title: 'Programa de Intercâmbio Universitário SADC',
+                        category: 'educacao',
+                        icon: '🎓'
+                    }
                 },
                 {
                     id: '3',
+                    service_id: 'service-5',
                     user_id: 'user-3',
-                    service_type: 'Transporte Regional',
-                    name: 'Carlos Mumbala',
-                    email: 'carlos@email.com',
-                    phone: '+244 924 166 401',
+                    user_name: 'Carlos Mumbala',
+                    user_email: 'carlos@email.com',
+                    user_phone: '+264 61 123 456',
+                    user_country: t('country.namibia'),
                     message: 'Preciso de transporte seguro entre Windhoek e Walvis Bay.',
                     status: 'completed',
+                    priority: 'medium',
                     created_at: '2024-06-16T11:20:00Z',
-                    user_country: t('country.namibia')
+                    updated_at: '2024-06-16T11:20:00Z',
+                    completed_date: '2024-06-18T14:30:00Z',
+                    service: {
+                        id: 'service-5',
+                        title: 'Sistema Integrado de Transporte Regional',
+                        category: 'transporte',
+                        icon: '✈️'
+                    }
                 }
             ]);
         }
@@ -573,7 +611,7 @@ const AdminDashboard: React.FC = () => {
             'pending': 'bg-yellow-100 text-yellow-800',
             'approved': 'bg-green-100 text-green-800',
             'rejected': 'bg-red-100 text-red-800',
-            'processing': 'bg-blue-100 text-blue-800',
+            'in_progress': 'bg-blue-100 text-blue-800',
             'completed': 'bg-green-100 text-green-800',
             'cancelled': 'bg-gray-100 text-gray-800',
             'active': 'bg-green-100 text-green-800',
@@ -975,7 +1013,7 @@ const AdminDashboard: React.FC = () => {
                                                     <div className="flex flex-wrap items-center gap-2 mb-2">
                                                         <span className="text-sm sm:text-base">{getCountryFlag(request.user_country || '')}</span>
                                                         <h4 className="font-semibold text-gray-900 text-sm sm:text-base truncate flex-1 min-w-0">
-                                                            {request.service_type}
+                                                            {request.service?.title || 'Serviço não especificado'}
                                                         </h4>
                                                     </div>
                                                 </div>
@@ -988,15 +1026,15 @@ const AdminDashboard: React.FC = () => {
                                                 <div className="space-y-1">
                                                     <p className="text-xs sm:text-sm text-gray-600">
                                                         <strong>{t('requests.name')}</strong>
-                                                        <span className="block sm:inline sm:ml-1 truncate">{request.name}</span>
+                                                        <span className="block sm:inline sm:ml-1 truncate">{request.user_name}</span>
                                                     </p>
                                                     <p className="text-xs sm:text-sm text-gray-600">
                                                         <strong>{t('applications.email')}</strong>
-                                                        <span className="block sm:inline sm:ml-1 truncate">{request.email}</span>
+                                                        <span className="block sm:inline sm:ml-1 truncate">{request.user_email}</span>
                                                     </p>
                                                     <p className="text-xs sm:text-sm text-gray-600">
                                                         <strong>{t('requests.phone')}</strong>
-                                                        <span className="block sm:inline sm:ml-1">{request.phone}</span>
+                                                        <span className="block sm:inline sm:ml-1">{request.user_phone || 'N/A'}</span>
                                                     </p>
                                                 </div>
                                                 <div className="space-y-1">
@@ -1020,7 +1058,7 @@ const AdminDashboard: React.FC = () => {
                                                 {request.status === 'pending' && (
                                                     <>
                                                         <button
-                                                            onClick={() => handleProcessServiceRequest(request.id, 'processing')}
+                                                            onClick={() => handleProcessServiceRequest(request.id, 'in_progress')}
                                                             className="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm hover:bg-blue-700 transition-colors flex items-center justify-center gap-1"
                                                         >
                                                             <span>🔄</span>
@@ -1036,7 +1074,7 @@ const AdminDashboard: React.FC = () => {
                                                     </>
                                                 )}
 
-                                                {request.status === 'processing' && (
+                                                {request.status === 'in_progress' && (
                                                     <button
                                                         onClick={() => handleProcessServiceRequest(request.id, 'completed')}
                                                         className="bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm hover:bg-green-700 transition-colors flex items-center justify-center gap-1"
@@ -1047,7 +1085,7 @@ const AdminDashboard: React.FC = () => {
                                                 )}
 
                                                 <a
-                                                    href={`https://wa.me/${request.phone.replace(/\s+/g, '')}`}
+                                                    href={`https://wa.me/${(request.user_phone || '').replace(/\s+/g, '')}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="bg-green-500 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm hover:bg-green-600 transition-colors flex items-center justify-center gap-1"
@@ -1057,7 +1095,7 @@ const AdminDashboard: React.FC = () => {
                                                 </a>
 
                                                 <a
-                                                    href={`mailto:${request.email}?subject=Africa's Hands - ${request.service_type}&body=Olá ${request.name}, recebemos sua solicitação sobre ${request.service_type}.`}
+                                                    href={`mailto:${request.user_email}?subject=Africa's Hands - ${request.service?.title || 'Serviço'}&body=Olá ${request.user_name}, recebemos sua solicitação sobre ${request.service?.title || 'o serviço'}.`}
                                                     className="bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm hover:bg-gray-700 transition-colors flex items-center justify-center gap-1"
                                                 >
                                                     <span>📧</span>
@@ -1217,7 +1255,7 @@ const AdminDashboard: React.FC = () => {
             </div>
         </div>
 
-      {/* ✅ MODAL DE EDIÇÃO */ }
+      {/* ✅ MODAL DE EDIÇÃO */}
     {
         showEditModal && editingOpportunity && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -1488,7 +1526,7 @@ const AdminDashboard: React.FC = () => {
         )
     }
 
-    {/* ✅ MODAL DE CONFIRMAÇÃO DE EXCLUSÃO */ }
+    {/* ✅ MODAL DE CONFIRMAÇÃO DE EXCLUSÃO */}
     {
         deleteConfirm && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -1519,7 +1557,7 @@ const AdminDashboard: React.FC = () => {
         )
     }
 
-    {/* Modal de Detalhes */ }
+    {/* Modal de Detalhes */}
     {
         selectedItem && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -1552,7 +1590,7 @@ const AdminDashboard: React.FC = () => {
         )
     }
 
-    {/* Aviso de erro */ }
+    {/* Aviso de erro */}
     {
         error && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">

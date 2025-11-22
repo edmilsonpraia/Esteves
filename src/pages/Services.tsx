@@ -246,9 +246,22 @@ const ServicesAfricasHands: React.FC = () => {
     ));
   };
 
-  const handleRequestService = (service: Service) => {
-    // Simular ação de solicitar serviço
-    alert(`Solicitação enviada para: ${service.title}`);
+  const handleRequestService = (_service: Service) => {
+    // Navegar para a página de contatos usando o sistema interno de navegação
+    if ((window as any).navigateToPage) {
+      (window as any).navigateToPage('contact');
+
+      // Scroll para o formulário após um pequeno delay
+      setTimeout(() => {
+        const formulario = document.getElementById('formulario');
+        if (formulario) {
+          formulario.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    } else {
+      // Fallback: se a função não existir, tentar redirecionamento direto
+      window.location.href = '/contact#formulario';
+    }
   };
 
   return (
@@ -844,10 +857,40 @@ const ServicesAfricasHands: React.FC = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-red-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition-colors text-lg">
+            <button
+              onClick={() => {
+                if ((window as any).navigateToPage) {
+                  (window as any).navigateToPage('contact');
+                  setTimeout(() => {
+                    const formulario = document.getElementById('formulario');
+                    if (formulario) {
+                      formulario.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }, 100);
+                } else {
+                  window.location.href = '/contact#formulario';
+                }
+              }}
+              className="bg-white text-red-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition-colors text-lg"
+            >
               💬 Falar com Especialista
             </button>
-            <button className="border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-white hover:text-red-600 transition-colors text-lg">
+            <button
+              onClick={() => {
+                if ((window as any).navigateToPage) {
+                  (window as any).navigateToPage('contact');
+                  setTimeout(() => {
+                    const formulario = document.getElementById('formulario');
+                    if (formulario) {
+                      formulario.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }, 100);
+                } else {
+                  window.location.href = '/contact#formulario';
+                }
+              }}
+              className="border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-white hover:text-red-600 transition-colors text-lg"
+            >
               📋 Solicitar Proposta Personalizada
             </button>
           </div>

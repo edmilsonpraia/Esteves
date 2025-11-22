@@ -265,7 +265,7 @@ const ContactAfricasHands: React.FC = () => {
         </section>
 
         {/* Formulário de Contato e Informações */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <section id="formulario" className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Formulário */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
