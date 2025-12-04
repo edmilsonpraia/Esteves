@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useOpportunities } from '../context/OpportunitiesContext';
 import { supabase } from '../lib/supabase';
 import LazyImage from '../components/LazyImage';
+import { logger } from '../utils/logger';
 
 interface Opportunity {
   id: string;
@@ -124,19 +125,20 @@ const UserDashboard: React.FC = () => {
     });
   }, []);
 
-  // Carregar perfil do usuário (memorizado)
+  // Carregar perfil do usuário (memorizado e otimizado)
   const loadUserProfile = useCallback(async () => {
     if (!user) return;
 
     try {
+      // Optimized query - only select needed columns
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, email, full_name, role, country, sector, organization')
         .eq('id', user.id)
         .single();
 
       if (error) {
-        console.error('Erro ao carregar perfil:', error);
+        logger.error('Erro ao carregar perfil:', error);
         setUserProfile({
           full_name: user.email?.split('@')[0] || t('user.defaultName'),
           email: user.email,
@@ -146,14 +148,7 @@ const UserDashboard: React.FC = () => {
       }
 
       setUserProfile(data);
-
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Perfil do usuário carregado:', data);
-
-        if (data?.role === 'admin' || data?.role === 'administrator') {
-          console.log('Usuário admin detectado no UserDashboard');
-        }
-      }
+      logger.log('Perfil do usuário carregado:', data);
 
       setFormData(prev => ({
         ...prev,
@@ -161,7 +156,7 @@ const UserDashboard: React.FC = () => {
         email: data?.email || user.email || ''
       }));
     } catch (err) {
-      console.error('Erro inesperado ao carregar perfil:', err);
+      logger.error('Erro inesperado ao carregar perfil:', err);
       setUserProfile({
         full_name: user.email?.split('@')[0] || t('user.defaultName'),
         email: user.email,
@@ -170,72 +165,46 @@ const UserDashboard: React.FC = () => {
     }
   }, [user, t]);
 
-  // Carregar conexões do usuário (memorizado)
+  // Carregar conexões do usuário (memorizado e otimizado)
   const loadUserConnections = useCallback(async () => {
     if (!user) return;
 
     try {
-      // Tentar carregar conexões com JOIN
+      // Simplified query without JOIN - limit to 10 most recent connections
       const { data, error } = await supabase
         .from('connections')
-        .select(`
-          *,
-          connected_user:profiles!connected_user_id(
-            full_name,
-            avatar_url,
-            sector,
-            country,
-            organization
-          )
-        `)
+        .select('id, user_id, connected_user_id, status, created_at')
         .eq('user_id', user.id)
         .eq('status', 'accepted')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(10);
 
       if (error) {
-        // Se falhar, tentar sem JOIN (fallback)
-        console.warn('JOIN falhou, usando fallback:', error.message);
-        const { data: simpleData, error: simpleError } = await supabase
-          .from('connections')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('status', 'accepted')
-          .order('created_at', { ascending: false });
-
-        if (simpleError) {
-          console.error('Erro ao carregar conexões:', simpleError);
-          return;
-        }
-
-        setConnections(simpleData || []);
+        logger.error('Erro ao carregar conexões:', error);
         return;
       }
 
       setConnections(data || []);
+      logger.log(`${data?.length || 0} conexões carregadas`);
     } catch (err) {
-      console.error('Erro ao carregar conexões:', err);
+      logger.error('Erro inesperado ao carregar conexões:', err);
     }
   }, [user]);
 
-  // Carregar dados iniciais (memorizado)
-  const loadInitialData = useCallback(async () => {
-    try {
-      await Promise.all([
-        loadUserProfile(),
-        loadUserConnections()
-      ]);
-    } catch (err) {
-      console.error('Erro ao carregar dados:', err);
-      setError(t('common.error'));
-    }
-  }, [t, loadUserProfile, loadUserConnections]);
-
-  // Carregar dados iniciais ao montar
+  // Carregar dados iniciais ao montar (não-bloqueante)
   useEffect(() => {
     if (user) {
-      loadInitialData();
+      // Load profile and connections asynchronously (non-blocking)
+      loadUserProfile().catch(err => {
+        logger.error('Erro ao carregar perfil inicial:', err);
+        setError(t('common.error'));
+      });
+
+      loadUserConnections().catch(err => {
+        logger.error('Erro ao carregar conexões inicial:', err);
+      });
     }
-  }, [user, loadInitialData]);
+  }, [user, loadUserProfile, loadUserConnections, t]);
 
   // Candidatar a uma oportunidade
   const handleApplyToOpportunity = async (opportunityId: string) => {
@@ -246,7 +215,7 @@ const UserDashboard: React.FC = () => {
       await applyToOpportunity(opportunityId);
       alert(t('opportunities.applySuccess'));
     } catch (err: any) {
-      console.error('Erro ao candidatar:', err);
+      logger.error('Erro ao candidatar:', err);
       alert(err.message || t('common.error'));
     } finally {
       setLoading(false);
@@ -283,7 +252,7 @@ const UserDashboard: React.FC = () => {
       alert(t('services.success'));
       closeRequestForm();
     } catch (err) {
-      console.error('Erro ao enviar solicitação:', err);
+      logger.error('Erro ao enviar solicitação:', err);
       alert(t('common.error'));
     } finally {
       setLoading(false);
@@ -307,7 +276,7 @@ const UserDashboard: React.FC = () => {
       if (error) throw error;
       alert(t('opportunities.save'));
     } catch (err) {
-      console.error('Erro ao salvar oportunidade:', err);
+      logger.error('Erro ao salvar oportunidade:', err);
       alert(t('common.error'));
     }
   };
@@ -536,8 +505,8 @@ const UserDashboard: React.FC = () => {
           <div className="flex items-center justify-center gap-2">
             <span>👨‍💼</span>
             <span className="font-medium">{t('user.adminNotice')}</span>
-            <button 
-              onClick={() => console.log('Redirecionar para AdminDashboard')}
+            <button
+              onClick={() => logger.log('Redirecionar para AdminDashboard')}
               className="bg-white bg-opacity-20 px-3 py-1 rounded-lg text-sm hover:bg-opacity-30 transition-colors ml-2"
             >
               {t('user.goToAdmin')} →

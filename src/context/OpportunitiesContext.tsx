@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
+import { logger } from '../utils/logger';
 
 export interface Opportunity {
   id: string;
@@ -93,40 +94,39 @@ export const OpportunitiesProvider: React.FC<{ children: React.ReactNode }> = ({
   // ===================================================
   const loadOpportunities = useCallback(async () => {
     try {
-      setLoading(true);
       setError(null);
 
-      console.log('🔄 Carregando oportunidades...');
+      logger.log('🔄 Carregando oportunidades...');
 
+      // Simplified query - remove expensive JOIN, add limit
       const { data, error: fetchError } = await supabase
         .from('opportunities')
-        .select(`
-          *,
-          applications!inner(count)
-        `)
+        .select('*')
         .eq('status', 'active')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(50); // Limit to 50 most recent opportunities
 
       if (fetchError) {
-        console.error('❌ Erro ao carregar oportunidades:', fetchError);
-        
+        logger.error('❌ Erro ao carregar oportunidades:', fetchError);
+
         // Fallback com dados de exemplo se falhar
         setOpportunities(getExampleOpportunities());
+        setLoading(false);
         return;
       }
 
       if (data) {
-        console.log(`✅ ${data.length} oportunidades carregadas do Supabase`);
+        logger.log(`✅ ${data.length} oportunidades carregadas do Supabase`);
         setOpportunities(data);
       } else {
-        console.log('📋 Nenhuma oportunidade encontrada, usando dados de exemplo');
+        logger.log('📋 Nenhuma oportunidade encontrada, usando dados de exemplo');
         setOpportunities(getExampleOpportunities());
       }
 
     } catch (err) {
-      console.error('❌ Erro inesperado ao carregar oportunidades:', err);
+      logger.error('❌ Erro inesperado ao carregar oportunidades:', err);
       setError('Erro ao carregar oportunidades');
-      
+
       // Usar dados de exemplo como fallback
       setOpportunities(getExampleOpportunities());
     } finally {
@@ -141,29 +141,28 @@ export const OpportunitiesProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!user || !isAuthenticated) return;
 
     try {
-      console.log('📋 Carregando candidaturas do usuário...');
+      logger.log('📋 Carregando candidaturas do usuário...');
 
+      // Simplified query - remove expensive JOIN, just get application IDs
       const { data, error: fetchError } = await supabase
         .from('applications')
-        .select(`
-          *,
-          opportunity:opportunities(*)
-        `)
+        .select('*')
         .eq('user_id', user.id)
-        .order('application_date', { ascending: false });
+        .order('application_date', { ascending: false })
+        .limit(20); // Limit to 20 most recent applications
 
       if (fetchError) {
-        console.error('❌ Erro ao carregar candidaturas:', fetchError);
+        logger.error('❌ Erro ao carregar candidaturas:', fetchError);
         return;
       }
 
       if (data) {
-        console.log(`✅ ${data.length} candidaturas carregadas`);
+        logger.log(`✅ ${data.length} candidaturas carregadas`);
         setUserApplications(data);
       }
 
     } catch (err) {
-      console.error('❌ Erro ao carregar candidaturas:', err);
+      logger.error('❌ Erro ao carregar candidaturas:', err);
     }
   }, [user, isAuthenticated]);
 
@@ -176,7 +175,7 @@ export const OpportunitiesProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     try {
-      console.log('🚀 Criando nova oportunidade:', opportunityData.title);
+      logger.log('🚀 Criando nova oportunidade:', opportunityData.title);
 
       const newOpportunity = {
         ...opportunityData,
@@ -193,14 +192,14 @@ export const OpportunitiesProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (error) throw error;
 
-      console.log('✅ Oportunidade criada com sucesso:', data.id);
+      logger.log('✅ Oportunidade criada com sucesso:', data.id);
 
       // Atualizar estado local imediatamente
       setOpportunities(prev => [data, ...prev]);
 
       return data;
     } catch (err: any) {
-      console.error('❌ Erro ao criar oportunidade:', err);
+      logger.error('❌ Erro ao criar oportunidade:', err);
       throw new Error(err.message || 'Erro ao criar oportunidade');
     }
   };
@@ -214,7 +213,7 @@ export const OpportunitiesProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     try {
-      console.log('📝 Atualizando oportunidade:', id);
+      logger.log('📝 Atualizando oportunidade:', id);
 
       const { data, error } = await supabase
         .from('opportunities')
@@ -228,15 +227,15 @@ export const OpportunitiesProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (error) throw error;
 
-      console.log('✅ Oportunidade atualizada com sucesso');
+      logger.log('✅ Oportunidade atualizada com sucesso');
 
       // Atualizar estado local
-      setOpportunities(prev => 
+      setOpportunities(prev =>
         prev.map(opp => opp.id === id ? { ...opp, ...data } : opp)
       );
 
     } catch (err: any) {
-      console.error('❌ Erro ao atualizar oportunidade:', err);
+      logger.error('❌ Erro ao atualizar oportunidade:', err);
       throw new Error(err.message || 'Erro ao atualizar oportunidade');
     }
   };
@@ -250,7 +249,7 @@ export const OpportunitiesProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     try {
-      console.log('🗑️ Deletando oportunidade:', id);
+      logger.log('🗑️ Deletando oportunidade:', id);
 
       const { error } = await supabase
         .from('opportunities')
@@ -259,13 +258,13 @@ export const OpportunitiesProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (error) throw error;
 
-      console.log('✅ Oportunidade deletada com sucesso');
+      logger.log('✅ Oportunidade deletada com sucesso');
 
       // Remover do estado local
       setOpportunities(prev => prev.filter(opp => opp.id !== id));
 
     } catch (err: any) {
-      console.error('❌ Erro ao deletar oportunidade:', err);
+      logger.error('❌ Erro ao deletar oportunidade:', err);
       throw new Error(err.message || 'Erro ao deletar oportunidade');
     }
   };
@@ -279,7 +278,7 @@ export const OpportunitiesProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     try {
-      console.log('📤 Candidatando-se à oportunidade:', opportunityId);
+      logger.log('📤 Candidatando-se à oportunidade:', opportunityId);
 
       // Verificar se já se candidatou
       const existingApplication = userApplications.find(
@@ -301,21 +300,18 @@ export const OpportunitiesProvider: React.FC<{ children: React.ReactNode }> = ({
       const { data, error } = await supabase
         .from('applications')
         .insert([applicationData])
-        .select(`
-          *,
-          opportunity:opportunities(*)
-        `)
+        .select('*')
         .single();
 
       if (error) throw error;
 
-      console.log('✅ Candidatura enviada com sucesso');
+      logger.log('✅ Candidatura enviada com sucesso');
 
       // Atualizar candidaturas do usuário
       setUserApplications(prev => [data, ...prev]);
 
     } catch (err: any) {
-      console.error('❌ Erro ao candidatar-se:', err);
+      logger.error('❌ Erro ao candidatar-se:', err);
       throw new Error(err.message || 'Erro ao enviar candidatura');
     }
   };
@@ -401,7 +397,7 @@ export const OpportunitiesProvider: React.FC<{ children: React.ReactNode }> = ({
   const subscribeToOpportunities = useCallback(() => {
     if (subscription) return; // Já está subscrito
 
-    console.log('🔔 Iniciando subscription para oportunidades em tempo real...');
+    logger.log('🔔 Iniciando subscription para oportunidades em tempo real...');
 
     const sub = supabase
       .channel('opportunities-channel')
@@ -413,11 +409,11 @@ export const OpportunitiesProvider: React.FC<{ children: React.ReactNode }> = ({
           table: 'opportunities'
         },
         (payload) => {
-          console.log('🔔 Mudança em tempo real detectada:', payload);
+          logger.log('🔔 Mudança em tempo real detectada:', payload);
 
           switch (payload.eventType) {
             case 'INSERT':
-              console.log('➕ Nova oportunidade criada:', payload.new.title);
+              logger.log('➕ Nova oportunidade criada:', payload.new.title);
               setOpportunities(prev => {
                 const exists = prev.some(opp => opp.id === payload.new.id);
                 if (exists) return prev;
@@ -426,7 +422,7 @@ export const OpportunitiesProvider: React.FC<{ children: React.ReactNode }> = ({
               break;
 
             case 'UPDATE':
-              console.log('📝 Oportunidade atualizada:', payload.new.title);
+              logger.log('📝 Oportunidade atualizada:', payload.new.title);
               setOpportunities(prev =>
                 prev.map(opp =>
                   opp.id === payload.new.id ? { ...opp, ...payload.new } : opp
@@ -435,7 +431,7 @@ export const OpportunitiesProvider: React.FC<{ children: React.ReactNode }> = ({
               break;
 
             case 'DELETE':
-              console.log('🗑️ Oportunidade deletada:', payload.old.id);
+              logger.log('🗑️ Oportunidade deletada:', payload.old.id);
               setOpportunities(prev =>
                 prev.filter(opp => opp.id !== payload.old.id)
               );
@@ -450,7 +446,7 @@ export const OpportunitiesProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const unsubscribeFromOpportunities = useCallback(() => {
     if (subscription) {
-      console.log('🔕 Desconectando subscription...');
+      logger.log('🔕 Desconectando subscription...');
       supabase.removeChannel(subscription);
       setSubscription(null);
     }
@@ -460,21 +456,34 @@ export const OpportunitiesProvider: React.FC<{ children: React.ReactNode }> = ({
   // ⚡ EFEITOS DE INICIALIZAÇÃO
   // ===================================================
   useEffect(() => {
-    loadOpportunities();
+    // Set loading to false immediately - don't block UI
+    setLoading(false);
+
+    // Load opportunities asynchronously (non-blocking)
+    loadOpportunities().catch(err => {
+      logger.error('❌ Erro ao carregar oportunidades inicial:', err);
+    });
   }, [loadOpportunities]);
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      loadUserApplications();
+      // Load user applications asynchronously (non-blocking)
+      loadUserApplications().catch(err => {
+        logger.error('❌ Erro ao carregar candidaturas inicial:', err);
+      });
     }
   }, [loadUserApplications, isAuthenticated, user]);
 
   useEffect(() => {
-    // Iniciar real-time quando componente monta
-    subscribeToOpportunities();
+    // Delay real-time subscription by 2 seconds to prioritize initial load
+    const timeoutId = setTimeout(() => {
+      logger.log('🔔 Iniciando subscription real-time após delay...');
+      subscribeToOpportunities();
+    }, 2000);
 
     // Cleanup quando componente desmonta
     return () => {
+      clearTimeout(timeoutId);
       unsubscribeFromOpportunities();
     };
   }, [subscribeToOpportunities, unsubscribeFromOpportunities]);

@@ -44,9 +44,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userRole, setUserRole] = useState<'admin' | 'user' | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 🔧 TIMEOUT PARA EVITAR LOADING INFINITO
-  const LOADING_TIMEOUT = 8000; // ✅ AUMENTADO de 3000 para 8000
-  const OPERATION_TIMEOUT = 5000; // ✅ AUMENTADO de 2000 para 5000
+  // 🔧 TIMEOUT OTIMIZADO PARA CARREGAMENTO RÁPIDO
+  const LOADING_TIMEOUT = 3000; // 3 segundos (reduzido de 8000)
+  const OPERATION_TIMEOUT = 2000; // 2 segundos (reduzido de 5000)
 
   // 🎯 FUNÇÃO: Determinar role baseado no email
   const determineRoleFromEmail = (email: string): 'admin' | 'user' => {
@@ -87,20 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const fetchPromise = supabase
         .from('profiles')
-        .select(`
-          id,
-          email,
-          full_name,
-          name,
-          role,
-          country,
-          sector,
-          organization,
-          avatar_url,
-          verified,
-          preferences,
-          created_at
-        `)
+        .select('id, email, full_name, role') // Apenas campos essenciais para carregamento rápido
         .eq('id', userId)
         .single();
 
@@ -369,9 +356,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
-        
+
         if (!isMounted) return;
-        
+
         if (error) {
           console.error('❌ [Init] Erro ao verificar sessão:', error);
           clearTimeout(timeoutId);
@@ -381,24 +368,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (session?.user) {
           console.log('👤 [Init] Sessão ativa encontrada para:', session.user.email);
-          
-          const userData = await getOrCreateProfile(session.user);
-          
-          if (isMounted && userData) {
-            setUser(userData);
-            setUserRole(userData.role);
-            console.log('✅ [Init] Autenticação inicial completa:', {
-              email: userData.email,
-              role: userData.role,
-              isAuthenticated: true
-            });
-          }
+
+          // ✅ OTIMIZAÇÃO: Definir isLoading(false) ANTES de carregar o perfil
+          // Isso permite que a UI seja mostrada mais rápido
+          clearTimeout(timeoutId);
+          setIsLoading(false);
+
+          // Carregar perfil de forma assíncrona (não bloqueia a UI)
+          getOrCreateProfile(session.user).then(userData => {
+            if (isMounted && userData) {
+              setUser(userData);
+              setUserRole(userData.role);
+              console.log('✅ [Init] Perfil carregado:', {
+                email: userData.email,
+                role: userData.role
+              });
+            }
+          }).catch(err => {
+            console.error('❌ [Init] Erro ao carregar perfil:', err);
+          });
         } else {
           console.log('📭 [Init] Nenhuma sessão ativa encontrada');
+          clearTimeout(timeoutId);
+          setIsLoading(false);
         }
       } catch (error) {
         console.error('❌ [Init] Erro na inicialização da autenticação:', error);
-      } finally {
         if (isMounted) {
           clearTimeout(timeoutId);
           setIsLoading(false);
