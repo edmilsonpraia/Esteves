@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useMemo, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabase';
 
@@ -1783,8 +1783,8 @@ export const TranslationProvider: React.FC<{ children: ReactNode }> = ({ childre
     }
   }, [user, isAuthenticated]);
 
-  // Função para alterar o idioma e atualizar o perfil do usuário
-  const handleSetLanguage = async (lang: string) => {
+  // Função para alterar o idioma e atualizar o perfil do usuário (memorizada)
+  const handleSetLanguage = useCallback(async (lang: string) => {
     setLanguage(lang);
     // Se o usuário estiver logado, atualiza a preferência no banco de dados
     if (user) {
@@ -1793,20 +1793,32 @@ export const TranslationProvider: React.FC<{ children: ReactNode }> = ({ childre
           .from('profiles')
           .update({ preferences: { ...user.preferences, language: lang } })
           .eq('id', user.id);
-        console.log(`✅ Preferência de idioma atualizada para '${lang}' no banco de dados.`);
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`✅ Preferência de idioma atualizada para '${lang}' no banco de dados.`);
+        }
       } catch (error) {
-        console.error('❌ Erro ao atualizar a preferência de idioma:', error);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('❌ Erro ao atualizar a preferência de idioma:', error);
+        }
       }
     }
-  };
+  }, [user]);
 
-  const t = (key: string): string => {
+  // Função de tradução memorizada
+  const t = useCallback((key: string): string => {
     const langObject = translations[language as keyof typeof translations];
     return langObject[key as keyof typeof langObject] || key;
-  };
+  }, [language]);
+
+  // Memorizar o valor do contexto para evitar re-renders desnecessários
+  const contextValue = useMemo(() => ({
+    t,
+    language,
+    setLanguage: handleSetLanguage
+  }), [t, language, handleSetLanguage]);
 
   return (
-    <TranslationContext.Provider value={{ t, language, setLanguage: handleSetLanguage }}>
+    <TranslationContext.Provider value={contextValue}>
       {children}
     </TranslationContext.Provider>
   );
@@ -1820,12 +1832,12 @@ export const useTranslation = (): TranslationContextType => {
   return context;
 };
 
-export const LanguageToggle: React.FC = () => {
+export const LanguageToggle: React.FC = React.memo(() => {
   const { language, setLanguage } = useTranslation();
 
-  const toggleLanguage = () => {
+  const toggleLanguage = useCallback(() => {
     setLanguage(language === 'en' ? 'pt' : 'en');
-  };
+  }, [language, setLanguage]);
 
   return (
     <button
@@ -1835,4 +1847,4 @@ export const LanguageToggle: React.FC = () => {
       {language === 'en' ? 'Switch to Portuguese' : 'Mudar para Inglês'}
     </button>
   );
-};
+});

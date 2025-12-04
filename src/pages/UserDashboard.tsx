@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation, LanguageToggle } from '../context/TranslationContext';
 import { useAuth } from '../context/AuthContext';
 import { useOpportunities } from '../context/OpportunitiesContext';
 import { supabase } from '../lib/supabase';
+import LazyImage from '../components/LazyImage';
 
 interface Opportunity {
   id: string;
@@ -56,17 +57,21 @@ const UserDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('opportunities');
   const [selectedCountry, setSelectedCountry] = useState('all');
   const [selectedSector, setSelectedSector] = useState('all');
-  const [showServicesModal, setShowServicesModal] = useState(false);
-  const [showEducationModal, setShowEducationModal] = useState(false);
-  const [showHealthModal, setShowHealthModal] = useState(false);
-  const [showCommerceModal, setShowCommerceModal] = useState(false);
-  const [showTourismModal, setShowTourismModal] = useState(false);
-  const [showTransportModal, setShowTransportModal] = useState(false);
-  const [showGuidesModal, setShowGuidesModal] = useState(false);
-  // const [selectedService, setSelectedService] = useState(''); // Removido - não usado
-  const [showRequestForm, setShowRequestForm] = useState(false);
+
+  // Consolidar todos os modais em um único estado (otimização de performance)
+  const [modals, setModals] = useState({
+    services: false,
+    education: false,
+    health: false,
+    commerce: false,
+    tourism: false,
+    transport: false,
+    guides: false,
+    requestForm: false,
+    connections: false
+  });
+
   const [selectedServiceForRequest, setSelectedServiceForRequest] = useState('');
-  const [showConnectionsModal, setShowConnectionsModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -82,7 +87,7 @@ const UserDashboard: React.FC = () => {
 
   const { t, language } = useTranslation();
   const { user } = useAuth();
-  
+
   const {
     opportunities,
     userApplications: applications,
@@ -94,27 +99,33 @@ const UserDashboard: React.FC = () => {
     // refreshOpportunities // Removido - não usado
   } = useOpportunities();
 
-  // Carregar dados iniciais
-  useEffect(() => {
-    if (user) {
-      loadInitialData();
-    }
-  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Helper para abrir modal (memorizado)
+  const openModal = useCallback((modalName: keyof typeof modals) => {
+    setModals(prev => ({ ...prev, [modalName]: true }));
+  }, []);
 
-  const loadInitialData = async () => {
-    try {
-      await Promise.all([
-        loadUserProfile(),
-        loadUserConnections()
-      ]);
-    } catch (err) {
-      console.error('Erro ao carregar dados:', err);
-      setError(t('common.error'));
-    }
-  };
+  // Helper para fechar modal (memorizado)
+  const closeModal = useCallback((modalName: keyof typeof modals) => {
+    setModals(prev => ({ ...prev, [modalName]: false }));
+  }, []);
 
-  // Carregar perfil do usuário
-  const loadUserProfile = async () => {
+  // Fechar todos os modais (memorizado)
+  const closeAllModals = useCallback(() => {
+    setModals({
+      services: false,
+      education: false,
+      health: false,
+      commerce: false,
+      tourism: false,
+      transport: false,
+      guides: false,
+      requestForm: false,
+      connections: false
+    });
+  }, []);
+
+  // Carregar perfil do usuário (memorizado)
+  const loadUserProfile = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -135,13 +146,15 @@ const UserDashboard: React.FC = () => {
       }
 
       setUserProfile(data);
-      
-      console.log('Perfil do usuário carregado:', data);
-      
-      if (data?.role === 'admin' || data?.role === 'administrator') {
-        console.log('Usuário admin detectado no UserDashboard');
+
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Perfil do usuário carregado:', data);
+
+        if (data?.role === 'admin' || data?.role === 'administrator') {
+          console.log('Usuário admin detectado no UserDashboard');
+        }
       }
-      
+
       setFormData(prev => ({
         ...prev,
         name: data?.full_name || user.email?.split('@')[0] || '',
@@ -155,35 +168,74 @@ const UserDashboard: React.FC = () => {
         role: 'user'
       });
     }
-  };
+  }, [user, t]);
 
-  // Carregar conexões do usuário
-  const loadUserConnections = async () => {
+  // Carregar conexões do usuário (memorizado)
+  const loadUserConnections = useCallback(async () => {
     if (!user) return;
 
-    const { data, error } = await supabase
-      .from('connections')
-      .select(`
-        *,
-        connected_user:profiles!connections_connected_user_id_fkey(
-          full_name,
-          avatar_url,
-          sector,
-          country,
-          organization
-        )
-      `)
-      .eq('user_id', user.id)
-      .eq('status', 'accepted')
-      .order('created_at', { ascending: false });
+    try {
+      // Tentar carregar conexões com JOIN
+      const { data, error } = await supabase
+        .from('connections')
+        .select(`
+          *,
+          connected_user:profiles!connected_user_id(
+            full_name,
+            avatar_url,
+            sector,
+            country,
+            organization
+          )
+        `)
+        .eq('user_id', user.id)
+        .eq('status', 'accepted')
+        .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Erro ao carregar conexões:', error);
-      return;
+      if (error) {
+        // Se falhar, tentar sem JOIN (fallback)
+        console.warn('JOIN falhou, usando fallback:', error.message);
+        const { data: simpleData, error: simpleError } = await supabase
+          .from('connections')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('status', 'accepted')
+          .order('created_at', { ascending: false });
+
+        if (simpleError) {
+          console.error('Erro ao carregar conexões:', simpleError);
+          return;
+        }
+
+        setConnections(simpleData || []);
+        return;
+      }
+
+      setConnections(data || []);
+    } catch (err) {
+      console.error('Erro ao carregar conexões:', err);
     }
+  }, [user]);
 
-    setConnections(data || []);
-  };
+  // Carregar dados iniciais (memorizado)
+  const loadInitialData = useCallback(async () => {
+    try {
+      await Promise.all([
+        loadUserProfile(),
+        loadUserConnections()
+      ]);
+    } catch (err) {
+      console.error('Erro ao carregar dados:', err);
+      setError(t('common.error'));
+    }
+  }, [t, loadUserProfile, loadUserConnections]);
+
+  // Carregar dados iniciais ao montar
+  useEffect(() => {
+    if (user) {
+      loadInitialData();
+    }
+  }, [user, loadInitialData]);
 
   // Candidatar a uma oportunidade
   const handleApplyToOpportunity = async (opportunityId: string) => {
@@ -348,60 +400,60 @@ const UserDashboard: React.FC = () => {
   };
 
   // Funções auxiliares
-  const openServicesModal = () => {
-    setShowServicesModal(true);
-  };
+  const openServicesModal = useCallback(() => {
+    openModal('services');
+  }, [openModal]);
 
-  const openEducationModal = () => {
-    setShowEducationModal(true);
-  };
+  const openEducationModal = useCallback(() => {
+    openModal('education');
+  }, [openModal]);
 
-  const openHealthModal = () => {
-    setShowHealthModal(true);
-  };
+  const openHealthModal = useCallback(() => {
+    openModal('health');
+  }, [openModal]);
 
-  const openCommerceModal = () => {
-    setShowCommerceModal(true);
-  };
+  const openCommerceModal = useCallback(() => {
+    openModal('commerce');
+  }, [openModal]);
 
-  const openTourismModal = () => {
-    setShowTourismModal(true);
-  };
+  const openTourismModal = useCallback(() => {
+    openModal('tourism');
+  }, [openModal]);
 
-  const openTransportModal = () => {
-    setShowTransportModal(true);
-  };
+  const openTransportModal = useCallback(() => {
+    openModal('transport');
+  }, [openModal]);
 
-  const openGuidesModal = () => {
-    setShowGuidesModal(true);
-  };
+  const openGuidesModal = useCallback(() => {
+    openModal('guides');
+  }, [openModal]);
 
-  const openConnectionsModal = () => {
-    setShowConnectionsModal(true);
-  };
+  const openConnectionsModal = useCallback(() => {
+    openModal('connections');
+  }, [openModal]);
 
-  const openRequestForm = (serviceType: string) => {
+  const openRequestForm = useCallback((serviceType: string) => {
     setSelectedServiceForRequest(serviceType);
-    setShowRequestForm(true);
-    // Fechar todos os modais
-    setShowServicesModal(false);
-    setShowEducationModal(false);
-    setShowHealthModal(false);
-    setShowCommerceModal(false);
-    setShowTourismModal(false);
-    setShowTransportModal(false);
-    setShowGuidesModal(false);
-  };
+    openModal('requestForm');
+    // Fechar todos os outros modais de serviços
+    closeModal('services');
+    closeModal('education');
+    closeModal('health');
+    closeModal('commerce');
+    closeModal('tourism');
+    closeModal('transport');
+    closeModal('guides');
+  }, [openModal, closeModal]);
 
-  const closeRequestForm = () => {
-    setShowRequestForm(false);
+  const closeRequestForm = useCallback(() => {
+    closeModal('requestForm');
     setSelectedServiceForRequest('');
     setFormData(prev => ({
       ...prev,
       phone: '',
       message: ''
     }));
-  };
+  }, [closeModal]);
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -640,7 +692,7 @@ const UserDashboard: React.FC = () => {
                   return (
                     <div key={opportunity.id} className="border border-gray-200 rounded-lg p-3">
                       <div className="flex gap-3">
-                        <img 
+                        <LazyImage
                           src={opportunity.image}
                           alt={opportunity.title}
                           className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
@@ -923,7 +975,7 @@ const UserDashboard: React.FC = () => {
       </div>
 
       {/* Modal de Educação */}
-      {showEducationModal && (
+      {modals.education && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-t-xl">
@@ -933,7 +985,7 @@ const UserDashboard: React.FC = () => {
                   <h2 className="text-lg font-bold">{t('education.title')}</h2>
                 </div>
                 <button
-                  onClick={() => setShowEducationModal(false)}
+                  onClick={() => closeModal('education')}
                   className="text-white hover:text-blue-200 p-1"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -998,7 +1050,7 @@ const UserDashboard: React.FC = () => {
               </div>
 
               <button
-                onClick={() => setShowEducationModal(false)}
+                onClick={() => closeModal('education')}
                 className="w-full mt-4 border border-blue-600 text-blue-600 py-3 rounded-lg font-medium text-sm"
               >
                 {t('common.close')}
@@ -1009,7 +1061,7 @@ const UserDashboard: React.FC = () => {
       )}
 
       {/* Modal de Saúde */}
-      {showHealthModal && (
+      {modals.health && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-4 rounded-t-xl">
@@ -1019,7 +1071,7 @@ const UserDashboard: React.FC = () => {
                   <h2 className="text-lg font-bold">{t('health.title')}</h2>
                 </div>
                 <button
-                  onClick={() => setShowHealthModal(false)}
+                  onClick={() => closeModal('health')}
                   className="text-white hover:text-green-200 p-1"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1084,7 +1136,7 @@ const UserDashboard: React.FC = () => {
               </div>
 
               <button
-                onClick={() => setShowHealthModal(false)}
+                onClick={() => closeModal('health')}
                 className="w-full mt-4 border border-green-600 text-green-600 py-3 rounded-lg font-medium text-sm"
               >
                 {t('common.close')}
@@ -1095,7 +1147,7 @@ const UserDashboard: React.FC = () => {
       )}
 
       {/* Modal de Comércio */}
-      {showCommerceModal && (
+      {modals.commerce && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-4 rounded-t-xl">
@@ -1105,7 +1157,7 @@ const UserDashboard: React.FC = () => {
                   <h2 className="text-lg font-bold">{t('commerce.title')}</h2>
                 </div>
                 <button
-                  onClick={() => setShowCommerceModal(false)}
+                  onClick={() => closeModal('commerce')}
                   className="text-white hover:text-purple-200 p-1"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1170,7 +1222,7 @@ const UserDashboard: React.FC = () => {
               </div>
 
               <button
-                onClick={() => setShowCommerceModal(false)}
+                onClick={() => closeModal('commerce')}
                 className="w-full mt-4 border border-purple-600 text-purple-600 py-3 rounded-lg font-medium text-sm"
               >
                 {t('common.close')}
@@ -1181,7 +1233,7 @@ const UserDashboard: React.FC = () => {
       )}
 
       {/* Modal de Turismo */}
-      {showTourismModal && (
+      {modals.tourism && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="bg-gradient-to-r from-orange-600 to-orange-700 text-white p-4 rounded-t-xl">
@@ -1191,7 +1243,7 @@ const UserDashboard: React.FC = () => {
                   <h2 className="text-lg font-bold">{t('tourism.title')}</h2>
                 </div>
                 <button
-                  onClick={() => setShowTourismModal(false)}
+                  onClick={() => closeModal('tourism')}
                   className="text-white hover:text-orange-200 p-1"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1256,7 +1308,7 @@ const UserDashboard: React.FC = () => {
               </div>
 
               <button
-                onClick={() => setShowTourismModal(false)}
+                onClick={() => closeModal('tourism')}
                 className="w-full mt-4 border border-orange-600 text-orange-600 py-3 rounded-lg font-medium text-sm"
               >
                 {t('common.close')}
@@ -1267,7 +1319,7 @@ const UserDashboard: React.FC = () => {
       )}
 
       {/* Modal de Transporte */}
-      {showTransportModal && (
+      {modals.transport && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white p-4 rounded-t-xl">
@@ -1277,7 +1329,7 @@ const UserDashboard: React.FC = () => {
                   <h2 className="text-lg font-bold">{t('transport.title')}</h2>
                 </div>
                 <button
-                  onClick={() => setShowTransportModal(false)}
+                  onClick={() => closeModal('transport')}
                   className="text-white hover:text-indigo-200 p-1"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1342,7 +1394,7 @@ const UserDashboard: React.FC = () => {
               </div>
 
               <button
-                onClick={() => setShowTransportModal(false)}
+                onClick={() => closeModal('transport')}
                 className="w-full mt-4 border border-indigo-600 text-indigo-600 py-3 rounded-lg font-medium text-sm"
               >
                 {t('common.close')}
@@ -1353,7 +1405,7 @@ const UserDashboard: React.FC = () => {
       )}
 
       {/* Modal de Guias Locais */}
-      {showGuidesModal && (
+      {modals.guides && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="bg-gradient-to-r from-teal-600 to-teal-700 text-white p-4 rounded-t-xl">
@@ -1363,7 +1415,7 @@ const UserDashboard: React.FC = () => {
                   <h2 className="text-lg font-bold">{t('guides.title')}</h2>
                 </div>
                 <button
-                  onClick={() => setShowGuidesModal(false)}
+                  onClick={() => closeModal('guides')}
                   className="text-white hover:text-teal-200 p-1"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1428,7 +1480,7 @@ const UserDashboard: React.FC = () => {
               </div>
 
               <button
-                onClick={() => setShowGuidesModal(false)}
+                onClick={() => closeModal('guides')}
                 className="w-full mt-4 border border-teal-600 text-teal-600 py-3 rounded-lg font-medium text-sm"
               >
                 {t('common.close')}
@@ -1439,7 +1491,7 @@ const UserDashboard: React.FC = () => {
       )}
 
       {/* Modal de Serviços - Versão Compacta */}
-      {showServicesModal && (
+      {modals.services && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
             {/* Header do Modal */}
@@ -1450,7 +1502,7 @@ const UserDashboard: React.FC = () => {
                   <h2 className="text-lg font-bold">{t('services.title')}</h2>
                 </div>
                 <button
-                  onClick={() => setShowServicesModal(false)}
+                  onClick={() => closeModal('services')}
                   className="text-white hover:text-red-200 p-1"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1530,7 +1582,7 @@ const UserDashboard: React.FC = () => {
 
               {/* Botão Fechar */}
               <button
-                onClick={() => setShowServicesModal(false)}
+                onClick={() => closeModal('services')}
                 className="w-full mt-6 bg-red-600 text-white py-3 rounded-lg font-medium"
               >
                 {t('common.close')}
@@ -1541,7 +1593,7 @@ const UserDashboard: React.FC = () => {
       )}
 
       {/* Modal de Conexões */}
-      {showConnectionsModal && (
+      {modals.connections && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
             {/* Header do Modal */}
@@ -1552,7 +1604,7 @@ const UserDashboard: React.FC = () => {
                   <h2 className="text-lg font-bold">{t('network.title')}</h2>
                 </div>
                 <button
-                  onClick={() => setShowConnectionsModal(false)}
+                  onClick={() => closeModal('connections')}
                   className="text-white hover:text-red-200 p-1"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1641,7 +1693,7 @@ const UserDashboard: React.FC = () => {
 
               {/* Botão Fechar */}
               <button
-                onClick={() => setShowConnectionsModal(false)}
+                onClick={() => closeModal('connections')}
                 className="w-full mt-4 border border-red-600 text-red-600 py-3 rounded-lg font-medium text-sm"
               >
                 {t('common.close')}
@@ -1652,7 +1704,7 @@ const UserDashboard: React.FC = () => {
       )}
 
       {/* Modal de Formulário de Solicitação */}
-      {showRequestForm && (
+      {modals.requestForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
             {/* Header do Modal */}

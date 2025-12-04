@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 
 // 🔧 CONTEXTOS E PROVIDERS
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -7,28 +7,32 @@ import { OpportunitiesProvider } from './context/OpportunitiesContext';
 
 // 🔧 BIBLIOTECA SUPABASE
 import { supabase } from './lib/supabase';
+import { logger } from './utils/logger';
 
-// 📄 PÁGINAS - Baseadas na sua estrutura real
-import HomePage from './pages/HomePage'; // ✅ NOVA IMPORTAÇÃO
-import AdminDashboardAfricasHands from './pages/AdminDashboardAfricasHands';
-import Analytics from './pages/Analytics';
-import ClientsManagement from './pages/ClientsManagement';
-import Contact from './pages/Contact';
-import CreateProject from './pages/CreateProject';
-import FinanceManagement from './pages/FinanceManagement';
+// 📄 PÁGINAS - Carregamento prioritário
+import HomePage from './pages/HomePage';
 import LoginAfricasHands from './pages/LoginAfricasHands';
-import ProjectsManagement from './pages/ProjectsManagement';
-import Services from './pages/Services';
-import TeamManagement from './pages/TeamManagement';
-import UserDashboard from './pages/UserDashboard';
 
 // 🧩 COMPONENTES - Baseados na sua estrutura real
 import Header from './components/Header';
 import IconWrapper from './components/IconWrapper';
 import Sidebar from './components/Sidebar';
 import AuthCallback from './components/AuthCallback';
+import LoadingFallback from './components/LoadingFallback';
 
-  // 🔍 COMPONENTE DE DEBUG - Remover em produção
+// 📄 PÁGINAS - Code splitting com lazy loading
+const AdminDashboardAfricasHands = lazy(() => import('./pages/AdminDashboardAfricasHands'));
+const Analytics = lazy(() => import('./pages/Analytics'));
+const ClientsManagement = lazy(() => import('./pages/ClientsManagement'));
+const Contact = lazy(() => import('./pages/Contact'));
+const CreateProject = lazy(() => import('./pages/CreateProject'));
+const FinanceManagement = lazy(() => import('./pages/FinanceManagement'));
+const ProjectsManagement = lazy(() => import('./pages/ProjectsManagement'));
+const Services = lazy(() => import('./pages/Services'));
+const TeamManagement = lazy(() => import('./pages/TeamManagement'));
+const UserDashboard = lazy(() => import('./pages/UserDashboard'));
+
+// 🔍 COMPONENTE DE DEBUG - Remover em produção
 const DebugAuthInfo: React.FC<{
   currentMode: string;
   currentPage: string;
@@ -55,7 +59,7 @@ const DebugAuthInfo: React.FC<{
       <button 
         onClick={async () => {
           if (user?.email) {
-            console.log('🔍 Verificando dados no Supabase...');
+            logger.log('🔍 Verificando dados no Supabase...');
             try {
               const { data: profiles, error } = await supabase
                 .from('profiles')
@@ -63,19 +67,19 @@ const DebugAuthInfo: React.FC<{
                 .eq('email', user.email);
               
               if (error) {
-                console.error('❌ Erro ao buscar perfil:', error);
+                logger.error('❌ Erro ao buscar perfil:', error);
               } else {
-                console.log('👤 Perfil encontrado:', profiles);
+                logger.log('👤 Perfil encontrado:', profiles);
                 
                 if (profiles && profiles.length > 0) {
-                  console.log('✅ Role no banco:', profiles[0].role);
-                  console.log('📋 Dados completos:', profiles[0]);
+                  logger.log('✅ Role no banco:', profiles[0].role);
+                  logger.log('📋 Dados completos:', profiles[0]);
                 } else {
-                  console.log('❌ Nenhum perfil encontrado no banco!');
+                  logger.log('❌ Nenhum perfil encontrado no banco!');
                 }
               }
             } catch (error) {
-              console.error('❌ Erro na consulta:', error);
+              logger.error('❌ Erro na consulta:', error);
             }
           }
         }}
@@ -88,7 +92,7 @@ const DebugAuthInfo: React.FC<{
       {isAuthenticated && userRole && (
         <button 
           onClick={() => {
-            console.log('🔄 Forçando redirecionamento manual...');
+            logger.log('🔄 Forçando redirecionamento manual...');
             if (userRole === 'admin') {
               setCurrentMode('admin');
             } else {
@@ -105,7 +109,7 @@ const DebugAuthInfo: React.FC<{
       {/* ✅ NOVO BOTÃO: Voltar para Home */}
       <button 
         onClick={() => {
-          console.log('🏠 Voltando para HomePage...');
+          logger.log('🏠 Voltando para HomePage...');
           setCurrentMode('home');
         }}
         className="mt-2 bg-purple-600 hover:bg-purple-700 px-2 py-1 rounded text-xs w-full"
@@ -148,7 +152,7 @@ const RealTimeStatus: React.FC = () => {
           table: 'opportunities'
         },
         (payload) => {
-          console.log('🔔 Nova oportunidade detectada!', payload.new);
+          logger.log('🔔 Nova oportunidade detectada!', payload.new);
           setNotificationCount(prev => prev + 1);
           
           // Auto-reset após 5 segundos
@@ -245,7 +249,7 @@ const AppContent: React.FC = () => {
 
   // ✅ NOVA FUNÇÃO: Navegar para Login (será chamada pela HomePage)
   const navigateToLogin = () => {
-    console.log('🚀 Navegando para tela de login...');
+    logger.log('🚀 Navegando para tela de login...');
     setCurrentMode('login');
   };
 
@@ -256,7 +260,7 @@ const AppContent: React.FC = () => {
 
     // ✅ NOVA: Expor função para navegar para qualquer página
     (window as any).navigateToPage = (page: string) => {
-      console.log('🚀 Navegando para página:', page);
+      logger.log('🚀 Navegando para página:', page);
       setCurrentPage(page);
     };
 
@@ -279,7 +283,7 @@ const AppContent: React.FC = () => {
       fragment.includes('error') ||                      // Erro no hash
       urlParams.get('error_description');                // Descrição de erro
 
-    console.log('🔍 [App] Verificando callback OAuth:', {
+    logger.log('🔍 [App] Verificando callback OAuth:', {
       hasCode: !!urlParams.get('code'),
       hasError: !!urlParams.get('error'),
       hasAccessToken: fragment.includes('access_token'),
@@ -289,13 +293,13 @@ const AppContent: React.FC = () => {
     });
 
     if (isOAuthCallback) {
-      console.log('🔄 [App] CALLBACK OAUTH DETECTADO - exibindo AuthCallback');
+      logger.log('🔄 [App] CALLBACK OAUTH DETECTADO - exibindo AuthCallback');
       setCurrentMode('callback');
       return;
     }
     
     // ✅ NOVA LÓGICA: Se usuário já está autenticado, ir direto para dashboard
-    console.log('🔄 [App] Verificando autenticação normal:', {
+    logger.log('🔄 [App] Verificando autenticação normal:', {
       isAuthenticated,
       userRole,
       isLoading,
@@ -305,13 +309,13 @@ const AppContent: React.FC = () => {
 
     // Se está carregando, aguardar
     if (isLoading) {
-      console.log('⏳ [App] Ainda carregando autenticação...');
+      logger.log('⏳ [App] Ainda carregando autenticação...');
       return;
     }
 
     // ✅ USUÁRIO AUTENTICADO: Redirecionar para dashboard (só se não estiver na home)
     if (isAuthenticated && userRole && user) {
-      console.log('✅ [App] Usuário autenticado detectado:', {
+      logger.log('✅ [App] Usuário autenticado detectado:', {
         email: user.email,
         role: userRole,
         currentMode
@@ -320,11 +324,11 @@ const AppContent: React.FC = () => {
       // ✅ NOVA REGRA: Só redirecionar se NÃO estiver na home e NÃO estiver no dashboard correto
       if (currentMode !== 'home' && currentMode !== userRole) {
         if (userRole === 'admin') {
-          console.log('🎯 [App] Redirecionando para dashboard ADMIN');
+          logger.log('🎯 [App] Redirecionando para dashboard ADMIN');
           setCurrentMode('admin');
           setCurrentPage('dashboard');
         } else if (userRole === 'user') {
-          console.log('🎯 [App] Redirecionando para dashboard USER');
+          logger.log('🎯 [App] Redirecionando para dashboard USER');
           setCurrentMode('user');
           setCurrentPage('dashboard');
         }
@@ -332,10 +336,10 @@ const AppContent: React.FC = () => {
     } 
     // ✅ USUÁRIO NÃO AUTENTICADO: Permitir ficar na home ou ir para login
     else if (!isAuthenticated && !isLoading && currentMode === 'admin') {
-      console.log('❌ [App] Usuário não autenticado tentando acessar área restrita, indo para login');
+      logger.log('❌ [App] Usuário não autenticado tentando acessar área restrita, indo para login');
       setCurrentMode('login');
     } else if (!isAuthenticated && !isLoading && currentMode === 'user') {
-      console.log('❌ [App] Usuário não autenticado tentando acessar área restrita, indo para login');
+      logger.log('❌ [App] Usuário não autenticado tentando acessar área restrita, indo para login');
       setCurrentMode('login');
     }
   }, [isAuthenticated, userRole, isLoading, user, currentMode]);
@@ -343,7 +347,7 @@ const AppContent: React.FC = () => {
   // ✅ MONITORAR MUDANÇAS NO CALLBACK PARA REDIRECIONAMENTO RÁPIDO
   useEffect(() => {
     if (currentMode === 'callback') {
-      console.log('📍 [App] Modo callback ativo, monitorando autenticação...', {
+      logger.log('📍 [App] Modo callback ativo, monitorando autenticação...', {
         isAuthenticated,
         userRole,
         isLoading,
@@ -352,7 +356,7 @@ const AppContent: React.FC = () => {
       
       // ✅ REDIRECIONAMENTO IMEDIATO se já está autenticado
       if (isAuthenticated && userRole && user && !isLoading) {
-        console.log('⚡ [App] REDIRECIONAMENTO IMEDIATO do callback para dashboard!');
+        logger.log('⚡ [App] REDIRECIONAMENTO IMEDIATO do callback para dashboard!');
         
         if (userRole === 'admin') {
           setCurrentMode('admin');
@@ -370,16 +374,16 @@ const AppContent: React.FC = () => {
   // ✅ TIMEOUT DE SEGURANÇA PARA CALLBACK (REDUZIDO)
   useEffect(() => {
     if (currentMode === 'callback') {
-      console.log('⏰ [App] Iniciando timeout de segurança para callback (5s)...');
+      logger.log('⏰ [App] Iniciando timeout de segurança para callback (5s)...');
       
       const timeoutId = setTimeout(async () => {
-        console.log('⚠️ [App] TIMEOUT ATIVADO: Verificando sessão manualmente...');
+        logger.log('⚠️ [App] TIMEOUT ATIVADO: Verificando sessão manualmente...');
         
         try {
           const { data: { session }, error } = await supabase.auth.getSession();
           
           if (session?.user && !error) {
-            console.log('✅ [App] Sessão encontrada no timeout:', session.user.email);
+            logger.log('✅ [App] Sessão encontrada no timeout:', session.user.email);
             
             // Determinar role baseado no email
             const email = session.user.email?.toLowerCase() || '';
@@ -388,10 +392,10 @@ const AppContent: React.FC = () => {
                            email === 'edmilsondelfilme45@gmail.com';
             
             if (isAdmin) {
-              console.log('👨‍💼 [App] Admin detectado no timeout');
+              logger.log('👨‍💼 [App] Admin detectado no timeout');
               setCurrentMode('admin');
             } else {
-              console.log('👤 [App] User detectado no timeout');
+              logger.log('👤 [App] User detectado no timeout');
               setCurrentMode('user');
             }
             setCurrentPage('dashboard');
@@ -399,11 +403,11 @@ const AppContent: React.FC = () => {
             // Limpar URL
             window.history.replaceState({}, document.title, '/');
           } else {
-            console.log('❌ [App] Nenhuma sessão no timeout, voltando ao home');
+            logger.log('❌ [App] Nenhuma sessão no timeout, voltando ao home');
             setCurrentMode('home'); // ✅ MUDANÇA: Voltar para home em vez de login
           }
         } catch (timeoutError) {
-          console.error('❌ [App] Erro no timeout:', timeoutError);
+          logger.error('❌ [App] Erro no timeout:', timeoutError);
           setCurrentMode('home'); // ✅ MUDANÇA: Voltar para home em vez de login
         }
       }, 5000); // 5 segundos
@@ -415,7 +419,7 @@ const AppContent: React.FC = () => {
   // 🔧 FUNÇÃO DE LOGOUT
   const handleLogout = async () => {
     try {
-      console.log('👋 Iniciando logout...');
+      logger.log('👋 Iniciando logout...');
       await logout();
       setCurrentMode('home'); // ✅ MUDANÇA: Voltar para home após logout
       setCurrentPage('dashboard');
@@ -423,13 +427,13 @@ const AppContent: React.FC = () => {
       // Limpar URL se necessário
       window.history.replaceState({}, document.title, '/');
     } catch (error) {
-      console.error('❌ Erro ao fazer logout:', error);
+      logger.error('❌ Erro ao fazer logout:', error);
     }
   };
 
   // 🔧 FUNÇÃO PARA MUDAR PÁGINA
   const handlePageChange = (page: string) => {
-    console.log('📄 Mudando para página:', page);
+    logger.log('📄 Mudando para página:', page);
     setCurrentPage(page);
   };
 
@@ -447,30 +451,36 @@ const AppContent: React.FC = () => {
     );
   }
 
-  // 🔧 RENDERIZAR PÁGINA BASEADO NO CURRENTPAGE
+  // 🔧 RENDERIZAR PÁGINA BASEADO NO CURRENTPAGE (com Suspense para code splitting)
   const renderPage = () => {
-    switch (currentPage) {
-      case 'dashboard':
-        return userRole === 'admin' ? <AdminDashboardAfricasHands /> : <UserDashboard />;
-      case 'analytics':
-        return <Analytics />;
-      case 'clients':
-        return <ClientsManagement />;
-      case 'projects':
-        return <ProjectsManagement />;
-      case 'create-project':
-        return <CreateProject />;
-      case 'team':
-        return <TeamManagement />;
-      case 'finance':
-        return <FinanceManagement />;
-      case 'services':
-        return <Services />;
-      case 'contact':
-        return <Contact />;
-      default:
-        return userRole === 'admin' ? <AdminDashboardAfricasHands /> : <UserDashboard />;
-    }
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        {(() => {
+          switch (currentPage) {
+            case 'dashboard':
+              return userRole === 'admin' ? <AdminDashboardAfricasHands /> : <UserDashboard />;
+            case 'analytics':
+              return <Analytics />;
+            case 'clients':
+              return <ClientsManagement />;
+            case 'projects':
+              return <ProjectsManagement />;
+            case 'create-project':
+              return <CreateProject />;
+            case 'team':
+              return <TeamManagement />;
+            case 'finance':
+              return <FinanceManagement />;
+            case 'services':
+              return <Services />;
+            case 'contact':
+              return <Contact />;
+            default:
+              return userRole === 'admin' ? <AdminDashboardAfricasHands /> : <UserDashboard />;
+          }
+        })()}
+      </Suspense>
+    );
   };
 
   // 🔧 RENDERIZAÇÃO POR MODO

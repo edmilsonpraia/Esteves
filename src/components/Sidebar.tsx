@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 interface SidebarProps {
@@ -9,38 +9,40 @@ interface SidebarProps {
   currentPage?: string;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ 
-  isOpen, 
-  onClose, 
+const Sidebar: React.FC<SidebarProps> = React.memo(({
+  isOpen,
+  onClose,
   onNavigate,
   currentPage = 'dashboard'
 }) => {
   const { userRole } = useAuth();
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['main']);
 
-  const toggleSubmenu = (menuId: string) => {
-    setExpandedMenus(prev => 
-      prev.includes(menuId) 
+  const toggleSubmenu = useCallback((menuId: string) => {
+    setExpandedMenus(prev =>
+      prev.includes(menuId)
         ? prev.filter(id => id !== menuId)
         : [...prev, menuId]
     );
-  };
+  }, []);
 
-  // 🔧 FUNÇÃO DE NAVEGAÇÃO CORRIGIDA
-  const handleNavigation = (pageId: string) => {
-    console.log('🧭 Navegando para:', pageId);
-    
+  // 🔧 FUNÇÃO DE NAVEGAÇÃO CORRIGIDA (memorizada)
+  const handleNavigation = useCallback((pageId: string) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🧭 Navegando para:', pageId);
+    }
+
     if (onNavigate) {
       onNavigate(pageId);
-    } else {
+    } else if (process.env.NODE_ENV === 'development') {
       console.warn('⚠️ onNavigate não foi fornecido ao Sidebar');
     }
-    
-    onClose(); // Fechar sidebar após navegação
-  };
 
-  // Menu items para administrador - ATUALIZADO COM IDs CORRETOS
-  const adminMenuItems = [
+    onClose(); // Fechar sidebar após navegação
+  }, [onNavigate, onClose]);
+
+  // Menu items para administrador - ATUALIZADO COM IDs CORRETOS (memorizado)
+  const adminMenuItems = useMemo(() => [
     {
       section: 'main',
       title: 'Principal',
@@ -50,7 +52,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           id: 'dashboard',
           label: 'Dashboard',
           icon: '📊',
-          pageId: 'dashboard', // ✅ ID para navegação interna
+          pageId: 'dashboard',
           badge: null
         },
         {
@@ -59,16 +61,16 @@ const Sidebar: React.FC<SidebarProps> = ({
           icon: '🚀',
           badge: '12',
           submenu: [
-            { 
-              label: 'Gestão de Projetos', 
-              pageId: 'projects', // ✅ ID para navegação interna
-              icon: '📋', 
-              badge: '12' 
+            {
+              label: 'Gestão de Projetos',
+              pageId: 'projects',
+              icon: '📋',
+              badge: '12'
             },
-            { 
-              label: 'Criar Projeto', 
-              pageId: 'create-project', // ✅ ID para navegação interna
-              icon: '➕' 
+            {
+              label: 'Criar Projeto',
+              pageId: 'create-project',
+              icon: '➕'
             }
           ]
         },
@@ -77,21 +79,21 @@ const Sidebar: React.FC<SidebarProps> = ({
           label: 'Clientes & Parceiros',
           icon: '🤝',
           badge: '45',
-          pageId: 'clients' // ✅ ID para navegação interna
+          pageId: 'clients'
         },
         {
           id: 'team',
           label: 'Equipe Regional',
           icon: '👥',
           badge: '28',
-          pageId: 'team' // ✅ ID para navegação interna
+          pageId: 'team'
         },
         {
           id: 'finance',
           label: 'Financeiro',
           icon: '💰',
           badge: '8',
-          pageId: 'finance' // ✅ ID para navegação interna
+          pageId: 'finance'
         }
       ]
     },
@@ -104,7 +106,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           id: 'analytics',
           label: 'Analytics & KPIs',
           icon: '📊',
-          pageId: 'analytics' // ✅ ID para navegação interna
+          pageId: 'analytics'
         }
       ]
     },
@@ -117,20 +119,20 @@ const Sidebar: React.FC<SidebarProps> = ({
           id: 'services',
           label: 'Serviços Regionais',
           icon: '🛒',
-          pageId: 'services' // ✅ ID para navegação interna
+          pageId: 'services'
         },
         {
           id: 'contact',
           label: 'Contato',
           icon: '📞',
-          pageId: 'contact' // ✅ ID para navegação interna
+          pageId: 'contact'
         }
       ]
     }
-  ];
+  ], []);
 
-  // Menu items para usuário comum - ATUALIZADO COM IDs CORRETOS
-  const userMenuItems = [
+  // Menu items para usuário comum - ATUALIZADO COM IDs CORRETOS (memorizado)
+  const userMenuItems = useMemo(() => [
     {
       section: 'main',
       title: 'Principal',
@@ -140,7 +142,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           id: 'dashboard',
           label: 'Meu Painel',
           icon: '📊',
-          pageId: 'dashboard' // ✅ ID para navegação interna
+          pageId: 'dashboard'
         }
       ]
     },
@@ -153,19 +155,22 @@ const Sidebar: React.FC<SidebarProps> = ({
           id: 'services',
           label: 'Serviços Regionais',
           icon: '🛒',
-          pageId: 'services' // ✅ ID para navegação interna
+          pageId: 'services'
         },
         {
           id: 'contact',
           label: 'Contato',
           icon: '📞',
-          pageId: 'contact' // ✅ ID para navegação interna
+          pageId: 'contact'
         }
       ]
     }
-  ];
+  ], []);
 
-  const menuSections = userRole === 'admin' ? adminMenuItems : userMenuItems;
+  const menuSections = useMemo(() =>
+    userRole === 'admin' ? adminMenuItems : userMenuItems,
+    [userRole, adminMenuItems, userMenuItems]
+  );
 
   const NavItem = ({ item, isSubmenu = false }: { item: any, isSubmenu?: boolean }) => {
     const hasSubmenu = item.submenu && item.submenu.length > 0;
@@ -427,6 +432,6 @@ const Sidebar: React.FC<SidebarProps> = ({
       </aside>
     </>
   );
-};
+});
 
 export default Sidebar;

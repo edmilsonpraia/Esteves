@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation, LanguageToggle } from '../context/TranslationContext';
+import LazyImage from '../components/LazyImage';
 
 interface ContactForm {
   name: string;
@@ -243,7 +244,7 @@ const ContactAfricasHands: React.FC = () => {
             {contactInfo.map((info, index) => (
               <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
                 <div className="h-32 overflow-hidden">
-                  <img 
+                  <LazyImage
                     src={info.image}
                     alt={info.label}
                     className="w-full h-full object-cover"
@@ -591,7 +592,7 @@ const ContactAfricasHands: React.FC = () => {
             {teamMembers.map((member, index) => (
               <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center hover:shadow-lg transition-shadow">
                 <div className="relative inline-block mb-4">
-                  <img 
+                  <LazyImage
                     src={member.image}
                     alt={member.name}
                     className="w-24 h-24 rounded-full object-cover mx-auto"

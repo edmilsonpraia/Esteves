@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation, LanguageToggle } from '../context/TranslationContext';
 
@@ -7,7 +7,7 @@ interface HeaderProps {
   isSidebarOpen: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ onToggleSidebar, isSidebarOpen }) => {
+const Header: React.FC<HeaderProps> = React.memo(({ onToggleSidebar, isSidebarOpen }) => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
@@ -15,30 +15,36 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, isSidebarOpen }) => {
   const { userRole, logout, user } = useAuth(); // ✅ Adicionado 'user'
   const { t } = useTranslation();
 
-  // 🔧 FUNÇÃO DE LOGOUT CORRIGIDA
-  const handleLogout = async () => {
+  // 🔧 FUNÇÃO DE LOGOUT CORRIGIDA (memorizada)
+  const handleLogout = useCallback(async () => {
     try {
-      console.log('👋 Header: Iniciando logout...');
-      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('👋 Header: Iniciando logout...');
+      }
+
       // Fechar dropdowns
       setUserDropdownOpen(false);
       setNotificationsOpen(false);
-      
+
       // Chamar logout do AuthContext
       await logout();
-      
-      console.log('✅ Header: Logout realizado com sucesso');
-      
+
+      if (process.env.NODE_ENV === 'development') {
+        console.log('✅ Header: Logout realizado com sucesso');
+      }
+
       // NÃO fazer redirecionamento manual - deixar o App.tsx gerenciar
       // window.location.href = '/login'; // ❌ REMOVIDO
-      
-    } catch (error) {
-      console.error('❌ Header: Erro no logout:', error);
-    }
-  };
 
-  // Notificações simuladas - agora traduzidas
-  const notifications = [
+    } catch (error) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('❌ Header: Erro no logout:', error);
+      }
+    }
+  }, [logout]);
+
+  // Notificações simuladas - agora traduzidas (memorizadas)
+  const notifications = useMemo(() => [
     {
       id: 1,
       title: t('notifications.newProject.title'),
@@ -55,9 +61,9 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, isSidebarOpen }) => {
       read: false,
       type: 'warning'
     }
-  ];
+  ], [t]);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = useMemo(() => notifications.filter(n => !n.read).length, [notifications]);
 
   return (
     <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-30">
@@ -339,6 +345,6 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, isSidebarOpen }) => {
       </div>
     </header>
   );
-};
+});
 
 export default Header;
